@@ -4,9 +4,10 @@ import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.springframework.stereotype.Component;
 import ua.kostenko.carinfo.carinfoua.data.InfoData;
-import ua.kostenko.carinfo.carinfoua.data.InfoDataFields;
 
 import java.io.File;
 import java.io.FileReader;
@@ -23,6 +24,7 @@ import java.util.List;
 
 import static ua.kostenko.carinfo.carinfoua.data.InfoDataFields.*;
 
+@Component
 public class Utils {
 
   public String downloadJson(String url) throws IOException {
@@ -30,14 +32,17 @@ public class Utils {
   }
 
   public Path downloadZip(String fileUrl) throws IOException {
+    System.out.println("Downloading archive from: " + fileUrl);
     URL url = new URL(fileUrl);
     String fileName = "archive.zip";
     Path targetPath = new File("." + File.separator + fileName).toPath();
     Files.copy(url.openStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+    System.out.println("Finished downloading archive from: " + fileUrl);
     return targetPath;
   }
 
-  public List<InfoData> readCsv() throws IOException {
+  public List<InfoData> readCsv(String dateLabel) throws IOException {
+    System.out.println("Started reading csv from zip archive");
     String source = "./archive.zip";
     String destination = "./archive";
     try {
@@ -46,7 +51,7 @@ public class Utils {
     } catch (ZipException e) {
       e.printStackTrace();
     }
-    Reader in = new FileReader(String.valueOf(Files.list(Paths.get("./archive")).findFirst().orElseGet(null)));
+    Reader in = new FileReader(String.valueOf(Files.list(Paths.get(destination)).findFirst().orElseGet(null)));
     Iterable<CSVRecord> records = CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader().parse(in);
     List<InfoData> resultList = new ArrayList<>();
     for (CSVRecord record : records) {
@@ -70,8 +75,12 @@ public class Utils {
       data.setCarOwnWeight(record.get(CAR_OWN_WEIGHT.getFieldName()));
       data.setCarTotalWeight(record.get(CAR_TOTAL_WEIGHT.getFieldName()));
       data.setCarNewRegistrationNumber(record.get(CAR_NEW_REGISTRATION_NUMBER.getFieldName()));
+      data.setDataSetYear(dateLabel);
       resultList.add(data);
     }
+    FileUtils.forceDelete(Paths.get(source).toFile());
+    FileUtils.forceDelete(Paths.get(destination).toFile());
+    System.out.println("Finished reading csv from zip archive");
     return resultList;
   }
 }
