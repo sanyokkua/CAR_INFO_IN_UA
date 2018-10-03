@@ -19,7 +19,8 @@ public enum InfoDataFields {
   CAR_ENGINE_CAPACITY("capacity"),
   CAR_OWN_WEIGHT("own_weight"),
   CAR_TOTAL_WEIGHT("total_weight"),
-  CAR_NEW_REGISTRATION_NUMBER("n_reg_new");
+  CAR_NEW_REGISTRATION_NUMBER("n_reg_new"),
+  DATA_SET_YEAR("dataSetYear");
 
   private String fieldName;
 

@@ -93,6 +93,8 @@ public class InfoData {
         return reg_addr_koatuu;
       case REGISTRATION_DATE:
         return registrationDate;
+      case DATA_SET_YEAR:
+        return dataSetYear;
       default:
         return null;
     }
