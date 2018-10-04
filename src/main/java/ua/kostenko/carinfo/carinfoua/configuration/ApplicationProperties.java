@@ -13,4 +13,8 @@ public class ApplicationProperties {
   public String APP_ARCHIVE_NAME;
   @Value("${app.archive.dir}")
   public String APP_ARCHIVE_DIR;
+  @Value("${app.koatuu.file.path}")
+  public String APP_KOATUU_FILE_PATH;
+  @Value("${app.data.service.center.url}")
+  public String APP_DATA_SERVICE_CENTER_URL;
 }

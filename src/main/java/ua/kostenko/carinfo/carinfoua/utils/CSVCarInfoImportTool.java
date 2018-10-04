@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ua.kostenko.carinfo.carinfoua.configuration.ApplicationProperties;
 import ua.kostenko.carinfo.carinfoua.data.InfoData;
-import ua.kostenko.carinfo.carinfoua.persistent.CarInfoDataApi;
+import ua.kostenko.carinfo.carinfoua.persistent.services.CarInfoDataService;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -26,20 +26,20 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Component
-public class CSVImportTool {
+public class CSVCarInfoImportTool {
   private static final String DATE_PATTERN = "ddMMyyyy";
-  private static final Logger LOGGER = LoggerFactory.getLogger(CSVImportTool.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CSVCarInfoImportTool.class);
   private Utils utils;
-  private CarInfoDataApi carInfoDataApi;
+  private CarInfoDataService carInfoDataService;
   private ApplicationProperties applicationProperties;
 
   @Autowired
-  public CSVImportTool(Utils utils, CarInfoDataApi carInfoDataApi, ApplicationProperties applicationProperties) {
+  public CSVCarInfoImportTool(Utils utils, CarInfoDataService carInfoDataService, ApplicationProperties applicationProperties) {
     Preconditions.checkNotNull(utils);
-    Preconditions.checkNotNull(carInfoDataApi);
+    Preconditions.checkNotNull(carInfoDataService);
     Preconditions.checkNotNull(applicationProperties);
     this.utils = utils;
-    this.carInfoDataApi = carInfoDataApi;
+    this.carInfoDataService = carInfoDataService;
     this.applicationProperties = applicationProperties;
   }
 
@@ -60,8 +60,9 @@ public class CSVImportTool {
       String dateLabel = parseDateLabel(linkUrl);
       LOGGER.info("Created dateLabel for archive: {}", dateLabel);
       if (isNeedToUpdate(dateLabel)) {
+        carInfoDataService.removeAllByDateForDataSet(dateLabel);//TODO: will be changed to updating entities instead their deletion
         List<InfoData> infoData = getInfoDataListFromArchive(linkUrl, dateLabel);
-        carInfoDataApi.saveAll(infoData);
+        carInfoDataService.saveAll(infoData);
         LOGGER.info("Added data from link: {}", linkUrl);
       } else {
         LOGGER.info("Skipping processing for archive {} by label {} because it already exists in DB", linkUrl, dateLabel);
@@ -72,7 +73,7 @@ public class CSVImportTool {
 
   private boolean isNeedToUpdate(String dateLabel) {
     boolean isCurrentYear = LocalDate.now().getYear() == Integer.parseInt(dateLabel);
-    boolean isExistsInDb = carInfoDataApi.checkYearInDb(dateLabel);
+    boolean isExistsInDb = carInfoDataService.checkYearInDb(dateLabel);
     return !isExistsInDb || isCurrentYear;
   }
 

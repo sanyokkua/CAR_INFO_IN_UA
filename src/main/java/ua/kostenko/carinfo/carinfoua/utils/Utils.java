@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import static ua.kostenko.carinfo.carinfoua.data.InfoDataFields.*;
+import static ua.kostenko.carinfo.carinfoua.data.InfoData.InfoDataFields.*;
 
 @Component
 public class Utils {
@@ -42,12 +42,12 @@ public class Utils {
     this.applicationProperties = applicationProperties;
   }
 
-  public String downloadJson(String url) throws IOException {
+  String downloadJson(String url) throws IOException {
     LOGGER.info("Downloading Info JSON from: {}", url);
     return IOUtils.toString(new URL(url), Charset.forName("UTF-8"));
   }
 
-  public Path downloadZip(String fileUrl, String dateLabel) throws IOException {
+  Path downloadZip(String fileUrl, String dateLabel) throws IOException {
     LOGGER.info("Downloading archive from: {}", fileUrl);
     URL url = new URL(fileUrl);
     String fileName = applicationProperties.APP_ARCHIVE_DIR + File.separator + applicationProperties.APP_ARCHIVE_NAME + "_" + dateLabel + ".zip";
@@ -59,7 +59,7 @@ public class Utils {
     return targetPath;
   }
 
-  public List<InfoData> readCsvFromFile(Path archiveFilePath, String dateLabel) throws IOException {
+  List<InfoData> readCsvFromFile(Path archiveFilePath, String dateLabel) throws IOException {
     LOGGER.info("Started reading csv from zip archive");
     LOGGER.info("Archive file is: {}", archiveFilePath.toAbsolutePath().toString());
 
