@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.carinfoua.data;
+package ua.kostenko.carinfo.carinfoua.data.persistent.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,12 +7,14 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
-@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServiceCenterData {
+@Entity
+@Table(name = "ServiceCenter")
+public class ServiceCenterEntity {
   @Id
   @Column(name = "dep_code", nullable = false)
   Long depId;
@@ -20,19 +22,7 @@ public class ServiceCenterData {
   String address;
   @Column(name = "email")
   String email;
-
-  enum ServiceCenterDataFields {
-    DEP_ID("dep_code"),
-    ADDRESS("address"),
-    EMAIL("email");
-    private String fieldName;
-
-    ServiceCenterDataFields(String fieldName) {
-      this.fieldName = fieldName;
-    }
-
-    public String getFieldName() {
-      return fieldName;
-    }
-  }
 }
+
+
+

@@ -13,8 +13,14 @@ public class ApplicationProperties {
   public String APP_ARCHIVE_NAME;
   @Value("${app.archive.dir}")
   public String APP_ARCHIVE_DIR;
-  @Value("${app.koatuu.file.path}")
-  public String APP_KOATUU_FILE_PATH;
+  @Value("${app.administrative.objects.file.path}")
+  public String APP_ADMINISTRATIVE_OBJECTS_FILE_PATH;
   @Value("${app.data.service.center.url}")
   public String APP_DATA_SERVICE_CENTER_URL;
+  @Value("${app.data.service.center.css.selector}")
+  public String APP_DATA_SERVICE_CENTER_CSS_SELECTOR;
+  @Value("${app.region.codes.file.path}")
+  public String APP_REGION_CODES_FILE_PATH;
+  @Value("${app.region.codes.absent}")
+  public String APP_REGION_CODES_ABSENT;
 }

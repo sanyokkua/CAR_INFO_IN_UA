@@ -5,31 +5,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Controller;
-import ua.kostenko.carinfo.carinfoua.utils.CSVCarInfoImportTool;
-import ua.kostenko.carinfo.carinfoua.utils.CSVKOATUUImportTool;
+import ua.kostenko.carinfo.carinfoua.utils.CsvAdministrativeObjectsImportTool;
+import ua.kostenko.carinfo.carinfoua.utils.CsvRegistrationInformationImportTool;
 import ua.kostenko.carinfo.carinfoua.utils.ServiceCenterDataImportTool;
 
 @Controller
 public class InitController {
-  private CSVCarInfoImportTool csvCarInfoImportTool;
-  private CSVKOATUUImportTool csvkoatuuImportTool;
-  private ServiceCenterDataImportTool serviceCenterDataImportTool;
+  private final CsvRegistrationInformationImportTool csvRegistrationInformationImportTool;
+  private final CsvAdministrativeObjectsImportTool csvAdministrativeObjectsImportTool;
+  private final ServiceCenterDataImportTool serviceCenterDataImportTool;
 
   @Autowired
-  public InitController(CSVCarInfoImportTool csvCarInfoImportTool, CSVKOATUUImportTool csvkoatuuImportTool, ServiceCenterDataImportTool serviceCenterDataImportTool) {
-    Preconditions.checkNotNull(csvCarInfoImportTool);
-    Preconditions.checkNotNull(csvkoatuuImportTool);
+  public InitController(CsvRegistrationInformationImportTool csvRegistrationInformationImportTool, CsvAdministrativeObjectsImportTool csvAdministrativeObjectsImportTool,
+      ServiceCenterDataImportTool serviceCenterDataImportTool) {
+    Preconditions.checkNotNull(csvRegistrationInformationImportTool);
+    Preconditions.checkNotNull(csvAdministrativeObjectsImportTool);
     Preconditions.checkNotNull(serviceCenterDataImportTool);
-    this.csvCarInfoImportTool = csvCarInfoImportTool;
-    this.csvkoatuuImportTool = csvkoatuuImportTool;
+    this.csvRegistrationInformationImportTool = csvRegistrationInformationImportTool;
+    this.csvAdministrativeObjectsImportTool = csvAdministrativeObjectsImportTool;
     this.serviceCenterDataImportTool = serviceCenterDataImportTool;
   }
 
   @EventListener(ApplicationReadyEvent.class)
   public void initDatabase() {
-    serviceCenterDataImportTool.initiServiceCenterData();
-    csvkoatuuImportTool.initDB();
-    csvCarInfoImportTool.initDB();
+    serviceCenterDataImportTool.initDB();
+    csvAdministrativeObjectsImportTool.initDB();
+    csvRegistrationInformationImportTool.initDB();
   }
 
 }
