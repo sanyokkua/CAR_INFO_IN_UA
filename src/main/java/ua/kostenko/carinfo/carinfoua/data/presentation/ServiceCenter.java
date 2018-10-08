@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ServiceCenter {
-  long numberOfServiceCenter;
-  String address;
-  String email;
-  private String name;
+    long numberOfServiceCenter;
+    String address;
+    String email;
+    private String name;
 }

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CombinedInformation {
-  private Auto auto;
-  private Registration registration;
-  private ServiceCenter serviceCenter;
+    private Auto auto;
+    private Registration registration;
+    private ServiceCenter serviceCenter;
 }

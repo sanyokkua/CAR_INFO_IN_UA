@@ -7,11 +7,11 @@ import java.util.List;
 
 public interface RegistrationInformationService {
 
-  void saveAll(List<RegistrationInformationEntity> registrationInformationEntityList);
+    void saveAll(List<RegistrationInformationEntity> registrationInformationEntityList);
 
-  void removeAllByDateForDataSet(String date);
+    void removeAllByDateForDataSet(String date);
 
-  List<RegistrationInformationEntity> search(InfoDataFields field, String value);
+    List<RegistrationInformationEntity> search(InfoDataFields field, String value);
 
-  boolean checkDatasetYearInDb(String date);
+    boolean checkDatasetYearInDb(String date);
 }

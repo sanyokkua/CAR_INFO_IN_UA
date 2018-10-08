@@ -8,4 +8,5 @@ import javax.transaction.Transactional;
 
 @Repository
 @Transactional
-public interface AdministrativeObjectsCrudRepository extends CrudRepository<AdministrativeObjectEntity, Long> {}
+public interface AdministrativeObjectsCrudRepository extends CrudRepository<AdministrativeObjectEntity, Long> {
+}

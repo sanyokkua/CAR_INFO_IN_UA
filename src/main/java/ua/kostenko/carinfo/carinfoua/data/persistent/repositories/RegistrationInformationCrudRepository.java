@@ -11,14 +11,14 @@ import java.util.List;
 @Transactional
 public interface RegistrationInformationCrudRepository extends CrudRepository<RegistrationInformationEntity, Long> {
 
-  RegistrationInformationEntity findFirstByDataSetYear(String year);
+    RegistrationInformationEntity findFirstByDataSetYear(String year);
 
-  List<RegistrationInformationEntity> findAllByCarNewRegistrationNumberLike(String number);
+    List<RegistrationInformationEntity> findAllByCarNewRegistrationNumberLike(String number);
 
-  List<RegistrationInformationEntity> findAllByCarModelLike(String model);
+    List<RegistrationInformationEntity> findAllByCarModelLike(String model);
 
-  List<RegistrationInformationEntity> findAllByCarBrandLike(String brand);
+    List<RegistrationInformationEntity> findAllByCarBrandLike(String brand);
 
-  void deleteAllByDataSetYear(String dataSetYear);
+    void deleteAllByDataSetYear(String dataSetYear);
 
 }

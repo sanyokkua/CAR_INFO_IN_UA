@@ -15,13 +15,13 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "ServiceCenter")
 public class ServiceCenterEntity {
-  @Id
-  @Column(name = "dep_code", nullable = false)
-  Long depId;
-  @Column(name = "address")
-  String address;
-  @Column(name = "email")
-  String email;
+    @Id
+    @Column(name = "dep_code", nullable = false)
+    Long depId;
+    @Column(name = "address")
+    String address;
+    @Column(name = "email")
+    String email;
 }
 
 

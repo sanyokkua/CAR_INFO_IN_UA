@@ -15,27 +15,27 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "AdministrativeObject")
 public class AdministrativeObjectEntity {
-  @Id
-  @Column(name = "id", nullable = false)
-  private Long id;
-  @Column(name = "typeName")
-  private String typeName;
-  @Column(name = "name")
-  private String name;
+    @Id
+    @Column(name = "id", nullable = false)
+    private Long id;
+    @Column(name = "typeName")
+    private String typeName;
+    @Column(name = "name")
+    private String name;
 
-  public enum AdministrativeObjectsFields {
-    ID_NUMBER("TE"),
-    TYPE_NAME("NP"),
-    NAME("NU");
+    public enum AdministrativeObjectsFields {
+        ID_NUMBER("TE"),
+        TYPE_NAME("NP"),
+        NAME("NU");
 
-    private final String fieldName;
+        private final String fieldName;
 
-    AdministrativeObjectsFields(String fieldName) {
-      this.fieldName = fieldName;
+        AdministrativeObjectsFields(String fieldName) {
+            this.fieldName = fieldName;
+        }
+
+        public String getFieldName() {
+            return fieldName;
+        }
     }
-
-    public String getFieldName() {
-      return fieldName;
-    }
-  }
 }
