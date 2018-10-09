@@ -1,6 +1,7 @@
 package ua.kostenko.carinfo.carinfoua.controllers;
 
 import com.google.common.base.Preconditions;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -10,6 +11,7 @@ import ua.kostenko.carinfo.carinfoua.utils.CsvRegistrationInformationImportTool;
 import ua.kostenko.carinfo.carinfoua.utils.ServiceCenterDataImportTool;
 
 @Controller
+@Slf4j
 public class InitController {
     private final CsvRegistrationInformationImportTool csvRegistrationInformationImportTool;
     private final CsvAdministrativeObjectsImportTool csvAdministrativeObjectsImportTool;

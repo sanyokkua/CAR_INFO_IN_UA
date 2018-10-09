@@ -3,8 +3,7 @@ package ua.kostenko.carinfo.carinfoua.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,8 +20,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @org.springframework.web.bind.annotation.RestController
+@Slf4j
 public class RestController {
-    private final static Logger LOGGER = LoggerFactory.getLogger(RestController.class);
     private final RegistrationInformationService registrationInformationService;
     private final ResponseCreatorHelper responseCreatorHelper;
 
@@ -37,13 +36,13 @@ public class RestController {
     @RequestMapping(value = "/search/{number}", method = RequestMethod.GET)
     public ResponseEntity<String> searchByNumber(@PathVariable String number) throws JsonProcessingException {
         number = number.toUpperCase();
-        LOGGER.info("Processing request by url /search/{}", number);
+        log.info("Processing request by url /search/{}", number);
         LocalDateTime before = LocalDateTime.now();
         ObjectMapper mapper = new ObjectMapper();
-        List<RegistrationInformationEntity> results = registrationInformationService.search(RegistrationInformationEntity.InfoDataFields.CAR_NEW_REGISTRATION_NUMBER, number.toUpperCase());
+        List<RegistrationInformationEntity> results = registrationInformationService.search(RegistrationInformationEntity.RegistrationInformationEntityFields.CAR_NEW_REGISTRATION_NUMBER, number.toUpperCase());
         List<CombinedInformation> combinedInformation = responseCreatorHelper.getCombinedInformation(results);
         ResponseEntity<String> responseEntity = new ResponseEntity<>(mapper.writeValueAsString(combinedInformation), HttpStatus.OK);
-        LOGGER.info("Processing of request by url /search/{} finished, time: {} ms", number, Duration.between(before, LocalDateTime.now()).toMillis());
+        log.info("Processing of request by url /search/{} finished, time: {} ms", number, Duration.between(before, LocalDateTime.now()).toMillis());
         return responseEntity;
     }
 
@@ -51,13 +50,13 @@ public class RestController {
     public ResponseEntity<String> searchRaw(@PathVariable String field, @PathVariable String value) throws JsonProcessingException {
         field = field.toUpperCase();
         value = value.toUpperCase();
-        LOGGER.info("Processing request by url /search/raw/{}/{}", field, value);
+        log.info("Processing request by url /search/raw/{}/{}", field, value);
         LocalDateTime before = LocalDateTime.now();
         ObjectMapper mapper = new ObjectMapper();
-        List<RegistrationInformationEntity> results = registrationInformationService.search(RegistrationInformationEntity.InfoDataFields.getInfoDataFieldByName(field), value);
+        List<RegistrationInformationEntity> results = registrationInformationService.search(RegistrationInformationEntity.RegistrationInformationEntityFields.getInfoDataFieldByName(field), value);
         List<CombinedInformation> combinedInformation = responseCreatorHelper.getCombinedInformation(results);
         ResponseEntity<String> responseEntity = new ResponseEntity<>(mapper.writeValueAsString(combinedInformation), HttpStatus.OK);
-        LOGGER.info("Processing of request by url /search/raw/{}/{} finished, time: {} ms", field, value, Duration.between(before, LocalDateTime.now()).toMillis());
+        log.info("Processing of request by url /search/raw/{}/{} finished, time: {} ms", field, value, Duration.between(before, LocalDateTime.now()).toMillis());
         return responseEntity;
     }
 

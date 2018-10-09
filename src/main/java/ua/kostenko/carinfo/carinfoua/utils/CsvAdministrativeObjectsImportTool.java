@@ -1,10 +1,9 @@
 package ua.kostenko.carinfo.carinfoua.utils;
 
 import com.google.common.base.Preconditions;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
@@ -26,8 +25,8 @@ import static java.util.Objects.nonNull;
 import static ua.kostenko.carinfo.carinfoua.data.persistent.entities.AdministrativeObjectEntity.AdministrativeObjectsFields.*;
 
 @Component
+@Slf4j
 public class CsvAdministrativeObjectsImportTool {
-    private final static Logger LOGGER = LoggerFactory.getLogger(CsvAdministrativeObjectsImportTool.class);
     private final AdministrativeObjectsCrudRepository administrativeObjectsCrudRepository;
     private final ApplicationProperties applicationProperties;
 
@@ -40,28 +39,28 @@ public class CsvAdministrativeObjectsImportTool {
     }
 
     public void initDB() {
-        LOGGER.info("Started initializing AdministrativeObjects");
+        log.info("Started initializing AdministrativeObjects");
         Path administrativeObjectsFilePath = null;
         try {
             administrativeObjectsFilePath = Paths.get(new ClassPathResource(applicationProperties.APP_ADMINISTRATIVE_OBJECTS_FILE_PATH).getFile().getAbsolutePath());
         } catch (IOException e) {
-            LOGGER.error("Error with opening file", e);
+            log.error("Error with opening file", e);
         }
         if (Objects.nonNull(administrativeObjectsFilePath)) {
-            LOGGER.info("AdministrativeObjects file path: {}", administrativeObjectsFilePath.toAbsolutePath().toString());
+            log.info("AdministrativeObjects file path: {}", administrativeObjectsFilePath.toAbsolutePath().toString());
             List<AdministrativeObjectEntity> administrativeObjectEntityList = mapCsvFile(administrativeObjectsFilePath);
             administrativeObjectsCrudRepository.saveAll(administrativeObjectEntityList.stream()
                     .filter(administrativeObjectEntity -> nonNull(administrativeObjectEntity) && nonNull(
                             administrativeObjectEntity.getId()))
                     .collect(Collectors.toList()));
-            LOGGER.info("Finished initializing AdministrativeObjects. Saved all AdministrativeObjectEntity to DB");
+            log.info("Finished initializing AdministrativeObjects. Saved all AdministrativeObjectEntity to DB");
         } else {
-            LOGGER.warn("Problem with getting path to file: {}", applicationProperties.APP_ADMINISTRATIVE_OBJECTS_FILE_PATH);
+            log.warn("Problem with getting path to file: {}", applicationProperties.APP_ADMINISTRATIVE_OBJECTS_FILE_PATH);
         }
     }
 
     private List<AdministrativeObjectEntity> mapCsvFile(Path destination) {
-        LOGGER.info("Starting mapping of csv AdministrativeObjectEntity records to object");
+        log.info("Starting mapping of csv AdministrativeObjectEntity records to object");
         List<AdministrativeObjectEntity> resultList = new ArrayList<>();
         try (Reader in = new FileReader(destination.toFile())) {
             Iterable<CSVRecord> records = CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader().parse(in);
@@ -69,9 +68,9 @@ public class CsvAdministrativeObjectsImportTool {
                 AdministrativeObjectEntity data = mapCsvToAdministrativeObject(record);
                 resultList.add(data);
             }
-            LOGGER.info("Finished mapping csv AdministrativeObjectEntity records");
+            log.info("Finished mapping csv AdministrativeObjectEntity records");
         } catch (IOException ex) {
-            LOGGER.warn("IOException happened", ex);
+            log.warn("IOException happened", ex);
         }
         return resultList;
     }

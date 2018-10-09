@@ -4,11 +4,9 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import ua.kostenko.carinfo.carinfoua.data.persistent.entities.RegistrationInformationEntity;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
-@Transactional
 public interface RegistrationInformationCrudRepository extends CrudRepository<RegistrationInformationEntity, Long> {
 
     RegistrationInformationEntity findFirstByDataSetYear(String year);

@@ -69,7 +69,7 @@ public class RegistrationInformationEntity { //Number of records 8 653 790
         return DigestUtils.sha512Hex(stringBuilder);
     }
 
-    public enum InfoDataFields {
+    public enum RegistrationInformationEntityFields {
         PERSON("person"),
         ADMINISTRATIVE_OBJECT("reg_addr_koatuu"),
         OPERATION_CODE("oper_code"),
@@ -93,17 +93,141 @@ public class RegistrationInformationEntity { //Number of records 8 653 790
 
         private final String fieldName;
 
-        InfoDataFields(String fieldName) {
+        RegistrationInformationEntityFields(String fieldName) {
             this.fieldName = fieldName;
         }
 
-        public static InfoDataFields getInfoDataFieldByName(String fieldName) {
+        public static RegistrationInformationEntityFields getInfoDataFieldByName(String fieldName) {
             Preconditions.checkState(StringUtils.isNotBlank(fieldName));
-            return Stream.of(InfoDataFields.values()).filter(infoDataFields -> fieldName.equalsIgnoreCase(infoDataFields.getFieldName())).findFirst().get();
+            return Stream.of(RegistrationInformationEntityFields.values()).filter(infoDataFields -> fieldName.equalsIgnoreCase(infoDataFields.getFieldName())).findFirst().get();
         }
 
         public String getFieldName() {
             return fieldName;
+        }
+    }
+
+    public static class RegistrationInformationEntityBuilder {
+        RegistrationInformationEntity entity;
+
+        public RegistrationInformationEntityBuilder() {
+            entity = new RegistrationInformationEntity();
+        }
+
+        private String getValueOrEmptyString(String value) {
+            if (StringUtils.isBlank(value)) {
+                return "";
+            }
+            return value;
+        }
+
+        public RegistrationInformationEntityBuilder setId(String id) {
+            entity.setId(getValueOrEmptyString(id));
+            return this;
+        }
+
+        public RegistrationInformationEntityBuilder setPerson(String person) {
+            entity.setPerson(getValueOrEmptyString(person));
+            return this;
+        }
+
+        public RegistrationInformationEntityBuilder setAdministrativeObjectCode(Long administrativeObjectCode) {
+            entity.setAdministrativeObjectCode(administrativeObjectCode);
+            return this;
+        }
+
+        public RegistrationInformationEntityBuilder setOperationCode(Long operationCode) {
+            entity.setOperationCode(operationCode);
+            return this;
+        }
+
+        public RegistrationInformationEntityBuilder setOperationName(String operationName) {
+            entity.setOperationName(getValueOrEmptyString(operationName));
+            return this;
+        }
+
+        public RegistrationInformationEntityBuilder setRegistrationDate(String registrationDate) {
+            entity.setRegistrationDate(getValueOrEmptyString(registrationDate));
+            return this;
+        }
+
+        public RegistrationInformationEntityBuilder setDepartmentCode(Long departmentCode) {
+            entity.setDepartmentCode(departmentCode);
+            return this;
+        }
+
+        public RegistrationInformationEntityBuilder setDepartmentName(String departmentName) {
+            entity.setDepartmentName(getValueOrEmptyString(departmentName));
+            return this;
+        }
+
+        public RegistrationInformationEntityBuilder setCarBrand(String carBrand) {
+            entity.setCarBrand(getValueOrEmptyString(carBrand));
+            return this;
+        }
+
+        public RegistrationInformationEntityBuilder setCarModel(String carModel) {
+            entity.setCarModel(getValueOrEmptyString(carModel));
+            return this;
+        }
+
+        public RegistrationInformationEntityBuilder setCarMakeYear(Long carMakeYear) {
+            entity.setCarMakeYear(carMakeYear);
+            return this;
+        }
+
+        public RegistrationInformationEntityBuilder setCarColor(String carColor) {
+            entity.setCarColor(getValueOrEmptyString(carColor));
+            return this;
+        }
+
+        public RegistrationInformationEntityBuilder setCarKind(String carKind) {
+            entity.setCarKind(getValueOrEmptyString(carKind));
+            return this;
+        }
+
+        public RegistrationInformationEntityBuilder setCarBody(String carBody) {
+            entity.setCarBody(getValueOrEmptyString(carBody));
+            return this;
+        }
+
+        public RegistrationInformationEntityBuilder setCarPurpose(String carPurpose) {
+            entity.setCarPurpose(getValueOrEmptyString(carPurpose));
+            return this;
+        }
+
+        public RegistrationInformationEntityBuilder setCarFuel(String carFuel) {
+            entity.setCarFuel(getValueOrEmptyString(carFuel));
+            return this;
+        }
+
+        public RegistrationInformationEntityBuilder setCarEngineCapacity(Long carEngineCapacity) {
+            entity.setCarEngineCapacity(carEngineCapacity);
+            return this;
+        }
+
+        public RegistrationInformationEntityBuilder setCarOwnWeight(Long carOwnWeight) {
+            entity.setCarOwnWeight(carOwnWeight);
+            return this;
+        }
+
+        public RegistrationInformationEntityBuilder setCarTotalWeight(Long carTotalWeight) {
+            entity.setCarTotalWeight(carTotalWeight);
+            return this;
+        }
+
+        public RegistrationInformationEntityBuilder setCarNewRegistrationNumber(String carNewRegistrationNumber) {
+            entity.setCarNewRegistrationNumber(getValueOrEmptyString(carNewRegistrationNumber));
+            return this;
+        }
+
+        public RegistrationInformationEntityBuilder setDataSetYear(String dataSetYear) {
+            entity.setDataSetYear(getValueOrEmptyString(dataSetYear));
+            return this;
+        }
+
+        public RegistrationInformationEntity build() {
+            return entity;
         }
     }
 }
