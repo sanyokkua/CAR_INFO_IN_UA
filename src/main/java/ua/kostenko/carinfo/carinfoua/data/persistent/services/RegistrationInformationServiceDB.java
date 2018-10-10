@@ -2,41 +2,67 @@ package ua.kostenko.carinfo.carinfoua.data.persistent.services;
 
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ua.kostenko.carinfo.carinfoua.configuration.ApplicationProperties;
 import ua.kostenko.carinfo.carinfoua.data.persistent.entities.RegistrationInformationEntity;
-import ua.kostenko.carinfo.carinfoua.data.persistent.repositories.AdministrativeObjectsCrudRepository;
 import ua.kostenko.carinfo.carinfoua.data.persistent.repositories.RegistrationInformationCrudRepository;
-import ua.kostenko.carinfo.carinfoua.data.persistent.repositories.ServiceCenterCrudRepository;
 
+import javax.persistence.EntityManagerFactory;
+import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 @Service
+@Transactional
 @Slf4j
 public class RegistrationInformationServiceDB implements RegistrationInformationService {
     private final RegistrationInformationCrudRepository registrationInformationCRUDRepository;
-    private final AdministrativeObjectsCrudRepository administrativeObjectsCrudRepository;
-    private final ServiceCenterCrudRepository serviceCenterCrudRepository;
+    private final ApplicationProperties applicationProperties;
+    private final EntityManagerFactory factory;
 
     @Autowired
-    public RegistrationInformationServiceDB(RegistrationInformationCrudRepository registrationInformationCRUDRepository, AdministrativeObjectsCrudRepository administrativeObjectsCrudRepository,
-                                            ServiceCenterCrudRepository serviceCenterCrudRepository) {
+    public RegistrationInformationServiceDB(RegistrationInformationCrudRepository registrationInformationCRUDRepository, ApplicationProperties applicationProperties, EntityManagerFactory factory) {
         Preconditions.checkNotNull(registrationInformationCRUDRepository);
-        Preconditions.checkNotNull(administrativeObjectsCrudRepository);
-        Preconditions.checkNotNull(serviceCenterCrudRepository);
+        Preconditions.checkNotNull(applicationProperties);
+        Preconditions.checkNotNull(factory);
         this.registrationInformationCRUDRepository = registrationInformationCRUDRepository;
-        this.administrativeObjectsCrudRepository = administrativeObjectsCrudRepository;
-        this.serviceCenterCrudRepository = serviceCenterCrudRepository;
+        this.applicationProperties = applicationProperties;
+        this.factory = factory;
     }
 
     @Override
-    public void saveAll(List<RegistrationInformationEntity> registrationInformationEntityList) {
+    public void saveAll(Collection<RegistrationInformationEntity> registrationInformationEntityList) {
         log.info("Saving list of RegistrationInformationEntity Objects, size: {}", registrationInformationEntityList.size());
         LocalTime before = LocalTime.now();
-        registrationInformationCRUDRepository.saveAll(registrationInformationEntityList);
+        log.info("Time when saving started: {}", before.toString());
+        long counter = Long.valueOf(applicationProperties.APP_LOG_MAPPER_COUNTER);
+        SessionFactory sessionFactory = factory.unwrap(SessionFactory.class);
+        if (sessionFactory == null) {
+            throw new NullPointerException("factory is not a hibernate factory");
+        }
+        List<RegistrationInformationEntity> list = new ArrayList<>(registrationInformationEntityList);
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        for (int i = 0; i < list.size(); i++) {
+            session.saveOrUpdate(list.get(i));
+            if (list.size() % counter == 0 || i + 1 >= list.size()) {
+                session.flush();
+                session.clear();
+            }
+        }
+        transaction.commit();
+        session.close();
+
+//        registrationInformationCRUDRepository.saveAll(registrationInformationEntityList);
+//        registrationInformationCRUDRepository.flush();
         Duration duration = Duration.between(before, LocalTime.now());
         log.info("Saved list of RegistrationInformationEntity Objects, size: {}", registrationInformationEntityList.size());
         log.info("Time spent for saving: {} ms, {} sec, {} min", duration.toMillis(), duration.getSeconds(), duration.toMinutes());

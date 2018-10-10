@@ -5,13 +5,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.stream.Stream;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Data
 @AllArgsConstructor
@@ -65,8 +67,12 @@ public class RegistrationInformationEntity { //Number of records 8 653 790
 
     public static String createId(RegistrationInformationEntity object) {
         String stringBuilder = object.getPerson() + object.getRegistrationDate() + object.getDepartmentName() + object.getCarBrand() + object.getCarModel() + object.getCarColor() + object.getCarMakeYear()
-                + object.getCarBody() + object.getCarNewRegistrationNumber() + object.getCarOwnWeight() + object.getCarTotalWeight() + object.getCarEngineCapacity();
+                + object.getCarBody() + object.getCarNewRegistrationNumber() + object.getCarOwnWeight() + object.getCarTotalWeight() + object.getCarEngineCapacity() + object.getCarFuel() + object.getCarPurpose();
         return DigestUtils.sha512Hex(stringBuilder);
+    }
+
+    public boolean hasNullMainFields() {
+        return isBlank(registrationDate) || isBlank(carBrand) || isBlank(carKind) || isBlank(carNewRegistrationNumber);
     }
 
     public enum RegistrationInformationEntityFields {
@@ -98,7 +104,7 @@ public class RegistrationInformationEntity { //Number of records 8 653 790
         }
 
         public static RegistrationInformationEntityFields getInfoDataFieldByName(String fieldName) {
-            Preconditions.checkState(StringUtils.isNotBlank(fieldName));
+            Preconditions.checkState(isNotBlank(fieldName));
             return Stream.of(RegistrationInformationEntityFields.values()).filter(infoDataFields -> fieldName.equalsIgnoreCase(infoDataFields.getFieldName())).findFirst().get();
         }
 
@@ -115,7 +121,7 @@ public class RegistrationInformationEntity { //Number of records 8 653 790
         }
 
         private String getValueOrEmptyString(String value) {
-            if (StringUtils.isBlank(value)) {
+            if (isBlank(value)) {
                 return "";
             }
             return value;
@@ -227,6 +233,9 @@ public class RegistrationInformationEntity { //Number of records 8 653 790
         }
 
         public RegistrationInformationEntity build() {
+            if (entity.hasNullMainFields()) {
+                return null;
+            }
             return entity;
         }
     }

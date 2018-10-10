@@ -25,11 +25,14 @@ import java.io.Reader;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -56,25 +59,24 @@ public class CsvRegistrationInformationImportTool {
 
     public void initDB() {
         log.info("Started initializing DB");
-        String downloadJson = null;
-        try {
-            downloadJson = getOpenDataJson();
-        } catch (IOException e) {
-            log.error("Exception occurred when trying to get Info JSON", e);
-        }
-        List<String> downloadLinks = getDownloadLinks(downloadJson);
+        String downloadJson = getOpenDataJson();
+        log.info("Downloaded json with next content: \n{}", downloadJson);
+
         log.info("Links for download csv archives:");
+        List<String> downloadLinks = getDownloadLinks(downloadJson);
         downloadLinks.forEach(s -> log.info("Download link: {}", s));
+
         log.info("Starting downloading...");
         downloadLinks.forEach(linkUrl -> {
             log.info("Processing link: {}", linkUrl);
             String dateLabel = parseDateLabel(linkUrl);
             log.info("Created dateLabel for archive: {}", dateLabel);
             if (isNeedToUpdate(dateLabel)) {
+                log.info("Data for datelabel {} is need to update", dateLabel);
                 registrationInformationService.removeAllByDateForDataSet(dateLabel);//TODO: will be changed to updating entities instead their deletion
-                List<RegistrationInformationEntity> infoData = getInfoDataListFromArchive(linkUrl, dateLabel);
-                registrationInformationService.saveAll(infoData);
-                infoData.clear();
+                Collection<RegistrationInformationEntity> registrationInformationFromArchive = getRegistrationInformationFromArchive(linkUrl, dateLabel);
+                registrationInformationService.saveAll(registrationInformationFromArchive);
+                registrationInformationFromArchive.clear();
                 log.info("Added data from link: {}", linkUrl);
             } else {
                 log.info("Skipping processing for archive {} by label {} because it already exists in DB", linkUrl, dateLabel);
@@ -83,14 +85,15 @@ public class CsvRegistrationInformationImportTool {
         log.info("Finished initializing DB");
     }
 
-    private boolean isNeedToUpdate(String dateLabel) {
-        boolean isCurrentYear = LocalDate.now().getYear() == Integer.parseInt(dateLabel);
-        boolean isExistsInDb = registrationInformationService.checkDatasetYearInDb(dateLabel);
-        return !isExistsInDb || isCurrentYear;
-    }
-
-    private String getOpenDataJson() throws IOException {
-        return downloadJson(applicationProperties.APP_DATA_SET_JSON_URL);
+    private String getOpenDataJson() {
+        String downloadJson = null;
+        try {
+            log.info("Downloading Info JSON from: {}", applicationProperties.APP_DATA_SET_JSON_URL);
+            downloadJson = IOUtils.toString(new URL(applicationProperties.APP_DATA_SET_JSON_URL), Charset.forName("UTF-8"));
+        } catch (IOException e) {
+            log.error("Exception occurred when trying to get Info JSON", e);
+        }
+        return downloadJson;
     }
 
     private List<String> getDownloadLinks(String downloadJson) {
@@ -124,56 +127,53 @@ public class CsvRegistrationInformationImportTool {
         return dateLabel;
     }
 
-    private List<RegistrationInformationEntity> getInfoDataListFromArchive(String linkUrl, String dateLabel) {
-        Path downloadZip = null;
-        try {
-            log.info("Trying to download archive from: {}", linkUrl);
-            downloadZip = downloadZip(linkUrl, dateLabel);
-            log.info("Archive downloaded from: {}, path to archive: {}", linkUrl, downloadZip.toAbsolutePath().toString());
-        } catch (IOException e) {
-            log.error(String.format("Error occurred with downloading archive from: %s", linkUrl), e);
-        }
-        assert downloadZip != null;
-        List<RegistrationInformationEntity> registrationInformationEntityList = Collections.emptyList();
-        try {
-            log.info("Trying to parse csv file: {}", downloadZip.toAbsolutePath().toString());
-            registrationInformationEntityList = readCsvFromFile(downloadZip, dateLabel);
-            log.info("Csv file {} parsed", downloadZip.toAbsolutePath().toString());
-        } catch (IOException e) {
-            log.error(String.format("Error occurred with parsing csv file: %s", downloadZip.toAbsolutePath().toString()), e);
-        }
-        return registrationInformationEntityList;
+    private boolean isNeedToUpdate(String dateLabel) {
+        boolean isCurrentYear = LocalDate.now().getYear() == Integer.parseInt(dateLabel);
+        boolean isExistsInDb = registrationInformationService.checkDatasetYearInDb(dateLabel);
+        return !isExistsInDb || isCurrentYear;
     }
 
-    private String downloadJson(String url) throws IOException {
-        log.info("Downloading Info JSON from: {}", url);
-        return IOUtils.toString(new URL(url), Charset.forName("UTF-8"));
+    private Collection<RegistrationInformationEntity> getRegistrationInformationFromArchive(String linkUrl, String dateLabel) {
+        Path downloadedZip = downloadZip(linkUrl, dateLabel);
+        return readCsvFromArchiveFile(downloadedZip, dateLabel);
     }
 
-    private Path downloadZip(String fileUrl, String dateLabel) throws IOException {
-        log.info("Downloading archive from: {}", fileUrl);
-        URL url = new URL(fileUrl);
-        String fileName = applicationProperties.APP_ARCHIVE_DIR + File.separator + applicationProperties.APP_ARCHIVE_NAME + "_" + dateLabel + ".zip";
-        log.info("Created archive name: {}", fileName);
-        Path targetPath = new File(fileName).toPath();
-        log.info("Saving archive to folder: {}", targetPath.toAbsolutePath().toString());
-        Files.copy(url.openStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-        log.info("Finished downloading archive from: " + fileUrl);
+    private Path downloadZip(String fileUrl, String dateLabel) {
+        Path targetPath = null;
+        try {
+            log.info("Downloading archive from: {}", fileUrl);
+            URL url = new URL(fileUrl);
+            String fileName = applicationProperties.APP_ARCHIVE_DIR + File.separator + applicationProperties.APP_ARCHIVE_NAME + "_" + dateLabel + ".zip";
+            log.info("Created archive name: {}", fileName);
+            targetPath = new File(fileName).toPath();
+            log.info("Saving archive to folder: {}", targetPath.toAbsolutePath().toString());
+            Files.copy(url.openStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+            log.info("Finished downloading archive from: " + fileUrl);
+        } catch (IOException e) {
+            log.error(String.format("Error occurred with downloading archive from: %s", fileUrl), e);
+        }
+        Preconditions.checkNotNull(targetPath, String.format("Error occurred in downloading archive from: %s, path to archive is null", fileUrl));
+        log.info("Archive downloaded from: {}, path to archive: {}", fileUrl, targetPath.toAbsolutePath().toString());
         return targetPath;
     }
 
-    private List<RegistrationInformationEntity> readCsvFromFile(Path archiveFilePath, String dateLabel) throws IOException {
-        log.info("Started reading csv from zip archive");
-        log.info("Archive file is: {}", archiveFilePath.toAbsolutePath().toString());
-
-        String fileName = applicationProperties.APP_ARCHIVE_DIR + File.separator + applicationProperties.APP_ARCHIVE_NAME + "_" + dateLabel;
-        Path destination = Paths.get(fileName);
-
-        extractZipArchive(archiveFilePath, destination);
-        List<RegistrationInformationEntity> resultList = mapCsvFile(dateLabel, destination);
-        deleteTempFiles(archiveFilePath, destination);
-
-        log.info("Finished reading csv from zip archive. Number of csv records in result list: {}", resultList.size());
+    private Collection<RegistrationInformationEntity> readCsvFromArchiveFile(Path archiveFilePath, String dateLabel) {
+        Collection<RegistrationInformationEntity> resultList = null;
+        try {
+            log.info("Trying to parse csv file: {}", archiveFilePath.toAbsolutePath().toString());
+            log.info("Started reading csv from zip archive");
+            log.info("Archive file is: {}", archiveFilePath.toAbsolutePath().toString());
+            String fileName = applicationProperties.APP_ARCHIVE_DIR + File.separator + applicationProperties.APP_ARCHIVE_NAME + "_" + dateLabel;
+            Path destination = Paths.get(fileName);
+            extractZipArchive(archiveFilePath, destination);
+            List<Path> filesInArchive = Files.list(destination).collect(Collectors.toList());
+            resultList = mapCsvFiles(dateLabel, filesInArchive);
+            deleteTempFiles(archiveFilePath, destination);
+            log.info("Finished reading csv from zip archive. Number of csv records in result list: {}", resultList.size());
+            log.info("Csv file {} parsed", archiveFilePath.toAbsolutePath().toString());
+        } catch (IOException e) {
+            log.error(String.format("Error occurred with parsing csv file: %s", archiveFilePath.toAbsolutePath().toString()), e);
+        }
         return resultList;
     }
 
@@ -199,47 +199,93 @@ public class CsvRegistrationInformationImportTool {
         }
     }
 
-    private List<RegistrationInformationEntity> mapCsvFile(String dateLabel, Path destination) {
-        log.info("Starting mapping of csv records to object");
-        List<RegistrationInformationEntity> resultList = new LinkedList<>();
-        try (Reader in = new FileReader(String.valueOf(Files.list(destination).findFirst().orElseGet(null)))) {
-            Iterable<CSVRecord> records = CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader().parse(in);
-            for (CSVRecord record : records) {
-                RegistrationInformationEntity data = mapCsvToInfoData(dateLabel, record);
-                data.setId(RegistrationInformationEntity.createId(data));
-                resultList.add(data);
+    private Collection<RegistrationInformationEntity> mapCsvFiles(String dateLabel, List<Path> filesInArchive) {
+        LocalTime before = LocalTime.now();
+        log.info("Starting mapping of csv records to objects, time: {}", before.toString());
+        Map<String, RegistrationInformationEntity> resultList = new HashMap<>();
+        long count = Long.valueOf(applicationProperties.APP_LOG_MAPPER_COUNTER);
+        filesInArchive.forEach(destination -> {
+            log.info("Csv file path: {}", destination.toAbsolutePath().toString());
+            if (destination.toFile().exists()) {
+                char delimiter = getDelimiter(destination);
+                try (Reader in = new FileReader(destination.toFile())) {
+                    Iterable<CSVRecord> records = CSVFormat.DEFAULT.withDelimiter(delimiter).withFirstRecordAsHeader().parse(in);
+                    long counter = 0;
+                    for (CSVRecord record : records) {
+                        RegistrationInformationEntity data = mapCsvToRegistrationInformationEntity(dateLabel, record);
+                        if (data != null) {
+                            if (resultList.containsKey(data.getId())) {
+                                log.warn("Result already has object with this id: {}", data.getId());
+                                log.warn("First object in collection: {}", resultList.get(data.getId()).toString());
+                                log.warn("Object which will be added: {}", data.toString());
+                            }
+                            resultList.put(data.getId(), data);
+                        } else {
+                            log.info("Returned null from mapping function");
+                        }
+                        counter++;
+                        if (counter % count == 0) {
+                            log.info("Mapped: {}", resultList.size());
+                        }
+                    }
+                    log.info("Finished mapping csv records");
+                } catch (IOException ex) {
+                    log.warn("IOException happened", ex);
+                }
             }
-            log.info("Finished mapping csv records");
-        } catch (IOException ex) {
-            log.warn("IOException happened", ex);
-        }
-        return resultList;
+        });
+        Duration duration = Duration.between(before, LocalTime.now());
+        log.info("Finished mapping all csv files from all files in zip. Time spent: {} ms, {} min", duration.toMillis(), duration.toMinutes());
+        return resultList.values();
     }
 
-    private RegistrationInformationEntity mapCsvToInfoData(String dateLabel, CSVRecord record) {
+    private char getDelimiter(Path destination) {
+        char result = 0;
+        try {
+            List<String> strings = FileUtils.readLines(destination.toFile(), StandardCharsets.UTF_8);
+            if (strings.size() > 0) {
+                String firstString = strings.get(0);
+                int index = firstString.lastIndexOf("person");
+                result = firstString.charAt(index + 1);
+            }
+        } catch (Exception e) {
+            log.error("Error with reading file", e);
+            result = ',';
+        }
+        return result;
+    }
+
+    private RegistrationInformationEntity mapCsvToRegistrationInformationEntity(String dateLabel, CSVRecord record) {
         RegistrationInformationEntity.RegistrationInformationEntityBuilder builder = new RegistrationInformationEntity.RegistrationInformationEntityBuilder();
-        Map<String, String> recordDataMap = record.toMap();
-        builder.setPerson(recordDataMap.getOrDefault(PERSON.getFieldName(), ""))
-                .setAdministrativeObjectCode(parseOrGetNull(recordDataMap.getOrDefault(ADMINISTRATIVE_OBJECT.getFieldName(), "")))
-                .setOperationCode(parseOrGetNull(recordDataMap.getOrDefault(OPERATION_CODE.getFieldName(), "")))
-                .setOperationName(recordDataMap.getOrDefault(OPERATION_NAME.getFieldName(), ""))
-                .setRegistrationDate(recordDataMap.getOrDefault(REGISTRATION_DATE.getFieldName(), ""))
-                .setDepartmentCode(parseOrGetNull(recordDataMap.getOrDefault(DEPARTMENT_CODE.getFieldName(), "")))
-                .setDepartmentName(recordDataMap.getOrDefault(DEPARTMENT_NAME.getFieldName(), ""))
-                .setCarBrand(recordDataMap.getOrDefault(CAR_BRAND.getFieldName(), ""))
-                .setCarModel(recordDataMap.getOrDefault(CAR_MODEL.getFieldName(), ""))
-                .setCarMakeYear(parseOrGetNull(recordDataMap.getOrDefault(CAR_MAKE_YEAR.getFieldName(), "")))
-                .setCarColor(recordDataMap.getOrDefault(CAR_COLOR.getFieldName(), ""))
-                .setCarKind(recordDataMap.getOrDefault(CAR_KIND.getFieldName(), ""))
-                .setCarBody(recordDataMap.getOrDefault(CAR_BODY.getFieldName(), ""))
-                .setCarPurpose(recordDataMap.getOrDefault(CAR_PURPOSE.getFieldName(), ""))
-                .setCarFuel(recordDataMap.getOrDefault(CAR_FUEL.getFieldName(), ""))
-                .setCarEngineCapacity(parseOrGetNull(recordDataMap.getOrDefault(CAR_ENGINE_CAPACITY.getFieldName(), "")))
-                .setCarOwnWeight(parseOrGetNull(recordDataMap.getOrDefault(CAR_OWN_WEIGHT.getFieldName(), "")))
-                .setCarTotalWeight(parseOrGetNull(recordDataMap.getOrDefault(CAR_TOTAL_WEIGHT.getFieldName(), "")))
-                .setCarNewRegistrationNumber(recordDataMap.getOrDefault(CAR_NEW_REGISTRATION_NUMBER.getFieldName(), ""))
-                .setDataSetYear(dateLabel);
-        return builder.build();
+        try {
+            builder.setPerson(record.get(PERSON.getFieldName()))
+                    .setAdministrativeObjectCode(parseOrGetNull(record.get(ADMINISTRATIVE_OBJECT.getFieldName())))
+                    .setOperationCode(parseOrGetNull(record.get(OPERATION_CODE.getFieldName())))
+                    .setOperationName(record.get(OPERATION_NAME.getFieldName()))
+                    .setRegistrationDate(record.get(REGISTRATION_DATE.getFieldName()))
+                    .setDepartmentCode(parseOrGetNull(record.get(DEPARTMENT_CODE.getFieldName())))
+                    .setDepartmentName(record.get(DEPARTMENT_NAME.getFieldName()))
+                    .setCarBrand(record.get(CAR_BRAND.getFieldName()))
+                    .setCarModel(record.get(CAR_MODEL.getFieldName()))
+                    .setCarMakeYear(parseOrGetNull(record.get(CAR_MAKE_YEAR.getFieldName())))
+                    .setCarColor(record.get(CAR_COLOR.getFieldName()))
+                    .setCarKind(record.get(CAR_KIND.getFieldName()))
+                    .setCarBody(record.get(CAR_BODY.getFieldName()))
+                    .setCarPurpose(record.get(CAR_PURPOSE.getFieldName()))
+                    .setCarFuel(record.get(CAR_FUEL.getFieldName()))
+                    .setCarEngineCapacity(parseOrGetNull(record.get(CAR_ENGINE_CAPACITY.getFieldName())))
+                    .setCarOwnWeight(parseOrGetNull(record.get(CAR_OWN_WEIGHT.getFieldName())))
+                    .setCarTotalWeight(parseOrGetNull(record.get(CAR_TOTAL_WEIGHT.getFieldName())))
+                    .setCarNewRegistrationNumber(record.get(CAR_NEW_REGISTRATION_NUMBER.getFieldName()))
+                    .setDataSetYear(dateLabel);
+        } catch (Exception ex) {
+            log.debug("exception", ex);
+        }
+        RegistrationInformationEntity registrationInformationEntity = builder.build();
+        if (registrationInformationEntity != null) {
+            registrationInformationEntity.setId(RegistrationInformationEntity.createId(registrationInformationEntity));
+        }
+        return registrationInformationEntity;
     }
 
     private Long parseOrGetNull(String value) {

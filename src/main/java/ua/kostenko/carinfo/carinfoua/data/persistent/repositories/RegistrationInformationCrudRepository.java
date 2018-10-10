@@ -1,13 +1,13 @@
 package ua.kostenko.carinfo.carinfoua.data.persistent.repositories;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import ua.kostenko.carinfo.carinfoua.data.persistent.entities.RegistrationInformationEntity;
 
 import java.util.List;
 
 @Repository
-public interface RegistrationInformationCrudRepository extends CrudRepository<RegistrationInformationEntity, Long> {
+public interface RegistrationInformationCrudRepository extends JpaRepository<RegistrationInformationEntity, Long> {
 
     RegistrationInformationEntity findFirstByDataSetYear(String year);
 
