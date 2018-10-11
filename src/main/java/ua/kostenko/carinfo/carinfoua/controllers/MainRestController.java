@@ -10,23 +10,25 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import ua.kostenko.carinfo.carinfoua.data.persistent.entities.RegistrationInformationEntity;
 import ua.kostenko.carinfo.carinfoua.data.persistent.services.RegistrationInformationService;
 import ua.kostenko.carinfo.carinfoua.data.presentation.CombinedInformation;
 import ua.kostenko.carinfo.carinfoua.utils.ResponseCreatorHelper;
+import ua.kostenko.carinfo.carinfoua.utils.csv.fields.RegistrationInformationCSV;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@org.springframework.web.bind.annotation.RestController
+@RestController
 @Slf4j
-public class RestController {
+public class MainRestController {
     private final RegistrationInformationService registrationInformationService;
     private final ResponseCreatorHelper responseCreatorHelper;
 
     @Autowired
-    public RestController(RegistrationInformationService registrationInformationService, ResponseCreatorHelper responseCreatorHelper) {
+    public MainRestController(RegistrationInformationService registrationInformationService, ResponseCreatorHelper responseCreatorHelper) {
         Preconditions.checkNotNull(registrationInformationService);
         Preconditions.checkNotNull(responseCreatorHelper);
         this.registrationInformationService = registrationInformationService;
@@ -39,24 +41,10 @@ public class RestController {
         log.info("Processing request by url /search/{}", number);
         LocalDateTime before = LocalDateTime.now();
         ObjectMapper mapper = new ObjectMapper();
-        List<RegistrationInformationEntity> results = registrationInformationService.search(RegistrationInformationEntity.RegistrationInformationEntityFields.CAR_NEW_REGISTRATION_NUMBER, number.toUpperCase());
+        List<RegistrationInformationEntity> results = registrationInformationService.search(RegistrationInformationCSV.CAR_NEW_REGISTRATION_NUMBER, number.toUpperCase());
         List<CombinedInformation> combinedInformation = responseCreatorHelper.getCombinedInformation(results);
         ResponseEntity<String> responseEntity = new ResponseEntity<>(mapper.writeValueAsString(combinedInformation), HttpStatus.OK);
         log.info("Processing of request by url /search/{} finished, time: {} ms", number, Duration.between(before, LocalDateTime.now()).toMillis());
-        return responseEntity;
-    }
-
-    @RequestMapping(value = "/search/raw/{field}/{value}", method = RequestMethod.GET)
-    public ResponseEntity<String> searchRaw(@PathVariable String field, @PathVariable String value) throws JsonProcessingException {
-        field = field.toUpperCase();
-        value = value.toUpperCase();
-        log.info("Processing request by url /search/raw/{}/{}", field, value);
-        LocalDateTime before = LocalDateTime.now();
-        ObjectMapper mapper = new ObjectMapper();
-        List<RegistrationInformationEntity> results = registrationInformationService.search(RegistrationInformationEntity.RegistrationInformationEntityFields.getInfoDataFieldByName(field), value);
-        List<CombinedInformation> combinedInformation = responseCreatorHelper.getCombinedInformation(results);
-        ResponseEntity<String> responseEntity = new ResponseEntity<>(mapper.writeValueAsString(combinedInformation), HttpStatus.OK);
-        log.info("Processing of request by url /search/raw/{}/{} finished, time: {} ms", field, value, Duration.between(before, LocalDateTime.now()).toMillis());
         return responseEntity;
     }
 

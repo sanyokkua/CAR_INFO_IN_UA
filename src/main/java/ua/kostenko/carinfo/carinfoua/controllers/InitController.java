@@ -6,16 +6,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Controller;
-import ua.kostenko.carinfo.carinfoua.utils.CsvAdministrativeObjectsImportTool;
-import ua.kostenko.carinfo.carinfoua.utils.CsvRegistrationInformationImportTool;
+import ua.kostenko.carinfo.carinfoua.utils.Initializer;
 import ua.kostenko.carinfo.carinfoua.utils.ServiceCenterDataImportTool;
+import ua.kostenko.carinfo.carinfoua.utils.csv.tools.CsvAdministrativeObjectsImportTool;
+import ua.kostenko.carinfo.carinfoua.utils.csv.tools.CsvRegistrationInformationImportTool;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Controller
 @Slf4j
 public class InitController {
-    private final CsvRegistrationInformationImportTool csvRegistrationInformationImportTool;
-    private final CsvAdministrativeObjectsImportTool csvAdministrativeObjectsImportTool;
-    private final ServiceCenterDataImportTool serviceCenterDataImportTool;
+    private final List<Initializer> needToBeInitialized;
 
     @Autowired
     public InitController(CsvRegistrationInformationImportTool csvRegistrationInformationImportTool, CsvAdministrativeObjectsImportTool csvAdministrativeObjectsImportTool,
@@ -23,16 +25,12 @@ public class InitController {
         Preconditions.checkNotNull(csvRegistrationInformationImportTool);
         Preconditions.checkNotNull(csvAdministrativeObjectsImportTool);
         Preconditions.checkNotNull(serviceCenterDataImportTool);
-        this.csvRegistrationInformationImportTool = csvRegistrationInformationImportTool;
-        this.csvAdministrativeObjectsImportTool = csvAdministrativeObjectsImportTool;
-        this.serviceCenterDataImportTool = serviceCenterDataImportTool;
+        needToBeInitialized = Arrays.asList(serviceCenterDataImportTool, csvAdministrativeObjectsImportTool, csvRegistrationInformationImportTool);
     }
 
     @EventListener(ApplicationReadyEvent.class)
     public void initDatabase() {
-        serviceCenterDataImportTool.initDB();
-        csvAdministrativeObjectsImportTool.initDB();
-        csvRegistrationInformationImportTool.initDB();
+        needToBeInitialized.forEach(Initializer::init);
     }
 
 }

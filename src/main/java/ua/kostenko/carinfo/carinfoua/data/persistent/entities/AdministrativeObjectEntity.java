@@ -22,20 +22,4 @@ public class AdministrativeObjectEntity {
     private String typeName;
     @Column(name = "name")
     private String name;
-
-    public enum AdministrativeObjectsFields {
-        ID_NUMBER("TE"),
-        TYPE_NAME("NP"),
-        NAME("NU");
-
-        private final String fieldName;
-
-        AdministrativeObjectsFields(String fieldName) {
-            this.fieldName = fieldName;
-        }
-
-        public String getFieldName() {
-            return fieldName;
-        }
-    }
 }

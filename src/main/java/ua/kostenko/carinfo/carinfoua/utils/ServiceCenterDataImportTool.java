@@ -22,7 +22,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Component
 @Slf4j
-public class ServiceCenterDataImportTool {
+public class ServiceCenterDataImportTool implements Initializer {
     private final ApplicationProperties applicationProperties;
     private final ServiceCenterCrudRepository serviceCenterCrudRepository;
 
@@ -34,7 +34,8 @@ public class ServiceCenterDataImportTool {
         this.serviceCenterCrudRepository = serviceCenterCrudRepository;
     }
 
-    public void initDB() {
+    @Override
+    public void init() {
         log.info("Starting initialization of ServiceCenters data.");
         Document htmlPageDocument = null;
         try {
@@ -49,11 +50,11 @@ public class ServiceCenterDataImportTool {
             Elements tbody = htmlPageDocument.select(applicationProperties.APP_DATA_SERVICE_CENTER_CSS_SELECTOR);
             for (Element tr : tbody) {
                 List<Element> childTd = tr.childNodes()
-                        .stream()
-                        .filter(node -> node instanceof Element)
-                        .map(node -> ((Element) node))
-                        .filter(element -> isNotBlank(element.text()))
-                        .collect(Collectors.toList());
+                                          .stream()
+                                          .filter(node -> node instanceof Element)
+                                          .map(node -> ((Element) node))
+                                          .filter(element -> isNotBlank(element.text()))
+                                          .collect(Collectors.toList());
                 if (childTd.size() > 4) {
                     String departmentId = childTd.get(0).text().trim();
                     String address = childTd.get(1).text().trim();

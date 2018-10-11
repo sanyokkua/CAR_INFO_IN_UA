@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import ua.kostenko.carinfo.carinfoua.configuration.ApplicationProperties;
 import ua.kostenko.carinfo.carinfoua.data.persistent.entities.RegistrationInformationEntity;
 import ua.kostenko.carinfo.carinfoua.data.persistent.repositories.RegistrationInformationCrudRepository;
+import ua.kostenko.carinfo.carinfoua.utils.csv.fields.RegistrationInformationCSV;
 
 import javax.persistence.EntityManagerFactory;
 import javax.transaction.Transactional;
@@ -52,17 +53,14 @@ public class RegistrationInformationServiceDB implements RegistrationInformation
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
         for (int i = 0; i < list.size(); i++) {
-            session.saveOrUpdate(list.get(i));
-            if (list.size() % counter == 0 || i + 1 >= list.size()) {
+            session.save(list.get(i));
+            if (i % counter == 0 || i + 1 >= list.size()) {
                 session.flush();
                 session.clear();
             }
         }
         transaction.commit();
         session.close();
-
-//        registrationInformationCRUDRepository.saveAll(registrationInformationEntityList);
-//        registrationInformationCRUDRepository.flush();
         Duration duration = Duration.between(before, LocalTime.now());
         log.info("Saved list of RegistrationInformationEntity Objects, size: {}", registrationInformationEntityList.size());
         log.info("Time spent for saving: {} ms, {} sec, {} min", duration.toMillis(), duration.getSeconds(), duration.toMinutes());
@@ -79,7 +77,7 @@ public class RegistrationInformationServiceDB implements RegistrationInformation
     }
 
     @Override
-    public List<RegistrationInformationEntity> search(RegistrationInformationEntity.RegistrationInformationEntityFields field, String value) {
+    public List<RegistrationInformationEntity> search(RegistrationInformationCSV field, String value) {
         log.info("Searching RegistrationInformationEntity for field: {}, value: {}", field.name(), value);
         List<RegistrationInformationEntity> results = Collections.EMPTY_LIST;
         switch (field) {

@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.carinfoua.utils;
+package ua.kostenko.carinfo.carinfoua.utils.csv.tools;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,8 +8,6 @@ import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +15,12 @@ import org.springframework.stereotype.Component;
 import ua.kostenko.carinfo.carinfoua.configuration.ApplicationProperties;
 import ua.kostenko.carinfo.carinfoua.data.persistent.entities.RegistrationInformationEntity;
 import ua.kostenko.carinfo.carinfoua.data.persistent.services.RegistrationInformationService;
+import ua.kostenko.carinfo.carinfoua.utils.Initializer;
+import ua.kostenko.carinfo.carinfoua.utils.csv.CSVReader;
+import ua.kostenko.carinfo.carinfoua.utils.csv.fields.RegistrationInformationCSV;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -35,16 +34,15 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static ua.kostenko.carinfo.carinfoua.data.persistent.entities.RegistrationInformationEntity.RegistrationInformationEntityFields.*;
-
 @Component
 @Slf4j
-public class CsvRegistrationInformationImportTool {
+public class CsvRegistrationInformationImportTool implements Initializer {
     private static final String DATE_PATTERN = "ddMMyyyy";
     private final RegistrationInformationService registrationInformationService;
     private final ApplicationProperties applicationProperties;
@@ -57,7 +55,8 @@ public class CsvRegistrationInformationImportTool {
         this.applicationProperties = applicationProperties;
     }
 
-    public void initDB() {
+    @Override
+    public void init() {
         log.info("Started initializing DB");
         String downloadJson = getOpenDataJson();
         log.info("Downloaded json with next content: \n{}", downloadJson);
@@ -202,41 +201,31 @@ public class CsvRegistrationInformationImportTool {
     private Collection<RegistrationInformationEntity> mapCsvFiles(String dateLabel, List<Path> filesInArchive) {
         LocalTime before = LocalTime.now();
         log.info("Starting mapping of csv records to objects, time: {}", before.toString());
-        Map<String, RegistrationInformationEntity> resultList = new HashMap<>();
+        Map<String, RegistrationInformationEntity> resultMap = new HashMap<>();
         long count = Long.valueOf(applicationProperties.APP_LOG_MAPPER_COUNTER);
         filesInArchive.forEach(destination -> {
-            log.info("Csv file path: {}", destination.toAbsolutePath().toString());
-            if (destination.toFile().exists()) {
-                char delimiter = getDelimiter(destination);
-                try (Reader in = new FileReader(destination.toFile())) {
-                    Iterable<CSVRecord> records = CSVFormat.DEFAULT.withDelimiter(delimiter).withFirstRecordAsHeader().parse(in);
-                    long counter = 0;
-                    for (CSVRecord record : records) {
-                        RegistrationInformationEntity data = mapCsvToRegistrationInformationEntity(dateLabel, record);
-                        if (data != null) {
-                            if (resultList.containsKey(data.getId())) {
-                                log.warn("Result already has object with this id: {}", data.getId());
-                                log.warn("First object in collection: {}", resultList.get(data.getId()).toString());
-                                log.warn("Object which will be added: {}", data.toString());
-                            }
-                            resultList.put(data.getId(), data);
-                        } else {
-                            log.info("Returned null from mapping function");
-                        }
-                        counter++;
-                        if (counter % count == 0) {
-                            log.info("Mapped: {}", resultList.size());
-                        }
+            AtomicLong counter = new AtomicLong(0);
+            CSVReader.mapCsvFile(destination, getDelimiter(destination), record -> {
+                RegistrationInformationEntity data = RegistrationInformationCSV.mapRecord(record);
+                if (data != null) {
+                    data.setDataSetYear(dateLabel);
+                    if (resultMap.containsKey(data.getId())) {
+                        log.debug("Result already has object with this id: {}", data.getId());
+                        log.debug("First object in collection: {}", resultMap.get(data.getId()).toString());
+                        log.debug("Object which will be added: {}", data.toString());
                     }
-                    log.info("Finished mapping csv records");
-                } catch (IOException ex) {
-                    log.warn("IOException happened", ex);
+                    resultMap.put(data.getId(), data);
+                } else {
+                    log.info("Returned null from mapping function");
                 }
-            }
+                if (counter.incrementAndGet() % count == 0) {
+                    log.info("Mapped: {}", resultMap.size());
+                }
+            });
         });
         Duration duration = Duration.between(before, LocalTime.now());
         log.info("Finished mapping all csv files from all files in zip. Time spent: {} ms, {} min", duration.toMillis(), duration.toMinutes());
-        return resultList.values();
+        return resultMap.values();
     }
 
     private char getDelimiter(Path destination) {
@@ -245,55 +234,11 @@ public class CsvRegistrationInformationImportTool {
             List<String> strings = FileUtils.readLines(destination.toFile(), StandardCharsets.UTF_8);
             if (strings.size() > 0) {
                 String firstString = strings.get(0);
-                int index = firstString.lastIndexOf("person");
-                result = firstString.charAt(index + 1);
+                result = firstString.replaceFirst("person", "").charAt(0);
             }
         } catch (Exception e) {
             log.error("Error with reading file", e);
             result = ',';
-        }
-        return result;
-    }
-
-    private RegistrationInformationEntity mapCsvToRegistrationInformationEntity(String dateLabel, CSVRecord record) {
-        RegistrationInformationEntity.RegistrationInformationEntityBuilder builder = new RegistrationInformationEntity.RegistrationInformationEntityBuilder();
-        try {
-            builder.setPerson(record.get(PERSON.getFieldName()))
-                    .setAdministrativeObjectCode(parseOrGetNull(record.get(ADMINISTRATIVE_OBJECT.getFieldName())))
-                    .setOperationCode(parseOrGetNull(record.get(OPERATION_CODE.getFieldName())))
-                    .setOperationName(record.get(OPERATION_NAME.getFieldName()))
-                    .setRegistrationDate(record.get(REGISTRATION_DATE.getFieldName()))
-                    .setDepartmentCode(parseOrGetNull(record.get(DEPARTMENT_CODE.getFieldName())))
-                    .setDepartmentName(record.get(DEPARTMENT_NAME.getFieldName()))
-                    .setCarBrand(record.get(CAR_BRAND.getFieldName()))
-                    .setCarModel(record.get(CAR_MODEL.getFieldName()))
-                    .setCarMakeYear(parseOrGetNull(record.get(CAR_MAKE_YEAR.getFieldName())))
-                    .setCarColor(record.get(CAR_COLOR.getFieldName()))
-                    .setCarKind(record.get(CAR_KIND.getFieldName()))
-                    .setCarBody(record.get(CAR_BODY.getFieldName()))
-                    .setCarPurpose(record.get(CAR_PURPOSE.getFieldName()))
-                    .setCarFuel(record.get(CAR_FUEL.getFieldName()))
-                    .setCarEngineCapacity(parseOrGetNull(record.get(CAR_ENGINE_CAPACITY.getFieldName())))
-                    .setCarOwnWeight(parseOrGetNull(record.get(CAR_OWN_WEIGHT.getFieldName())))
-                    .setCarTotalWeight(parseOrGetNull(record.get(CAR_TOTAL_WEIGHT.getFieldName())))
-                    .setCarNewRegistrationNumber(record.get(CAR_NEW_REGISTRATION_NUMBER.getFieldName()))
-                    .setDataSetYear(dateLabel);
-        } catch (Exception ex) {
-            log.debug("exception", ex);
-        }
-        RegistrationInformationEntity registrationInformationEntity = builder.build();
-        if (registrationInformationEntity != null) {
-            registrationInformationEntity.setId(RegistrationInformationEntity.createId(registrationInformationEntity));
-        }
-        return registrationInformationEntity;
-    }
-
-    private Long parseOrGetNull(String value) {
-        Long result = null;
-        try {
-            result = Long.valueOf(value);
-        } catch (Exception ex) {
-//      log.warn("Error occurred due parsing string to Long value. Value: {}", value);
         }
         return result;
     }

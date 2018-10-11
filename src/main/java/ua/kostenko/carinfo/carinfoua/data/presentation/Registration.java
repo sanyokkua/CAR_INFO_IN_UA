@@ -8,11 +8,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Registration {
-    private PersonKind person; // e.g. P // P (person) or J (juridical)
+    private PersonKind person;
     private String administrativeObjectTypeName;
     private String administrativeObjectName;
-    private String operationName; // e.g. 440 - ПЕРЕРЕЄСТРАЦIЯ ПРИ ВТРАТІ СВIДОЦТВА ПРО РЕЄСТРАЦIЮ
-    private String registrationDate; // date of operation  yyy-mm-dd 2018-01-01
+    private String operationName;
+    private String registrationDate;
     private String newRegistrationNumber;
     private String registrationNumberRegionName;
 
@@ -35,10 +35,6 @@ public class Registration {
                 default:
                     return PERSON;
             }
-        }
-
-        public String getKey() {
-            return key;
         }
     }
 }
