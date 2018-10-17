@@ -45,15 +45,11 @@ public class RegistrationInformationServiceDB implements RegistrationInformation
         LocalTime before = LocalTime.now();
         log.info("Time when saving started: {}", before.toString());
         long batchSize = Long.valueOf(applicationProperties.APP_LOG_MAPPER_BATCH_SIZE);
-        SessionFactory sessionFactory = factory.unwrap(SessionFactory.class);
-        if (sessionFactory == null) {
-            throw new NullPointerException("factory is not a hibernate factory");
-        }
-        Session session = sessionFactory.openSession();
+        Session session = getSession();
         Transaction transaction = session.beginTransaction();
         AtomicInteger i = new AtomicInteger();
         registrationInformationEntityList.forEach(registrationInformationEntity -> {
-            session.save(registrationInformationEntity);
+            session.saveOrUpdate(registrationInformationEntity);
             int count = i.incrementAndGet();
             if (count % batchSize == 0 || count + 1 >= registrationInformationEntityList.size()) {
                 session.flush();
@@ -65,6 +61,14 @@ public class RegistrationInformationServiceDB implements RegistrationInformation
         Duration duration = Duration.between(before, LocalTime.now());
         log.info("Saved list of RegistrationInformationEntity Objects, size: {}", registrationInformationEntityList.size());
         log.info("Time spent for saving: {} ms, {} sec, {} min", duration.toMillis(), duration.getSeconds(), duration.toMinutes());
+    }
+
+    private Session getSession() {
+        SessionFactory sessionFactory = factory.unwrap(SessionFactory.class);
+        if (sessionFactory == null) {
+            throw new NullPointerException("factory is not a hibernate factory");
+        }
+        return sessionFactory.openSession();
     }
 
     @Override

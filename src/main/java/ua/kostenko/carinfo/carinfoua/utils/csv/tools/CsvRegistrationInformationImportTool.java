@@ -16,8 +16,8 @@ import ua.kostenko.carinfo.carinfoua.configuration.ApplicationProperties;
 import ua.kostenko.carinfo.carinfoua.data.persistent.entities.RegistrationInformationEntity;
 import ua.kostenko.carinfo.carinfoua.data.persistent.services.RegistrationInformationService;
 import ua.kostenko.carinfo.carinfoua.utils.Initializer;
-import ua.kostenko.carinfo.carinfoua.utils.csv.CSVReader;
 import ua.kostenko.carinfo.carinfoua.utils.csv.fields.RegistrationInformationCSV;
+import ua.kostenko.carinfo.carinfoua.utils.io.CSVReader;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,7 +57,8 @@ public class CsvRegistrationInformationImportTool implements Initializer {
 
     @Override
     public void init() {
-        log.info("Started initializing DB");
+        LocalTime before = LocalTime.now();
+        log.info("Started initializing DB: {}", before.toString());
         String downloadJson = getOpenDataJson();
         log.info("Downloaded json with next content: \n{}", downloadJson);
 
@@ -72,7 +73,7 @@ public class CsvRegistrationInformationImportTool implements Initializer {
             log.info("Created dateLabel for archive: {}", dateLabel);
             if (isNeedToUpdate(dateLabel)) {
                 log.info("Data for datelabel {} is need to update", dateLabel);
-                registrationInformationService.removeAllByDateForDataSet(dateLabel);//TODO: will be changed to updating entities instead their deletion
+//                registrationInformationService.removeAllByDateForDataSet(dateLabel);//TODO: will be changed to updating entities instead their deletion
                 Collection<RegistrationInformationEntity> registrationInformationFromArchive = getRegistrationInformationFromArchive(linkUrl, dateLabel);
                 registrationInformationService.saveAll(registrationInformationFromArchive);
                 registrationInformationFromArchive.clear();
@@ -81,7 +82,8 @@ public class CsvRegistrationInformationImportTool implements Initializer {
                 log.info("Skipping processing for archive {} by label {} because it already exists in DB", linkUrl, dateLabel);
             }
         });
-        log.info("Finished initializing DB");
+        LocalTime after = LocalTime.now();
+        log.info("Finished initializing DB: finish time: {}, duration: {} minutes", after.toString(), Duration.between(before, after).toMinutes());
     }
 
     private String getOpenDataJson() {

@@ -44,24 +44,24 @@ public enum RegistrationInformationCSV {
                 carBrand = StringUtils.trim(carBrand);
             }
             builder.setPerson(StringUtils.trim(record.get(PERSON.fieldName)))
-                   .setAdministrativeObjectCode(parseOrGetNull(record.get(ADMINISTRATIVE_OBJECT.fieldName)))
-                   .setOperationCode(parseOrGetNull(record.get(OPERATION_CODE.fieldName)))
-                   .setOperationName(StringUtils.trim(record.get(OPERATION_NAME.fieldName)))
-                   .setRegistrationDate(StringUtils.trim(record.get(REGISTRATION_DATE.fieldName)))
-                   .setDepartmentCode(parseOrGetNull(record.get(DEPARTMENT_CODE.fieldName)))
-                   .setDepartmentName(StringUtils.trim(record.get(DEPARTMENT_NAME.fieldName)))
-                   .setCarBrand(carBrand)
-                   .setCarModel(carModel)
-                   .setCarMakeYear(parseOrGetNull(record.get(CAR_MAKE_YEAR.fieldName)))
-                   .setCarColor(StringUtils.trim(record.get(CAR_COLOR.fieldName)))
-                   .setCarKind(StringUtils.trim(record.get(CAR_KIND.fieldName)))
-                   .setCarBody(StringUtils.trim(record.get(CAR_BODY.fieldName)))
-                   .setCarPurpose(StringUtils.trim(record.get(CAR_PURPOSE.fieldName)))
-                   .setCarFuel(StringUtils.trim(record.get(CAR_FUEL.fieldName)))
-                   .setCarEngineCapacity(parseOrGetNull(record.get(CAR_ENGINE_CAPACITY.fieldName)))
-                   .setCarOwnWeight(parseOrGetNull(record.get(CAR_OWN_WEIGHT.fieldName)))
-                   .setCarTotalWeight(parseOrGetNull(record.get(CAR_TOTAL_WEIGHT.fieldName)))
-                   .setCarNewRegistrationNumber(StringUtils.trim(record.get(CAR_NEW_REGISTRATION_NUMBER.fieldName)));
+                    .setAdministrativeObjectCode(parseOrGetNull(record.get(ADMINISTRATIVE_OBJECT.fieldName)))
+                    .setOperationCode(parseOrGetNull(record.get(OPERATION_CODE.fieldName)))
+                    .setOperationName(StringUtils.trim(record.get(OPERATION_NAME.fieldName)))
+                    .setRegistrationDate(StringUtils.trim(record.get(REGISTRATION_DATE.fieldName)))
+                    .setDepartmentCode(parseOrGetNull(record.get(DEPARTMENT_CODE.fieldName)))
+                    .setDepartmentName(StringUtils.trim(record.get(DEPARTMENT_NAME.fieldName)))
+                    .setCarBrand(carBrand)
+                    .setCarModel(carModel)
+                    .setCarMakeYear(parseOrGetNull(record.get(CAR_MAKE_YEAR.fieldName)))
+                    .setCarColor(StringUtils.trim(record.get(CAR_COLOR.fieldName)))
+                    .setCarKind(StringUtils.trim(record.get(CAR_KIND.fieldName)))
+                    .setCarBody(StringUtils.trim(record.get(CAR_BODY.fieldName)))
+                    .setCarPurpose(StringUtils.trim(record.get(CAR_PURPOSE.fieldName)))
+                    .setCarFuel(StringUtils.trim(record.get(CAR_FUEL.fieldName)))
+                    .setCarEngineCapacity(parseOrGetNull(record.get(CAR_ENGINE_CAPACITY.fieldName)))
+                    .setCarOwnWeight(parseOrGetNull(record.get(CAR_OWN_WEIGHT.fieldName)))
+                    .setCarTotalWeight(parseOrGetNull(record.get(CAR_TOTAL_WEIGHT.fieldName)))
+                    .setCarNewRegistrationNumber(StringUtils.trim(record.get(CAR_NEW_REGISTRATION_NUMBER.fieldName)));
         } catch (Exception ex) {
             log.debug("exception", ex);
         }

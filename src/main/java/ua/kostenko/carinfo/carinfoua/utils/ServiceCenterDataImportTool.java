@@ -50,11 +50,11 @@ public class ServiceCenterDataImportTool implements Initializer {
             Elements tbody = htmlPageDocument.select(applicationProperties.APP_DATA_SERVICE_CENTER_CSS_SELECTOR);
             for (Element tr : tbody) {
                 List<Element> childTd = tr.childNodes()
-                                          .stream()
-                                          .filter(node -> node instanceof Element)
-                                          .map(node -> ((Element) node))
-                                          .filter(element -> isNotBlank(element.text()))
-                                          .collect(Collectors.toList());
+                        .stream()
+                        .filter(node -> node instanceof Element)
+                        .map(node -> ((Element) node))
+                        .filter(element -> isNotBlank(element.text()))
+                        .collect(Collectors.toList());
                 if (childTd.size() > 4) {
                     String departmentId = childTd.get(0).text().trim();
                     String address = childTd.get(1).text().trim();

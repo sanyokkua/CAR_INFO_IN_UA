@@ -8,11 +8,13 @@ import ua.kostenko.carinfo.carinfoua.configuration.ApplicationProperties;
 import ua.kostenko.carinfo.carinfoua.data.persistent.entities.RegionCodeEntity;
 import ua.kostenko.carinfo.carinfoua.data.persistent.repositories.RegionCodeCrudRepository;
 import ua.kostenko.carinfo.carinfoua.utils.Initializer;
-import ua.kostenko.carinfo.carinfoua.utils.csv.CSVReader;
+import ua.kostenko.carinfo.carinfoua.utils.io.CSVReader;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +36,8 @@ public class CsvRegionCodeImportTool implements Initializer {
 
     @Override
     public void init() {
+        LocalTime before = LocalTime.now();
+        log.info("Initializing RegionCode data from csv. Time: {}", before.toString());
         final List<RegionCodeEntity> resultList = new ArrayList<>();
         Path destination = null;
         try {
@@ -43,5 +47,7 @@ public class CsvRegionCodeImportTool implements Initializer {
         }
         CSVReader.mapCsvFile(destination, ';', record -> resultList.add(new RegionCodeEntity(record.get(CODE.getFieldName()), record.get(REGION.getFieldName()))));
         regionCodeCrudRepository.saveAll(resultList);
+        LocalTime after = LocalTime.now();
+        log.info("RegionCode data parsed and saved into DB. Time: {}, duration: {} ms", after.toString(), Duration.between(before, after).toMillis());
     }
 }

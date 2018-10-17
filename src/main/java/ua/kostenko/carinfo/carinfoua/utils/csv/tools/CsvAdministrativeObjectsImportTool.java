@@ -9,12 +9,14 @@ import ua.kostenko.carinfo.carinfoua.configuration.ApplicationProperties;
 import ua.kostenko.carinfo.carinfoua.data.persistent.entities.AdministrativeObjectEntity;
 import ua.kostenko.carinfo.carinfoua.data.persistent.repositories.AdministrativeObjectsCrudRepository;
 import ua.kostenko.carinfo.carinfoua.utils.Initializer;
-import ua.kostenko.carinfo.carinfoua.utils.csv.CSVReader;
 import ua.kostenko.carinfo.carinfoua.utils.csv.fields.AdministrativeObjectCSV;
+import ua.kostenko.carinfo.carinfoua.utils.io.CSVReader;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -38,7 +40,8 @@ public class CsvAdministrativeObjectsImportTool implements Initializer {
 
     @Override
     public void init() {
-        log.info("Started initializing AdministrativeObjects");
+        LocalTime before = LocalTime.now();
+        log.info("Started initializing AdministrativeObjects, time: {}", before.toString());
         Path administrativeObjectsFilePath = null;
         try {
             administrativeObjectsFilePath = Paths.get(new ClassPathResource(applicationProperties.APP_ADMINISTRATIVE_OBJECTS_FILE_PATH).getFile().getAbsolutePath());
@@ -56,10 +59,11 @@ public class CsvAdministrativeObjectsImportTool implements Initializer {
             });
 
             administrativeObjectsCrudRepository.saveAll(administrativeObjectEntityList.stream()
-                                                                                      .filter(administrativeObjectEntity -> nonNull(administrativeObjectEntity)
-                                                                                              && nonNull(administrativeObjectEntity.getId()))
-                                                                                      .collect(Collectors.toList()));
-            log.info("Finished initializing AdministrativeObjects. Saved all AdministrativeObjectEntity to DB");
+                    .filter(administrativeObjectEntity -> nonNull(administrativeObjectEntity)
+                            && nonNull(administrativeObjectEntity.getId()))
+                    .collect(Collectors.toList()));
+            LocalTime after = LocalTime.now();
+            log.info("Finished initializing AdministrativeObjects. Saved all AdministrativeObjectEntity to DB Time: {}, duration: {} ms", after.toString(), Duration.between(before, after).toMillis());
         } else {
             log.warn("Problem with getting path to file: {}", applicationProperties.APP_ADMINISTRATIVE_OBJECTS_FILE_PATH);
         }

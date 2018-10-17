@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.carinfoua.utils;
+package ua.kostenko.carinfo.carinfoua.controllers.utils;
 
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
@@ -54,17 +54,17 @@ public class ResponseCreatorHelper {
 
     private Auto getAuto(RegistrationInformationEntity registrationInformation) {
         return new Auto(registrationInformation.getCarBrand(), registrationInformation.getCarModel(), registrationInformation.getCarMakeYear(), registrationInformation.getCarColor(),
-                        registrationInformation.getCarKind(), registrationInformation.getCarBody(), registrationInformation.getCarPurpose(), registrationInformation.getCarFuel(),
-                        registrationInformation.getCarEngineCapacity(), registrationInformation.getCarOwnWeight(), registrationInformation.getCarTotalWeight());
+                registrationInformation.getCarKind(), registrationInformation.getCarBody(), registrationInformation.getCarPurpose(), registrationInformation.getCarFuel(),
+                registrationInformation.getCarEngineCapacity(), registrationInformation.getCarOwnWeight(), registrationInformation.getCarTotalWeight());
     }
 
     private Registration getRegistration(RegistrationInformationEntity registrationInformation, AdministrativeObjectEntity administrativeObject) {
         String code = registrationInformation.getCarNewRegistrationNumber().substring(0, 2);
         RegionCodeEntity defaultIfEmpty = new RegionCodeEntity("", "");
         return new Registration(Registration.PersonKind.getPersonKind(registrationInformation.getPerson()), administrativeObject.getTypeName(), administrativeObject.getName(),
-                                registrationInformation.getOperationName(), registrationInformation.getRegistrationDate(), registrationInformation
-                                        .getCarNewRegistrationNumber(),
-                                regionCodeCrudRepository.findById(code).orElse(defaultIfEmpty));
+                registrationInformation.getOperationName(), registrationInformation.getRegistrationDate(), registrationInformation
+                .getCarNewRegistrationNumber(),
+                regionCodeCrudRepository.findById(code).orElse(defaultIfEmpty));
     }
 
     private ServiceCenter getServiceCenter(RegistrationInformationEntity registrationInformation, ServiceCenterEntity serviceCenterEntity) {
