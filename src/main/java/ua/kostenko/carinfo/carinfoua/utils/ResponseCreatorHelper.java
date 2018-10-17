@@ -4,15 +4,16 @@ import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ua.kostenko.carinfo.carinfoua.data.persistent.entities.AdministrativeObjectEntity;
+import ua.kostenko.carinfo.carinfoua.data.persistent.entities.RegionCodeEntity;
 import ua.kostenko.carinfo.carinfoua.data.persistent.entities.RegistrationInformationEntity;
 import ua.kostenko.carinfo.carinfoua.data.persistent.entities.ServiceCenterEntity;
 import ua.kostenko.carinfo.carinfoua.data.persistent.repositories.AdministrativeObjectsCrudRepository;
+import ua.kostenko.carinfo.carinfoua.data.persistent.repositories.RegionCodeCrudRepository;
 import ua.kostenko.carinfo.carinfoua.data.persistent.repositories.ServiceCenterCrudRepository;
 import ua.kostenko.carinfo.carinfoua.data.presentation.Auto;
 import ua.kostenko.carinfo.carinfoua.data.presentation.CombinedInformation;
 import ua.kostenko.carinfo.carinfoua.data.presentation.Registration;
 import ua.kostenko.carinfo.carinfoua.data.presentation.ServiceCenter;
-import ua.kostenko.carinfo.carinfoua.utils.csv.tools.CsvRegionCodeImportTool;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,16 +23,16 @@ import java.util.stream.Collectors;
 public class ResponseCreatorHelper {
     private final AdministrativeObjectsCrudRepository administrativeObjectsCrudRepository;
     private final ServiceCenterCrudRepository serviceCenterCrudRepository;
-    private final CsvRegionCodeImportTool csvRegionCodeImportTool;
+    private final RegionCodeCrudRepository regionCodeCrudRepository;
 
     public ResponseCreatorHelper(AdministrativeObjectsCrudRepository administrativeObjectsCrudRepository, ServiceCenterCrudRepository serviceCenterCrudRepository,
-                                 CsvRegionCodeImportTool csvRegionCodeImportTool) {
+                                 RegionCodeCrudRepository regionCodeCrudRepository) {
         Preconditions.checkNotNull(administrativeObjectsCrudRepository);
         Preconditions.checkNotNull(serviceCenterCrudRepository);
-        Preconditions.checkNotNull(csvRegionCodeImportTool);
+        Preconditions.checkNotNull(regionCodeCrudRepository);
         this.administrativeObjectsCrudRepository = administrativeObjectsCrudRepository;
         this.serviceCenterCrudRepository = serviceCenterCrudRepository;
-        this.csvRegionCodeImportTool = csvRegionCodeImportTool;
+        this.regionCodeCrudRepository = regionCodeCrudRepository;
     }
 
     public List<CombinedInformation> getCombinedInformation(List<RegistrationInformationEntity> registrationInformationEntityList) {
@@ -39,11 +40,11 @@ public class ResponseCreatorHelper {
             log.info("Mapping RegistrationInformationEntity to CombinedInformation from object: {}", registrationInformationEntityList);
             Auto auto = getAuto(registrationInformation);
             log.info("Created Auto object: {}", auto);
-            AdministrativeObjectEntity administrativeObject = administrativeObjectsCrudRepository.findById(registrationInformation.getAdministrativeObjectCode()).orElseGet(null);
+            AdministrativeObjectEntity administrativeObject = administrativeObjectsCrudRepository.findById(registrationInformation.getAdministrativeObjectCode()).orElse(null);
             log.info("Found AdministrativeObjectEntity {}", administrativeObject);
             Registration registration = getRegistration(registrationInformation, administrativeObject);
             log.info("Created Registration object: {}", registration);
-            ServiceCenterEntity serviceCenterEntity = serviceCenterCrudRepository.findById(registrationInformation.getDepartmentCode()).orElseGet(null);
+            ServiceCenterEntity serviceCenterEntity = serviceCenterCrudRepository.findById(registrationInformation.getDepartmentCode()).orElse(null);
             log.info("Found ServiceCenterEntity object: {}", serviceCenterEntity);
             ServiceCenter serviceCenter = getServiceCenter(registrationInformation, serviceCenterEntity);
             log.info("Create ServiceCenter object: {}", serviceCenter);
@@ -58,10 +59,12 @@ public class ResponseCreatorHelper {
     }
 
     private Registration getRegistration(RegistrationInformationEntity registrationInformation, AdministrativeObjectEntity administrativeObject) {
+        String code = registrationInformation.getCarNewRegistrationNumber().substring(0, 2);
+        RegionCodeEntity defaultIfEmpty = new RegionCodeEntity("", "");
         return new Registration(Registration.PersonKind.getPersonKind(registrationInformation.getPerson()), administrativeObject.getTypeName(), administrativeObject.getName(),
                                 registrationInformation.getOperationName(), registrationInformation.getRegistrationDate(), registrationInformation
-                                                             .getCarNewRegistrationNumber(),
-                                csvRegionCodeImportTool.getRegion(registrationInformation.getCarNewRegistrationNumber()));
+                                        .getCarNewRegistrationNumber(),
+                                regionCodeCrudRepository.findById(code).orElse(defaultIfEmpty));
     }
 
     private ServiceCenter getServiceCenter(RegistrationInformationEntity registrationInformation, ServiceCenterEntity serviceCenterEntity) {

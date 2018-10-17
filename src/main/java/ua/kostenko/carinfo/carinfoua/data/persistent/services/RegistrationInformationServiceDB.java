@@ -16,10 +16,10 @@ import javax.persistence.EntityManagerFactory;
 import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @Transactional
@@ -44,21 +44,22 @@ public class RegistrationInformationServiceDB implements RegistrationInformation
         log.info("Saving list of RegistrationInformationEntity Objects, size: {}", registrationInformationEntityList.size());
         LocalTime before = LocalTime.now();
         log.info("Time when saving started: {}", before.toString());
-        long counter = Long.valueOf(applicationProperties.APP_LOG_MAPPER_COUNTER);
+        long batchSize = Long.valueOf(applicationProperties.APP_LOG_MAPPER_BATCH_SIZE);
         SessionFactory sessionFactory = factory.unwrap(SessionFactory.class);
         if (sessionFactory == null) {
             throw new NullPointerException("factory is not a hibernate factory");
         }
-        List<RegistrationInformationEntity> list = new ArrayList<>(registrationInformationEntityList);
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-        for (int i = 0; i < list.size(); i++) {
-            session.save(list.get(i));
-            if (i % counter == 0 || i + 1 >= list.size()) {
+        AtomicInteger i = new AtomicInteger();
+        registrationInformationEntityList.forEach(registrationInformationEntity -> {
+            session.save(registrationInformationEntity);
+            int count = i.incrementAndGet();
+            if (count % batchSize == 0 || count + 1 >= registrationInformationEntityList.size()) {
                 session.flush();
                 session.clear();
             }
-        }
+        });
         transaction.commit();
         session.close();
         Duration duration = Duration.between(before, LocalTime.now());

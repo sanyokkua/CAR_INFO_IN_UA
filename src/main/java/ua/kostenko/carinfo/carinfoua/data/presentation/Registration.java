@@ -3,6 +3,7 @@ package ua.kostenko.carinfo.carinfoua.data.presentation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ua.kostenko.carinfo.carinfoua.data.persistent.entities.RegionCodeEntity;
 
 @Data
 @AllArgsConstructor
@@ -14,7 +15,7 @@ public class Registration {
     private String operationName;
     private String registrationDate;
     private String newRegistrationNumber;
-    private String registrationNumberRegionName;
+    private RegionCodeEntity registrationNumberRegionName;
 
     public enum PersonKind {
         PERSON("P"),

@@ -23,6 +23,6 @@ public class ApplicationProperties {
     public String APP_REGION_CODES_FILE_PATH;
     @Value("${app.region.codes.absent}")
     public String APP_REGION_CODES_ABSENT;
-    @Value("${app.log.mapper.counter}")
-    public String APP_LOG_MAPPER_COUNTER;
+    @Value("${app.log.mapper.batch.size}")
+    public String APP_LOG_MAPPER_BATCH_SIZE;
 }

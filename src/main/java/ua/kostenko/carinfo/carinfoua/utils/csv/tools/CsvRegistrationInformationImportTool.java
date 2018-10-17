@@ -115,7 +115,7 @@ public class CsvRegistrationInformationImportTool implements Initializer {
         Pattern pattern = Pattern.compile("(\\d\\d\\d\\d\\d\\d\\d\\d)");
         Matcher matcher = pattern.matcher(lastPart);
         String dateLabel = null;
-        if (matcher.find()) {
+        if (matcher.find()) {//TODO:
             String dateString = matcher.group();
             log.info("Found date of current data set {}", dateString);
             log.info("Trying to parse date by pattern {}", DATE_PATTERN);
@@ -202,7 +202,7 @@ public class CsvRegistrationInformationImportTool implements Initializer {
         LocalTime before = LocalTime.now();
         log.info("Starting mapping of csv records to objects, time: {}", before.toString());
         Map<String, RegistrationInformationEntity> resultMap = new HashMap<>();
-        long count = Long.valueOf(applicationProperties.APP_LOG_MAPPER_COUNTER);
+        long count = Long.valueOf(applicationProperties.APP_LOG_MAPPER_BATCH_SIZE);
         filesInArchive.forEach(destination -> {
             AtomicLong counter = new AtomicLong(0);
             CSVReader.mapCsvFile(destination, getDelimiter(destination), record -> {

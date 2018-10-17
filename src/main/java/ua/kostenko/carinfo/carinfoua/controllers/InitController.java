@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import ua.kostenko.carinfo.carinfoua.utils.Initializer;
 import ua.kostenko.carinfo.carinfoua.utils.ServiceCenterDataImportTool;
 import ua.kostenko.carinfo.carinfoua.utils.csv.tools.CsvAdministrativeObjectsImportTool;
+import ua.kostenko.carinfo.carinfoua.utils.csv.tools.CsvRegionCodeImportTool;
 import ua.kostenko.carinfo.carinfoua.utils.csv.tools.CsvRegistrationInformationImportTool;
 
 import java.util.Arrays;
@@ -21,11 +22,12 @@ public class InitController {
 
     @Autowired
     public InitController(CsvRegistrationInformationImportTool csvRegistrationInformationImportTool, CsvAdministrativeObjectsImportTool csvAdministrativeObjectsImportTool,
-                          ServiceCenterDataImportTool serviceCenterDataImportTool) {
+                          ServiceCenterDataImportTool serviceCenterDataImportTool, CsvRegionCodeImportTool csvRegionCodeImportTool) {
         Preconditions.checkNotNull(csvRegistrationInformationImportTool);
         Preconditions.checkNotNull(csvAdministrativeObjectsImportTool);
         Preconditions.checkNotNull(serviceCenterDataImportTool);
-        needToBeInitialized = Arrays.asList(serviceCenterDataImportTool, csvAdministrativeObjectsImportTool, csvRegistrationInformationImportTool);
+        Preconditions.checkNotNull(csvRegionCodeImportTool);
+        needToBeInitialized = Arrays.asList(csvRegionCodeImportTool, serviceCenterDataImportTool, csvAdministrativeObjectsImportTool, csvRegistrationInformationImportTool);
     }
 
     @EventListener(ApplicationReadyEvent.class)

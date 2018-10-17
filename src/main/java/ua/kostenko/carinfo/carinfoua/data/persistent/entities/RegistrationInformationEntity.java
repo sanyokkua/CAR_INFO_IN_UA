@@ -23,41 +23,41 @@ public class RegistrationInformationEntity {
     private String id;
     @Column(name = "person")
     private String person;
-    @Column(name = "reg_addr_koatuu")
+    @Column(name = "administrativeObjectCode")
     private Long administrativeObjectCode;
-    @Column(name = "oper_code")
+    @Column(name = "operationCode")
     private Long operationCode;
-    @Column(name = "oper_name")
+    @Column(name = "operationName")
     private String operationName;
-    @Column(name = "d_reg")
+    @Column(name = "registrationDate")
     private String registrationDate;
-    @Column(name = "dep_code")
+    @Column(name = "departmentCode")
     private Long departmentCode;
-    @Column(name = "dep")
+    @Column(name = "departmentName")
     private String departmentName;
-    @Column(name = "brand")
+    @Column(name = "carBrand")
     private String carBrand;
-    @Column(name = "model")
+    @Column(name = "carModel")
     private String carModel;
-    @Column(name = "make_year")
+    @Column(name = "carMakeYear")
     private Long carMakeYear;
-    @Column(name = "color")
+    @Column(name = "carColor")
     private String carColor;
-    @Column(name = "kind")
+    @Column(name = "carKind")
     private String carKind;
-    @Column(name = "body")
+    @Column(name = "carBody")
     private String carBody;
-    @Column(name = "purpose")
+    @Column(name = "carPurpose")
     private String carPurpose;
-    @Column(name = "fuel")
+    @Column(name = "carFuel")
     private String carFuel;
-    @Column(name = "capacity")
+    @Column(name = "carEngineCapacity")
     private Long carEngineCapacity;
-    @Column(name = "own_weight")
+    @Column(name = "carOwnWeight")
     private Long carOwnWeight;
-    @Column(name = "total_weight")
+    @Column(name = "carTotalWeight")
     private Long carTotalWeight;
-    @Column(name = "n_reg_new")
+    @Column(name = "carNewRegistrationNumber")
     private String carNewRegistrationNumber;
     @Column(name = "dataSetYear")
     private String dataSetYear;
