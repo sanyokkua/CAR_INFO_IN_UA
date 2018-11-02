@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.carinfoua.utils.csv.fields;
+package ua.kostenko.carinfo.importing.utils.csv.fields;
 
 public enum RegionCodeCSV {
     CODE("Code"),

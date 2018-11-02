@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.carinfoua.utils.csv;
+package ua.kostenko.carinfo.importing.utils.csv;
 
 import org.apache.commons.csv.CSVRecord;
 

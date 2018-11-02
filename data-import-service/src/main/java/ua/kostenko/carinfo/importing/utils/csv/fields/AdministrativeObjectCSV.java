@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.carinfoua.utils.csv.fields;
+package ua.kostenko.carinfo.importing.utils.csv.fields;
 
 import org.apache.commons.csv.CSVRecord;
 import ua.kostenko.carinfo.carinfoua.data.persistent.entities.AdministrativeObjectEntity;

@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.importing.ua.kostenko.carinfo.importing;
+package ua.kostenko.carinfo.importing;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

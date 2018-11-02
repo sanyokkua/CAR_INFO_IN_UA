@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.carinfoua.utils.csv.tools;
+package ua.kostenko.carinfo.importing.utils.csv.tools;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,9 +15,9 @@ import org.springframework.stereotype.Component;
 import ua.kostenko.carinfo.carinfoua.configuration.ApplicationProperties;
 import ua.kostenko.carinfo.carinfoua.data.persistent.entities.RegistrationInformationEntity;
 import ua.kostenko.carinfo.carinfoua.data.persistent.services.RegistrationInformationService;
-import ua.kostenko.carinfo.carinfoua.utils.Initializer;
-import ua.kostenko.carinfo.carinfoua.utils.csv.fields.RegistrationInformationCSV;
-import ua.kostenko.carinfo.carinfoua.utils.io.CSVReader;
+import ua.kostenko.carinfo.importing.utils.Initializer;
+import ua.kostenko.carinfo.importing.utils.csv.fields.RegistrationInformationCSV;
+import ua.kostenko.carinfo.importing.utils.io.CSVReader;
 
 import java.io.File;
 import java.io.IOException;

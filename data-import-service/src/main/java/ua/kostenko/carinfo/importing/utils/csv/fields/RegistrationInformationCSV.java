@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.carinfoua.utils.csv.fields;
+package ua.kostenko.carinfo.importing.utils.csv.fields;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVRecord;

@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.carinfoua.utils;
+package ua.kostenko.carinfo.importing.utils;
 
 public interface Initializer {
     void init();

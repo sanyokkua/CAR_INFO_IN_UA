@@ -1,10 +1,10 @@
-package ua.kostenko.carinfo.carinfoua.utils.io;
+package ua.kostenko.carinfo.importing.utils.io;
 
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
-import ua.kostenko.carinfo.carinfoua.utils.csv.CSVMapper;
+import ua.kostenko.carinfo.importing.utils.csv.CSVMapper;
 
 import java.io.FileReader;
 import java.io.IOException;

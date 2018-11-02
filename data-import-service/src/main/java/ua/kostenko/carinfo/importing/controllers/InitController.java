@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.carinfoua.controllers;
+package ua.kostenko.carinfo.importing.controllers;
 
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
