@@ -10,12 +10,5 @@ import java.util.List;
 @Repository
 @Transactional
 public interface RegistrationInformationCrudRepository extends JpaRepository<RegistrationInformationEntity, Long> {
-
-    RegistrationInformationEntity findFirstByDataSetYear(String year);
-
-    List<RegistrationInformationEntity> findAllByCarNewRegistrationNumberLike(String number);
-
-    List<RegistrationInformationEntity> findAllByCarModelLike(String model);
-
-    List<RegistrationInformationEntity> findAllByCarBrandLike(String brand);
+  List<RegistrationInformationEntity> findAllByCarNewRegistrationNumberLike(String number);
 }
