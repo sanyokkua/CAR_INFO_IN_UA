@@ -1,7 +1,7 @@
 package ua.kostenko.carinfo.importing.utils.csv.fields;
 
 import org.apache.commons.csv.CSVRecord;
-import ua.kostenko.carinfo.carinfoua.data.persistent.entities.AdministrativeObjectEntity;
+import ua.kostenko.carinfo.importing.data.persistent.entities.AdministrativeObjectEntity;
 
 public enum AdministrativeObjectCSV {
     ID_NUMBER("TE"),

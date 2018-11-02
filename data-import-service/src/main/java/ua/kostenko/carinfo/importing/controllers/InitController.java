@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Controller;
-import ua.kostenko.carinfo.carinfoua.utils.Initializer;
-import ua.kostenko.carinfo.carinfoua.utils.ServiceCenterDataImportTool;
-import ua.kostenko.carinfo.carinfoua.utils.csv.tools.CsvAdministrativeObjectsImportTool;
-import ua.kostenko.carinfo.carinfoua.utils.csv.tools.CsvRegionCodeImportTool;
-import ua.kostenko.carinfo.carinfoua.utils.csv.tools.CsvRegistrationInformationImportTool;
+import ua.kostenko.carinfo.importing.utils.Initializer;
+import ua.kostenko.carinfo.importing.utils.ServiceCenterDataImportTool;
+import ua.kostenko.carinfo.importing.utils.csv.tools.CsvAdministrativeObjectsImportTool;
+import ua.kostenko.carinfo.importing.utils.csv.tools.CsvRegionCodeImportTool;
+import ua.kostenko.carinfo.importing.utils.csv.tools.CsvRegistrationInformationImportTool;
 
 import java.util.Arrays;
 import java.util.List;

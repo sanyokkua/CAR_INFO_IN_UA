@@ -3,7 +3,7 @@ package ua.kostenko.carinfo.importing.utils.csv.fields;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
-import ua.kostenko.carinfo.carinfoua.data.persistent.entities.RegistrationInformationEntity;
+import ua.kostenko.carinfo.importing.data.persistent.entities.RegistrationInformationEntity;
 
 @Slf4j
 public enum RegistrationInformationCSV {

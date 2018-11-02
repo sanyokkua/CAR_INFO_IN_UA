@@ -1,7 +1,7 @@
 package ua.kostenko.carinfo.importing.data.persistent.services;
 
-import ua.kostenko.carinfo.carinfoua.data.persistent.entities.RegistrationInformationEntity;
-import ua.kostenko.carinfo.carinfoua.utils.csv.fields.RegistrationInformationCSV;
+import ua.kostenko.carinfo.importing.data.persistent.entities.RegistrationInformationEntity;
+import ua.kostenko.carinfo.importing.utils.csv.fields.RegistrationInformationCSV;
 
 import java.util.Collection;
 import java.util.List;

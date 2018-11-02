@@ -7,10 +7,10 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ua.kostenko.carinfo.carinfoua.configuration.ApplicationProperties;
-import ua.kostenko.carinfo.carinfoua.data.persistent.entities.RegistrationInformationEntity;
-import ua.kostenko.carinfo.carinfoua.data.persistent.repositories.RegistrationInformationCrudRepository;
-import ua.kostenko.carinfo.carinfoua.utils.csv.fields.RegistrationInformationCSV;
+import ua.kostenko.carinfo.importing.configuration.ApplicationProperties;
+import ua.kostenko.carinfo.importing.data.persistent.entities.RegistrationInformationEntity;
+import ua.kostenko.carinfo.importing.data.persistent.repositories.RegistrationInformationCrudRepository;
+import ua.kostenko.carinfo.importing.utils.csv.fields.RegistrationInformationCSV;
 
 import javax.persistence.EntityManagerFactory;
 import javax.transaction.Transactional;

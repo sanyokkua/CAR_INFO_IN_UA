@@ -8,9 +8,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ua.kostenko.carinfo.carinfoua.configuration.ApplicationProperties;
-import ua.kostenko.carinfo.carinfoua.data.persistent.entities.ServiceCenterEntity;
-import ua.kostenko.carinfo.carinfoua.data.persistent.repositories.ServiceCenterCrudRepository;
+import ua.kostenko.carinfo.importing.configuration.ApplicationProperties;
+import ua.kostenko.carinfo.importing.data.persistent.entities.ServiceCenterEntity;
+import ua.kostenko.carinfo.importing.data.persistent.repositories.ServiceCenterCrudRepository;
 
 import java.io.IOException;
 import java.util.ArrayList;
