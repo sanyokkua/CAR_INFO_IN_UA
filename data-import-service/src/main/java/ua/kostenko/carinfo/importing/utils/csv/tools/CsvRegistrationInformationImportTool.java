@@ -207,6 +207,7 @@ public class CsvRegistrationInformationImportTool implements Initializer {
         long count = Long.valueOf(applicationProperties.APP_LOG_MAPPER_BATCH_SIZE);
         filesInArchive.forEach(destination -> {
             AtomicLong counter = new AtomicLong(0);
+          AtomicLong counterGeneral = new AtomicLong(0);
             CSVReader.mapCsvFile(destination, getDelimiter(destination), record -> {
                 RegistrationInformationEntity data = RegistrationInformationCSV.mapRecord(record);
                 if (data != null) {
@@ -220,10 +221,11 @@ public class CsvRegistrationInformationImportTool implements Initializer {
                 } else {
                     log.info("Returned null from mapping function");
                 }
+                counterGeneral.incrementAndGet();
                 if (counter.incrementAndGet() % count == 0) {
                     //TODO:
                     registrationInformationService.saveAll(resultMap.values());
-                    log.info("Mapped: {}", resultMap.size());
+                    log.info("Mapped: {} for {}", counterGeneral.get(), dateLabel);
                     resultMap.clear();
                 }
             });
