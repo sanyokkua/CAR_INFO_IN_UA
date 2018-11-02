@@ -54,6 +54,7 @@ public class RegistrationInformationServiceDB implements RegistrationInformation
             if (count % batchSize == 0 || count + 1 >= registrationInformationEntityList.size()) {
                 session.flush();
                 session.clear();
+                i.set(0);
             }
         });
         transaction.commit();
@@ -69,16 +70,6 @@ public class RegistrationInformationServiceDB implements RegistrationInformation
             throw new NullPointerException("factory is not a hibernate factory");
         }
         return sessionFactory.openSession();
-    }
-
-    @Override
-    public void removeAllByDateForDataSet(String date) {
-        log.info("Removing all data for date: {}", date);
-        LocalTime before = LocalTime.now();
-        registrationInformationCRUDRepository.deleteAllByDataSetYear(date);
-        Duration duration = Duration.between(before, LocalTime.now());
-        log.info("Removed all data for date: {}", date);
-        log.info("Time spent for removing: {} ms, {} sec, {} min", duration.toMillis(), duration.getSeconds(), duration.toMinutes());
     }
 
     @Override
@@ -103,10 +94,12 @@ public class RegistrationInformationServiceDB implements RegistrationInformation
     }
 
     @Override
-    public boolean checkDatasetYearInDb(String date) {
-        log.info("Checking existing records for date: {}", date);
+    public boolean isDataWithLabelAndDateExists(String dataSetLabel, String date) {
+        log.info("Checking existing records for date: {} and label {}", date, dataSetLabel);
         Preconditions.checkNotNull(date);
+        Preconditions.checkNotNull(dataSetLabel);
         RegistrationInformationEntity firstByDataSetYear = registrationInformationCRUDRepository.findFirstByDataSetYear(date);
-        return firstByDataSetYear != null && date.equalsIgnoreCase(firstByDataSetYear.getDataSetYear());
+        return firstByDataSetYear != null && date.equalsIgnoreCase(firstByDataSetYear.getDataSetYear()) && dataSetLabel.equalsIgnoreCase(firstByDataSetYear.getDataSetLabel());
     }
+
 }

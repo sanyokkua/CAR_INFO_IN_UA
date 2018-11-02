@@ -59,7 +59,7 @@ public class CsvRegistrationInformationImportTool implements Initializer {
     public void init() {
         LocalTime before = LocalTime.now();
         log.info("Started initializing DB: {}", before.toString());
-        String downloadJson = getOpenDataJson();
+        String downloadJson = getStructureDataPackageJson();
         log.info("Downloaded json with next content: \n{}", downloadJson);
 
         log.info("Links for download csv archives:");
@@ -69,53 +69,52 @@ public class CsvRegistrationInformationImportTool implements Initializer {
         log.info("Starting downloading...");
         downloadLinks.forEach(linkUrl -> {
             log.info("Processing link: {}", linkUrl);
-            String dateLabel = parseDateLabel(linkUrl);
-            log.info("Created dateLabel for archive: {}", dateLabel);
-            if (isNeedToUpdate(dateLabel)) {
-                log.info("Data for datelabel {} is need to update", dateLabel);
-//                registrationInformationService.removeAllByDateForDataSet(dateLabel);//TODO: will be changed to updating entities instead their deletion
-                Collection<RegistrationInformationEntity> registrationInformationFromArchive = getRegistrationInformationFromArchive(linkUrl, dateLabel);
-                registrationInformationService.saveAll(registrationInformationFromArchive);
-                registrationInformationFromArchive.clear();
+            String dataSetLabel = linkUrl.substring(linkUrl.lastIndexOf('/') + 1, linkUrl.lastIndexOf('.'));
+            String year = parseYear(dataSetLabel);
+            log.info("Parsed year for archive: {}, dataSetLabel: {}", year, dataSetLabel);
+            if (isNeedToUpdate(year, dataSetLabel)) {
+                log.info("Data for year {} and label {} is need to update", dataSetLabel, year);
+
+//                Collection<RegistrationInformationEntity> registrationInformationFromArchive = getRegistrationInformationFromArchive(linkUrl, year);
+                getRegistrationInformationFromArchive(linkUrl, year);
+//                registrationInformationService.saveAll(registrationInformationFromArchive);
+//                registrationInformationFromArchive.clear();
                 log.info("Added data from link: {}", linkUrl);
             } else {
-                log.info("Skipping processing for archive {} by label {} because it already exists in DB", linkUrl, dateLabel);
+                log.info("Skipping processing for archive {} by label {} because it already exists in DB", linkUrl, year);
             }
         });
         LocalTime after = LocalTime.now();
-        log.info("Finished initializing DB: finish time: {}, duration: {} minutes", after.toString(), Duration.between(before, after).toMinutes());
+        log.info("Finished initializing DB: finish time: {}, duration: {} minutes", after.toString(), Duration.between(before, after)
+                                                                                                              .toMinutes());
     }
 
-    private String getOpenDataJson() {
-        String downloadJson = null;
+    private String getStructureDataPackageJson() {
+        String resultJson = null;
         try {
-            log.info("Downloading Info JSON from: {}", applicationProperties.APP_DATA_SET_JSON_URL);
-            downloadJson = IOUtils.toString(new URL(applicationProperties.APP_DATA_SET_JSON_URL), Charset.forName("UTF-8"));
+            log.info("Downloading StructureDataPackage JSON from: {}", applicationProperties.APP_STRUCTURE_DATA_PACKAGE_JSON_URL);
+            resultJson = IOUtils.toString(new URL(applicationProperties.APP_STRUCTURE_DATA_PACKAGE_JSON_URL), Charset.forName("UTF-8"));
         } catch (IOException e) {
             log.error("Exception occurred when trying to get Info JSON", e);
         }
-        return downloadJson;
+        return resultJson;
     }
 
-    private List<String> getDownloadLinks(String downloadJson) {
+    private List<String> getDownloadLinks(String structureDataPackageJson) {
         Gson gson = new Gson();
         Type type = new TypeToken<Map<String, Object>>() {
         }.getType();
-        Map<String, Object> jsonMap = gson.fromJson(downloadJson, type);
+        Map<String, Object> jsonMap = gson.fromJson(structureDataPackageJson, type);
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonMap);
-            log.info("InfoJson content:\n{}", json);
+            log.info("StructureDataPackage JSON content:\n{}", new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(jsonMap));
         } catch (JsonProcessingException e) {
-            log.warn("Problem with writing map as Json for logging", e);
+            log.warn("Problem with writing StructureDataPackage JSON for logging", e);
         }
         return ((List<Map<String, String>>) jsonMap.get("resources")).stream().map(stringStringMap -> stringStringMap.get("path")).collect(Collectors.toList());
     }
 
-    private String parseDateLabel(String linkUrl) {
-        String lastPart = linkUrl.substring(linkUrl.lastIndexOf('/') + 1, linkUrl.lastIndexOf('.'));
-        Pattern pattern = Pattern.compile("(\\d\\d\\d\\d\\d\\d\\d\\d)");
-        Matcher matcher = pattern.matcher(lastPart);
+    private String parseYear(String lastPart) {
+        Matcher matcher = Pattern.compile("(\\d\\d\\d\\d\\d\\d\\d\\d)").matcher(lastPart);
         String dateLabel = null;
         if (matcher.find()) {//TODO:
             String dateString = matcher.group();
@@ -128,15 +127,13 @@ public class CsvRegistrationInformationImportTool implements Initializer {
         return dateLabel;
     }
 
-    private boolean isNeedToUpdate(String dateLabel) {
-        boolean isCurrentYear = LocalDate.now().getYear() == Integer.parseInt(dateLabel);
-        boolean isExistsInDb = registrationInformationService.checkDatasetYearInDb(dateLabel);
-        return !isExistsInDb || isCurrentYear;
+    private boolean isNeedToUpdate(String year, String dataLabel) {
+        return !registrationInformationService.isDataWithLabelAndDateExists(dataLabel, year);
     }
 
-    private Collection<RegistrationInformationEntity> getRegistrationInformationFromArchive(String linkUrl, String dateLabel) {
+    private void getRegistrationInformationFromArchive(String linkUrl, String dateLabel) {
         Path downloadedZip = downloadZip(linkUrl, dateLabel);
-        return readCsvFromArchiveFile(downloadedZip, dateLabel);
+        readCsvFromArchiveFile(downloadedZip, dateLabel);
     }
 
     private Path downloadZip(String fileUrl, String dateLabel) {
@@ -147,19 +144,21 @@ public class CsvRegistrationInformationImportTool implements Initializer {
             String fileName = applicationProperties.APP_ARCHIVE_DIR + File.separator + applicationProperties.APP_ARCHIVE_NAME + "_" + dateLabel + ".zip";
             log.info("Created archive name: {}", fileName);
             targetPath = new File(fileName).toPath();
-            log.info("Saving archive to folder: {}", targetPath.toAbsolutePath().toString());
+            log.info("Saving archive to folder: {}", targetPath.toAbsolutePath()
+                                                               .toString());
             Files.copy(url.openStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
             log.info("Finished downloading archive from: " + fileUrl);
         } catch (IOException e) {
             log.error(String.format("Error occurred with downloading archive from: %s", fileUrl), e);
         }
         Preconditions.checkNotNull(targetPath, String.format("Error occurred in downloading archive from: %s, path to archive is null", fileUrl));
-        log.info("Archive downloaded from: {}, path to archive: {}", fileUrl, targetPath.toAbsolutePath().toString());
+        log.info("Archive downloaded from: {}, path to archive: {}", fileUrl, targetPath.toAbsolutePath()
+                                                                                        .toString());
         return targetPath;
     }
 
-    private Collection<RegistrationInformationEntity> readCsvFromArchiveFile(Path archiveFilePath, String dateLabel) {
-        Collection<RegistrationInformationEntity> resultList = null;
+    private void readCsvFromArchiveFile(Path archiveFilePath, String dateLabel) {
+//        Collection<RegistrationInformationEntity> resultList = null;
         try {
             log.info("Trying to parse csv file: {}", archiveFilePath.toAbsolutePath().toString());
             log.info("Started reading csv from zip archive");
@@ -168,14 +167,15 @@ public class CsvRegistrationInformationImportTool implements Initializer {
             Path destination = Paths.get(fileName);
             extractZipArchive(archiveFilePath, destination);
             List<Path> filesInArchive = Files.list(destination).collect(Collectors.toList());
-            resultList = mapCsvFiles(dateLabel, filesInArchive);
+//            resultList = mapCsvFiles(dateLabel, filesInArchive);
+            mapCsvFiles(dateLabel, filesInArchive);
             deleteTempFiles(archiveFilePath, destination);
-            log.info("Finished reading csv from zip archive. Number of csv records in result list: {}", resultList.size());
+//            log.info("Finished reading csv from zip archive. Number of csv records in result list: {}", resultList.size());
             log.info("Csv file {} parsed", archiveFilePath.toAbsolutePath().toString());
         } catch (IOException e) {
             log.error(String.format("Error occurred with parsing csv file: %s", archiveFilePath.toAbsolutePath().toString()), e);
         }
-        return resultList;
+//        return resultList;
     }
 
     private void deleteTempFiles(Path... archiveFilePaths) throws IOException {
@@ -200,7 +200,7 @@ public class CsvRegistrationInformationImportTool implements Initializer {
         }
     }
 
-    private Collection<RegistrationInformationEntity> mapCsvFiles(String dateLabel, List<Path> filesInArchive) {
+    private void mapCsvFiles(String dateLabel, List<Path> filesInArchive) {
         LocalTime before = LocalTime.now();
         log.info("Starting mapping of csv records to objects, time: {}", before.toString());
         Map<String, RegistrationInformationEntity> resultMap = new HashMap<>();
@@ -221,13 +221,16 @@ public class CsvRegistrationInformationImportTool implements Initializer {
                     log.info("Returned null from mapping function");
                 }
                 if (counter.incrementAndGet() % count == 0) {
+                    //TODO:
+                    registrationInformationService.saveAll(resultMap.values());
                     log.info("Mapped: {}", resultMap.size());
+                    resultMap.clear();
                 }
             });
         });
         Duration duration = Duration.between(before, LocalTime.now());
         log.info("Finished mapping all csv files from all files in zip. Time spent: {} ms, {} min", duration.toMillis(), duration.toMinutes());
-        return resultMap.values();
+//        return resultMap.values();
     }
 
     private char getDelimiter(Path destination) {

@@ -61,6 +61,8 @@ public class RegistrationInformationEntity {
     private String carNewRegistrationNumber;
     @Column(name = "dataSetYear")
     private String dataSetYear;
+    @Column(name = "dataSetLabel")
+    private String dataSetLabel;
 
     public static String createId(RegistrationInformationEntity object) {
         return UUID.nameUUIDFromBytes(object.concatAllFields().getBytes()).toString();

@@ -18,7 +18,4 @@ public interface RegistrationInformationCrudRepository extends JpaRepository<Reg
     List<RegistrationInformationEntity> findAllByCarModelLike(String model);
 
     List<RegistrationInformationEntity> findAllByCarBrandLike(String brand);
-
-    void deleteAllByDataSetYear(String dataSetYear);
-
 }

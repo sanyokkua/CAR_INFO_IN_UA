@@ -10,9 +10,8 @@ public interface RegistrationInformationService {
 
     void saveAll(Collection<RegistrationInformationEntity> registrationInformationEntityList);
 
-    void removeAllByDateForDataSet(String date);
-
     List<RegistrationInformationEntity> search(RegistrationInformationCSV field, String value);
 
-    boolean checkDatasetYearInDb(String date);
+    boolean isDataWithLabelAndDateExists(String dataSetLabel, String date);
+
 }
