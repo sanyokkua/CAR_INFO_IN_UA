@@ -5,11 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import ua.kostenko.carinfo.importing.configuration.ApplicationProperties;
-import ua.kostenko.carinfo.importing.data.persistent.entities.RegionCodeEntity;
-import ua.kostenko.carinfo.importing.data.persistent.repositories.RegionCodeCrudRepository;
+import ua.kostenko.carinfo.importing.data.entities.RegionCodeEntity;
 import ua.kostenko.carinfo.importing.utils.Initializer;
-import ua.kostenko.carinfo.importing.utils.io.CSVReader;
 import ua.kostenko.carinfo.importing.utils.csv.fields.RegionCodeCSV;
+import ua.kostenko.carinfo.importing.utils.io.CSVReader;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -23,13 +22,10 @@ import java.util.List;
 @Slf4j
 public class CsvRegionCodeImportTool implements Initializer {
     private final ApplicationProperties applicationProperties;
-    private final RegionCodeCrudRepository regionCodeCrudRepository;
 
-    public CsvRegionCodeImportTool(ApplicationProperties applicationProperties, RegionCodeCrudRepository regionCodeCrudRepository) {
+    public CsvRegionCodeImportTool(ApplicationProperties applicationProperties) {
         Preconditions.checkNotNull(applicationProperties);
-        Preconditions.checkNotNull(regionCodeCrudRepository);
         this.applicationProperties = applicationProperties;
-        this.regionCodeCrudRepository = regionCodeCrudRepository;
     }
 
     @Override
@@ -44,7 +40,7 @@ public class CsvRegionCodeImportTool implements Initializer {
             log.error("Error with opening file", e);
         }
         CSVReader.mapCsvFile(destination, ';', record -> resultList.add(new RegionCodeEntity(record.get(RegionCodeCSV.CODE.getFieldName()), record.get(RegionCodeCSV.REGION.getFieldName()))));
-        regionCodeCrudRepository.saveAll(resultList);
+        //regionCodeCrudRepository.saveAll(resultList);
         LocalTime after = LocalTime.now();
         log.info("RegionCode data parsed and saved into DB. Time: {}, duration: {} ms", after.toString(), Duration.between(before, after).toMillis());
     }

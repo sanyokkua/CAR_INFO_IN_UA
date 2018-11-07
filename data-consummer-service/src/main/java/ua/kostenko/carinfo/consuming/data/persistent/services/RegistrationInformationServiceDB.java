@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.importing.data.persistent.services;
+package ua.kostenko.carinfo.consuming.data.persistent.services;
 
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
@@ -7,18 +7,15 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ua.kostenko.carinfo.importing.configuration.ApplicationProperties;
-import ua.kostenko.carinfo.importing.data.persistent.entities.RegistrationInformationEntity;
-import ua.kostenko.carinfo.importing.data.persistent.repositories.RegistrationInformationCrudRepository;
-import ua.kostenko.carinfo.importing.utils.csv.fields.RegistrationInformationCSV;
+import ua.kostenko.carinfo.consuming.configuration.ApplicationProperties;
+import ua.kostenko.carinfo.consuming.data.persistent.entities.RegistrationInformationEntity;
+import ua.kostenko.carinfo.consuming.data.persistent.repositories.RegistrationInformationCrudRepository;
 
 import javax.persistence.EntityManagerFactory;
 import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
@@ -62,6 +59,11 @@ public class RegistrationInformationServiceDB implements RegistrationInformation
         Duration duration = Duration.between(before, LocalTime.now());
         log.info("Saved list of RegistrationInformationEntity Objects, size: {}", registrationInformationEntityList.size());
         log.info("Time spent for saving: {} ms, {} sec, {} min", duration.toMillis(), duration.getSeconds(), duration.toMinutes());
+    }
+
+    @Override
+    public void save(RegistrationInformationEntity registrationInformationEntity) {
+        registrationInformationCRUDRepository.save(registrationInformationEntity);
     }
 
     private Session getSession() {

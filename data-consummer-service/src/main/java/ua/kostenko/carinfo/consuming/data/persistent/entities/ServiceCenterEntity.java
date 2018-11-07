@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.importing.data.persistent.entities;
+package ua.kostenko.carinfo.consuming.data.persistent.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

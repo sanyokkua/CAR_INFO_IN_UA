@@ -1,13 +1,9 @@
-package ua.kostenko.carinfo.importing.data.persistent.entities;
+package ua.kostenko.carinfo.importing.data.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import java.util.UUID;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -15,53 +11,28 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "RegistrationInformation")
 public class RegistrationInformationEntity {
-    @Id
-    @Column(name = "id", nullable = false)
     private String id;
-    @Column(name = "person")
     private String person;
-    @Column(name = "administrativeObjectCode")
     private Long administrativeObjectCode;
-    @Column(name = "operationCode")
     private Long operationCode;
-    @Column(name = "operationName")
     private String operationName;
-    @Column(name = "registrationDate")
     private String registrationDate;
-    @Column(name = "departmentCode")
     private Long departmentCode;
-    @Column(name = "departmentName")
     private String departmentName;
-    @Column(name = "carBrand")
     private String carBrand;
-    @Column(name = "carModel")
     private String carModel;
-    @Column(name = "carMakeYear")
     private Long carMakeYear;
-    @Column(name = "carColor")
     private String carColor;
-    @Column(name = "carKind")
     private String carKind;
-    @Column(name = "carBody")
     private String carBody;
-    @Column(name = "carPurpose")
     private String carPurpose;
-    @Column(name = "carFuel")
     private String carFuel;
-    @Column(name = "carEngineCapacity")
     private Long carEngineCapacity;
-    @Column(name = "carOwnWeight")
     private Long carOwnWeight;
-    @Column(name = "carTotalWeight")
     private Long carTotalWeight;
-    @Column(name = "carNewRegistrationNumber")
     private String carNewRegistrationNumber;
-    @Column(name = "dataSetYear")
     private String dataSetYear;
-    @Column(name = "dataSetLabel")
     private String dataSetLabel;
 
     public static String createId(RegistrationInformationEntity object) {

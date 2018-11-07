@@ -1,11 +1,10 @@
-package ua.kostenko.carinfo.importing.data.persistent.repositories;
+package ua.kostenko.carinfo.consuming.data.persistent.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ua.kostenko.carinfo.importing.data.persistent.entities.RegistrationInformationEntity;
+import ua.kostenko.carinfo.consuming.data.persistent.entities.RegistrationInformationEntity;
 
 import javax.transaction.Transactional;
-import java.util.List;
 
 @Repository
 @Transactional

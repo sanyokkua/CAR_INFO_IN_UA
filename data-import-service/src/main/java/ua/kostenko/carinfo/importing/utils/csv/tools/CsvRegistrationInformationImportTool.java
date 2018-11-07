@@ -2,6 +2,7 @@ package ua.kostenko.carinfo.importing.utils.csv.tools;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -13,8 +14,8 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ua.kostenko.carinfo.importing.configuration.ApplicationProperties;
-import ua.kostenko.carinfo.importing.data.persistent.entities.RegistrationInformationEntity;
-import ua.kostenko.carinfo.importing.data.persistent.services.RegistrationInformationService;
+import ua.kostenko.carinfo.importing.data.entities.RegistrationInformationEntity;
+import ua.kostenko.carinfo.importing.queue.RegistrationInformationQueueSender;
 import ua.kostenko.carinfo.importing.utils.Initializer;
 import ua.kostenko.carinfo.importing.utils.csv.fields.RegistrationInformationCSV;
 import ua.kostenko.carinfo.importing.utils.io.CSVReader;
@@ -44,15 +45,15 @@ import java.util.stream.Stream;
 @Slf4j
 public class CsvRegistrationInformationImportTool implements Initializer {
     private static final String DATE_PATTERN = "ddMMyyyy";
-    private final RegistrationInformationService registrationInformationService;
     private final ApplicationProperties applicationProperties;
+    private final RegistrationInformationQueueSender registrationInformationQueueSender;
 
     @Autowired
-    public CsvRegistrationInformationImportTool(RegistrationInformationService registrationInformationService, ApplicationProperties applicationProperties) {
-        Preconditions.checkNotNull(registrationInformationService);
+    public CsvRegistrationInformationImportTool(ApplicationProperties applicationProperties, RegistrationInformationQueueSender registrationInformationQueueSender) {
         Preconditions.checkNotNull(applicationProperties);
-        this.registrationInformationService = registrationInformationService;
+        Preconditions.checkNotNull(registrationInformationQueueSender);
         this.applicationProperties = applicationProperties;
+        this.registrationInformationQueueSender = registrationInformationQueueSender;
     }
 
     @Override
@@ -128,7 +129,7 @@ public class CsvRegistrationInformationImportTool implements Initializer {
     }
 
     private boolean isNeedToUpdate(String year, String dataLabel) {
-        return !registrationInformationService.isDataWithLabelAndDateExists(dataLabel, year);
+        return true;//!registrationInformationService.isDataWithLabelAndDateExists(dataLabel, year);
     }
 
     private void getRegistrationInformationFromArchive(String linkUrl, String dateLabel) {
@@ -224,15 +225,26 @@ public class CsvRegistrationInformationImportTool implements Initializer {
                 counterGeneral.incrementAndGet();
                 if (counter.incrementAndGet() % count == 0) {
                     //TODO:
-                    registrationInformationService.saveAll(resultMap.values());
+//                    registrationInformationService.saveAll(resultMap.values());
                     log.info("Mapped: {} for {}", counterGeneral.get(), dateLabel);
-                    resultMap.clear();
+//                    resultMap.clear();
                 }
             });
         });
         Duration duration = Duration.between(before, LocalTime.now());
         log.info("Finished mapping all csv files from all files in zip. Time spent: {} ms, {} min", duration.toMillis(), duration.toMinutes());
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        resultMap.values().forEach(registrationInformationEntity -> sendMessageToQueue(mapper, registrationInformationEntity));
 //        return resultMap.values();
+    }
+
+    private void sendMessageToQueue(ObjectMapper mapper, RegistrationInformationEntity registrationInformationEntity) {
+        try {
+            registrationInformationQueueSender.send(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(registrationInformationEntity));
+        } catch (JsonProcessingException e) {
+            log.error("Mapping to json problem", e);
+        }
     }
 
     private char getDelimiter(Path destination) {

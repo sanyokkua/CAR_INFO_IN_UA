@@ -9,8 +9,7 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ua.kostenko.carinfo.importing.configuration.ApplicationProperties;
-import ua.kostenko.carinfo.importing.data.persistent.entities.ServiceCenterEntity;
-import ua.kostenko.carinfo.importing.data.persistent.repositories.ServiceCenterCrudRepository;
+import ua.kostenko.carinfo.importing.data.entities.ServiceCenterEntity;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,14 +23,11 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 @Slf4j
 public class ServiceCenterDataImportTool implements Initializer {
     private final ApplicationProperties applicationProperties;
-    private final ServiceCenterCrudRepository serviceCenterCrudRepository;
 
     @Autowired
-    public ServiceCenterDataImportTool(ApplicationProperties applicationProperties, ServiceCenterCrudRepository serviceCenterCrudRepository) {
+    public ServiceCenterDataImportTool(ApplicationProperties applicationProperties) {
         Preconditions.checkNotNull(applicationProperties);
-        Preconditions.checkNotNull(serviceCenterCrudRepository);
         this.applicationProperties = applicationProperties;
-        this.serviceCenterCrudRepository = serviceCenterCrudRepository;
     }
 
     @Override
@@ -65,7 +61,7 @@ public class ServiceCenterDataImportTool implements Initializer {
             }
             resultList.forEach(
                     serviceCenterEntity -> log.info("Service center: id {}, address {}, email {}", serviceCenterEntity.getDepId(), serviceCenterEntity.getAddress(), serviceCenterEntity.getEmail()));
-            serviceCenterCrudRepository.saveAll(resultList);
+//            serviceCenterCrudRepository.saveAll(resultList);
             log.info("All information parsed");
         }
         log.info("Finished initialization of ServiceCenters data.");

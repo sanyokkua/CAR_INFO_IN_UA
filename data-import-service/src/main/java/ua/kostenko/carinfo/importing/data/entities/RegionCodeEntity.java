@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.importing.data.persistent.entities;
+package ua.kostenko.carinfo.importing.data.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,12 +12,7 @@ import javax.persistence.Table;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "RegionCode")
 public class RegionCodeEntity {
-    @Id
-    @Column(name = "code", nullable = false)
     private String code;
-    @Column(name = "region")
     private String region;
 }

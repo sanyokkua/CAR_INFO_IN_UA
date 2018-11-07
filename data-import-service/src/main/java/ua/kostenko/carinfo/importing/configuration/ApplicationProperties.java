@@ -25,4 +25,10 @@ public class ApplicationProperties {
     public String APP_REGION_CODES_ABSENT;
     @Value("${app.log.mapper.batch.size}")
     public String APP_LOG_MAPPER_BATCH_SIZE;
+    @Value("${app.queue.name}")
+    public String QUEUE_NAME;
+    @Value("${app.queue.exchange.name}")
+    public String QUEUE_EXCHANGE_NAME;
+    @Value("${app.queue.routing.key}")
+    public String QUEUE_ROUTING_KEY;
 }

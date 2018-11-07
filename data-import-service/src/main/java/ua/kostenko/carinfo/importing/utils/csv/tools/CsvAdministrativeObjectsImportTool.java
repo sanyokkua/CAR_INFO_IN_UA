@@ -6,8 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import ua.kostenko.carinfo.importing.configuration.ApplicationProperties;
-import ua.kostenko.carinfo.importing.data.persistent.entities.AdministrativeObjectEntity;
-import ua.kostenko.carinfo.importing.data.persistent.repositories.AdministrativeObjectsCrudRepository;
+import ua.kostenko.carinfo.importing.data.entities.AdministrativeObjectEntity;
 import ua.kostenko.carinfo.importing.utils.Initializer;
 import ua.kostenko.carinfo.importing.utils.csv.fields.AdministrativeObjectCSV;
 import ua.kostenko.carinfo.importing.utils.io.CSVReader;
@@ -20,21 +19,15 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-
-import static java.util.Objects.nonNull;
 
 @Component
 @Slf4j
 public class CsvAdministrativeObjectsImportTool implements Initializer {
-    private final AdministrativeObjectsCrudRepository administrativeObjectsCrudRepository;
     private final ApplicationProperties applicationProperties;
 
     @Autowired
-    public CsvAdministrativeObjectsImportTool(AdministrativeObjectsCrudRepository administrativeObjectsCrudRepository, ApplicationProperties applicationProperties) {
-        Preconditions.checkNotNull(administrativeObjectsCrudRepository);
+    public CsvAdministrativeObjectsImportTool(ApplicationProperties applicationProperties) {
         Preconditions.checkNotNull(applicationProperties);
-        this.administrativeObjectsCrudRepository = administrativeObjectsCrudRepository;
         this.applicationProperties = applicationProperties;
     }
 
@@ -58,10 +51,10 @@ public class CsvAdministrativeObjectsImportTool implements Initializer {
                 administrativeObjectEntityList.add(data);
             });
 
-            administrativeObjectsCrudRepository.saveAll(administrativeObjectEntityList.stream()
-                    .filter(administrativeObjectEntity -> nonNull(administrativeObjectEntity)
-                            && nonNull(administrativeObjectEntity.getId()))
-                    .collect(Collectors.toList()));
+//            administrativeObjectsCrudRepository.saveAll(administrativeObjectEntityList.stream()
+//                    .filter(administrativeObjectEntity -> nonNull(administrativeObjectEntity)
+//                            && nonNull(administrativeObjectEntity.getId()))
+//                    .collect(Collectors.toList()));
             LocalTime after = LocalTime.now();
             log.info("Finished initializing AdministrativeObjects. Saved all AdministrativeObjectEntity to DB Time: {}, duration: {} ms", after.toString(), Duration.between(before, after).toMillis());
         } else {
