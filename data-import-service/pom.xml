@@ -8,7 +8,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>ua.kostenko.carinfo.importing</name>
+    <name>ua.kostenko.carinfo.producing</name>
     <description>Demo project for Spring Boot</description>
 
     <parent>
