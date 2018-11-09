@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ua.kostenko.carinfo</groupId>
-    <artifactId>ua.kostenko.carinfo</artifactId>
+    <artifactId>car-info</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -12,7 +12,7 @@
     <description>Car Info Project</description>
 
     <modules>
-        <module>common-libs</module>
+        <module>common-classes</module>
         <module>data-consumer-service</module>
         <module>data-producer-service</module>
         <module>rest-service</module>
