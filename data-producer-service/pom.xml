@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ua.kostenko.carinfo.producing</groupId>
-    <artifactId>ua.kostenko.carinfo.producing</artifactId>
+    <artifactId>carinfo-producer-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Carinfo-Producer-Service</name>
+    <name>carinfo-producer-service</name>
     <description>Producer service which fills up queues with parsed data from csv</description>
 
     <parent>
