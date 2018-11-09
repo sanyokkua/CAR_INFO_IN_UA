@@ -1,4 +1,4 @@
-package com.kostenko.carinfo.carinfoua.web.carinfoua.web;
+package ua.kostenko.carinfo.consumer.producing;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
