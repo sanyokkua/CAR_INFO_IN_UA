@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>ua.kostenko.carinfo</groupId>
+    <artifactId>ua.kostenko.carinfo</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>CAR-INFO-PARENT</name>
+    <description>Car Info Project</description>
+
+    <modules>
+        <module>common-libs</module>
+        <module>data-consummer-service</module>
+        <module>data-import-service</module>
+        <module>rest-service</module>
+    </modules>
+
+</project>

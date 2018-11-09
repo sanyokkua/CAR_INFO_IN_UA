@@ -3,13 +3,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ua.kostenko.carinfo.consuming</groupId>
-    <artifactId>ua.kostenko.carinfo.consuming</artifactId>
+    <groupId>ua.kostenko.carinfo.common</groupId>
+    <artifactId>ua.kostenko.carinfo.common</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Carinfo-Consumer-Service</name>
-    <description>Consumer service which saves all data from queues to DB</description>
+    <name>Carinfo-Common-Classes</name>
+    <description>Common classes for car info project</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -25,11 +25,6 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>ua.kostenko.carinfo.common</groupId>
-            <artifactId>ua.kostenko.carinfo.common</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-amqp</artifactId>
@@ -118,14 +113,4 @@
             <version>1.11.3</version>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
-
 </project>
