@@ -13,8 +13,8 @@
 
     <modules>
         <module>common-libs</module>
-        <module>data-consummer-service</module>
-        <module>data-import-service</module>
+        <module>data-consumer-service</module>
+        <module>data-producer-service</module>
         <module>rest-service</module>
     </modules>
 
