@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import ua.kostenko.carinfo.common.entities.RegistrationInformationEntity;
 import ua.kostenko.carinfo.rest.controllers.utils.ResponseCreatorHelper;
-import ua.kostenko.carinfo.rest.data.persistent.services.RegistrationInformationService;
+import ua.kostenko.carinfo.rest.data.persistent.services.SearchService;
 import ua.kostenko.carinfo.rest.data.presentation.CombinedInformation;
 
 import java.time.Duration;
@@ -24,14 +24,14 @@ import java.util.List;
 @RestController
 @Slf4j
 public class MainRestController {
-    private final RegistrationInformationService registrationInformationService;
+    private final SearchService searchService;
     private final ResponseCreatorHelper responseCreatorHelper;
 
     @Autowired
-    public MainRestController(RegistrationInformationService registrationInformationService, ResponseCreatorHelper responseCreatorHelper) {
-        Preconditions.checkNotNull(registrationInformationService);
+    public MainRestController(SearchService searchService, ResponseCreatorHelper responseCreatorHelper) {
+        Preconditions.checkNotNull(searchService);
         Preconditions.checkNotNull(responseCreatorHelper);
-        this.registrationInformationService = registrationInformationService;
+        this.searchService = searchService;
         this.responseCreatorHelper = responseCreatorHelper;
     }
 
@@ -42,7 +42,7 @@ public class MainRestController {
         LocalDateTime before = LocalDateTime.now();
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-        List<RegistrationInformationEntity> results = registrationInformationService.search(number.toUpperCase());
+        List<RegistrationInformationEntity> results = searchService.search(number.toUpperCase());
         List<CombinedInformation> combinedInformation = responseCreatorHelper.getCombinedInformation(results);
         ResponseEntity<String> responseEntity = new ResponseEntity<>(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(combinedInformation), HttpStatus.OK);
         log.info("Processing of request by url /search/{} finished, time: {} ms", number, Duration.between(before, LocalDateTime.now()).toMillis());
