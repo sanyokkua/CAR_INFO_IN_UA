@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.consumer;
+package ua.kostenko.carinfo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
