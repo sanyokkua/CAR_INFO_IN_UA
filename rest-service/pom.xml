@@ -27,7 +27,7 @@
     <dependencies>
         <dependency>
             <groupId>ua.kostenko.carinfo.common</groupId>
-            <artifactId>ua.kostenko.carinfo.common</artifactId>
+            <artifactId>carinfo-common-classes</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>

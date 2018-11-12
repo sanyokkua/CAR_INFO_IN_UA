@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -35,6 +36,7 @@ public class MainRestController {
         this.responseCreatorHelper = responseCreatorHelper;
     }
 
+    @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/search/{number}", method = RequestMethod.GET)
     public ResponseEntity<String> searchByNumber(@PathVariable String number) throws JsonProcessingException {
         number = number.toUpperCase();
@@ -42,8 +44,7 @@ public class MainRestController {
         LocalDateTime before = LocalDateTime.now();
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-        List<RegistrationInformationEntity> results = searchService.search(number.toUpperCase());
-        List<CombinedInformation> combinedInformation = responseCreatorHelper.getCombinedInformation(results);
+        List<CombinedInformation> combinedInformation = searchService.searchAllByRegistrationNumber(number.toUpperCase());
         ResponseEntity<String> responseEntity = new ResponseEntity<>(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(combinedInformation), HttpStatus.OK);
         log.info("Processing of request by url /search/{} finished, time: {} ms", number, Duration.between(before, LocalDateTime.now()).toMillis());
         return responseEntity;
