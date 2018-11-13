@@ -54,9 +54,9 @@ public class CsvAdministrativeObjectsImportTool implements Initializer {
             final List<AdministrativeObjectEntity> administrativeObjectEntityList = new ArrayList<>();
             CSVReader.mapCsvFile(administrativeObjectsFilePath, ';', record -> administrativeObjectEntityList.add(AdministrativeObjectCSV.mapRecord(record)));
             administrativeObjectEntityList.stream().parallel()
-                                          .filter(administrativeObjectEntity -> nonNull(administrativeObjectEntity) && nonNull(administrativeObjectEntity.getId()))
-                                          .map(ObjectMapperTool::writeValueAsString)
-                                          .forEach(queueSender::send);
+                    .filter(administrativeObjectEntity -> nonNull(administrativeObjectEntity) && nonNull(administrativeObjectEntity.getId()))
+                    .map(ObjectMapperTool::writeValueAsString)
+                    .forEach(queueSender::send);
             LocalTime after = LocalTime.now();
             log.info("Finished initializing AdministrativeObjects. Sent all AdministrativeObjectEntity to queue Time: {}, duration: {} ms", after.toString(), Duration
                     .between(before, after).toMillis());

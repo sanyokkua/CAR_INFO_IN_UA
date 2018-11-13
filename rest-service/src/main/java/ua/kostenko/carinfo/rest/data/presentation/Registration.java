@@ -42,16 +42,10 @@ public class Registration {
     }
 
     public enum PersonKind {
-        PERSON("P"),
-        JURIDICAL("J");
+        PERSON,
+        JURIDICAL;
 
-        private final String key;
-
-        PersonKind(String key) {
-            this.key = key;
-        }
-
-        public static PersonKind getPersonKind(String person) {
+        static PersonKind getPersonKind(String person) {
             switch (person) {
                 case "P":
                     return PERSON;

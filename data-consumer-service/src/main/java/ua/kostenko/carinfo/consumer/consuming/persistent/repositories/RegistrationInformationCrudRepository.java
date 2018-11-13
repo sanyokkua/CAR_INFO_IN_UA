@@ -6,5 +6,4 @@ import ua.kostenko.carinfo.common.entities.RegistrationInformationEntity;
 
 @Repository
 public interface RegistrationInformationCrudRepository extends JpaRepository<RegistrationInformationEntity, Long> {
-    RegistrationInformationEntity findFirstByDataSetYear(String year);
 }

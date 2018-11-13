@@ -17,11 +17,10 @@ import java.util.Objects;
 @Slf4j
 public class ServiceCenterDataQueueReceiver implements QueueReceiver {
     private final List<ServiceCenterEntity> temp;
-    private final SaveScheduler<ServiceCenterEntity> saver;
 
     public ServiceCenterDataQueueReceiver(ServiceCenterService serviceCenterService) {
         temp = Collections.synchronizedList(new ArrayList<>());
-        saver = new SaveScheduler<>(serviceCenterService);
+        SaveScheduler<ServiceCenterEntity> saver = new SaveScheduler<>(serviceCenterService);
         saver.schedule(temp, 5);
     }
 

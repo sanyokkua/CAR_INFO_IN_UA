@@ -18,12 +18,11 @@ import java.util.Objects;
 @Slf4j
 public class RegistrationInformationQueueReceiver implements QueueReceiver {
     private final List<RegistrationInformationEntity> temp;
-    private final SaveScheduler<RegistrationInformationEntity> saver;
 
     @Autowired
     public RegistrationInformationQueueReceiver(RegistrationInformationService registrationInformationService) {
         temp = Collections.synchronizedList(new ArrayList<>());
-        saver = new SaveScheduler<>(registrationInformationService);
+        SaveScheduler<RegistrationInformationEntity> saver = new SaveScheduler<>(registrationInformationService);
         saver.schedule(temp, 5);
     }
 

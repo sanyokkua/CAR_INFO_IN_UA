@@ -18,12 +18,11 @@ import java.util.Objects;
 @Slf4j
 public class AdministrativeObjectQueueReceiver implements QueueReceiver {
     private final List<AdministrativeObjectEntity> temp;
-    private final SaveScheduler<AdministrativeObjectEntity> saver;
 
     @Autowired
     public AdministrativeObjectQueueReceiver(AdministrativeObjectsService registrationInformationService) {
         temp = Collections.synchronizedList(new ArrayList<>());
-        saver = new SaveScheduler<>(registrationInformationService);
+        SaveScheduler<AdministrativeObjectEntity> saver = new SaveScheduler<>(registrationInformationService);
         saver.schedule(temp, 5);
     }
 

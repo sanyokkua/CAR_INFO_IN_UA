@@ -1,15 +1,10 @@
 package ua.kostenko.carinfo.rest.data.persistent.services;
 
-import ua.kostenko.carinfo.common.entities.RegistrationInformationEntity;
 import ua.kostenko.carinfo.rest.data.presentation.CombinedInformation;
 
 import java.util.List;
 
 public interface SearchService {
-
-    List<RegistrationInformationEntity> search(String value);
-
-    ///NEW API
 
     List<CombinedInformation> searchAllByRegistrationNumber(String number);
 
@@ -25,20 +20,20 @@ public interface SearchService {
 
     List<String> getAllRegions();
 
-    int countAllRegistrations();
+    long countAllRegistrations();
 
-    int countAllByBrand(String brand);
+    long countAllByBrand(String brand);
 
-    int countAllByCarBrandAndModel(String brand, String model);
+    long countAllByCarBrandAndModel(String brand, String model);
 
-    int countAllByCarColor(String color);
+    long countAllByCarColor(String color);
 
-    int countAllByFuelType(String fuelType);
+    long countAllByFuelType(String fuelType);
 
-    int countAllByCarKind(String carKind);
+    long countAllByCarKind(String carKind);
 
-    int countAllCarsByYear(int year);
+    long countAllCarsByYear(int year);
 
-    int countAllCarsInRegion(String region);
+    long countAllCarsInRegion(String region);
 
 }
