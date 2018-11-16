@@ -52,12 +52,14 @@ public class DBSearchService implements SearchService {
         params.put("dep_code", ServiceCenterTable.FIELD_DEPARTMENT_CODE);
         params.put("department_code", RegistrationInformationTable.FIELD_DEPARTMENT_CODE);
         params.put("car_new_registration_number", RegistrationInformationTable.FIELD_CAR_NEW_REG_NUMBER);
+        params.put("registration_date", RegistrationInformationTable.FIELD_REGISTRATION_DATE);
         params.put("value", number);
         String sqlTemplate = new StringSubstitutor(params).replace("SELECT * " +
                 "FROM ${registration_information} " +
                 "JOIN ${administrative_object} ON ${administrative_object}.${id} = ${registration_information}.${administrative_object_code} " +
                 "JOIN ${service_center} ON ${service_center}.${dep_code} = ${registration_information}.${department_code} " +
-                "WHERE ${registration_information}.${car_new_registration_number} = '${value}'");
+                "WHERE ${registration_information}.${car_new_registration_number} = '${value}' " +
+                "ORDER BY ${registration_information}.${registration_date} DESC");
 
         try (Connection c = dataSource.getConnection()) {
             return new JdbcTemplate(new SingleConnectionDataSource(c, true)).query(sqlTemplate, (resultSet, i) -> {
