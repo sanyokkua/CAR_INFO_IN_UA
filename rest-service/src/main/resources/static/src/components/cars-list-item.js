@@ -4,8 +4,11 @@ Vue.component('cars-list-item', {
 <ul v-if="registration" class="collapsible hoverable" >
     <li>
         <div class="collapsible-header">
-            {{ registration.auto.carBrand }} {{ registration.auto.carModel }} - {{ registration.registration.newRegistrationNumber }}
-            <span class="new badge">{{ registration.registration.registrationDate }}</span></div>
+            {{ registration.auto.carBrand }} {{ registration.auto.carModel }} {{ registration.registration.newRegistrationNumber }}
+            <br/>
+            {{ registration.registration.operationName }}
+            <span class="new badge">{{ registration.registration.registrationDate }}</span>
+        </div>
         <div class="collapsible-body">
             <div class="card blue hoverable">
                 <div class="card-content"></div>
