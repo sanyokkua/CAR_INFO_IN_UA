@@ -14,6 +14,7 @@ new Vue({
             </ul>
         </div>
     </nav>
+    Statistics page
 </div>
         `
 });

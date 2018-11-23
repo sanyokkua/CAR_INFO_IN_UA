@@ -2,7 +2,6 @@ new Vue({
     el: '#app',
     data: {},
     template: `
-
 <div id="app">
     <nav>
         <div class="nav-wrapper">
@@ -14,6 +13,7 @@ new Vue({
             </ul>
         </div>
     </nav>
+    Login page
 </div>
         `
 });
