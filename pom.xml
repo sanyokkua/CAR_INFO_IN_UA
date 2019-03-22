@@ -16,6 +16,7 @@
         <module>data-consumer-service</module>
         <module>data-producer-service</module>
         <module>rest-service</module>
+        <module>data-import-service</module>
     </modules>
 
 </project>
