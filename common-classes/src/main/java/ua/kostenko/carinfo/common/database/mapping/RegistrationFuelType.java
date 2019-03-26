@@ -1,0 +1,35 @@
+package ua.kostenko.carinfo.common.database.mapping;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.NaturalId;
+import ua.kostenko.carinfo.common.database.Constants;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Entity
+@Table(schema = Constants.SCHEMA, name = Constants.RegistrationFuelType.TABLE, uniqueConstraints = {@UniqueConstraint(columnNames = Constants.RegistrationFuelType.FUEL_TYPE_NAME)})
+public class RegistrationFuelType implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = Constants.RegistrationFuelType.FUEL_TYPE_ID, nullable = false, columnDefinition = "serial")
+    private Long fuelTypeId;
+
+    @NaturalId
+    @Column(name = Constants.RegistrationFuelType.FUEL_TYPE_NAME, nullable = false)
+    private String fuelTypeName;
+
+    @Builder.Default
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "registrationFuelType", orphanRemoval = true, fetch = FetchType.EAGER)
+    private Set<RegistrationRecord> registrationRecords = new HashSet<>();
+}
