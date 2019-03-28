@@ -17,16 +17,16 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = Constants.SCHEMA, name = Constants.RegistrationColor.TABLE, uniqueConstraints = {@UniqueConstraint(columnNames = Constants.RegistrationColor.COLOR_NAME)})
+@Table(schema = Constants.SCHEMA, name = Constants.RegistrationColor.TABLE, uniqueConstraints = {@UniqueConstraint(columnNames = Constants.RegistrationColor.NAME)})
 public class RegistrationColor implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = Constants.RegistrationColor.COLOR_ID, nullable = false, columnDefinition = "serial")
+    @Column(name = Constants.RegistrationColor.ID, nullable = false, columnDefinition = "serial")
     private Long colorId;
 
     @NaturalId
-    @Column(name = Constants.RegistrationColor.COLOR_NAME, nullable = false)
+    @Column(name = Constants.RegistrationColor.NAME, nullable = false)
     private String colorName;
 
     @Builder.Default

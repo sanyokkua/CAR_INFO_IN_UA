@@ -17,16 +17,16 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = Constants.SCHEMA, name = Constants.RegistrationPurpose.TABLE, uniqueConstraints = {@UniqueConstraint(columnNames = Constants.RegistrationPurpose.PURPOSE_NAME)})
+@Table(schema = Constants.SCHEMA, name = Constants.RegistrationPurpose.TABLE, uniqueConstraints = {@UniqueConstraint(columnNames = Constants.RegistrationPurpose.NAME)})
 public class RegistrationPurpose implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = Constants.RegistrationPurpose.PURPOSE_ID, nullable = false, columnDefinition = "serial")
+    @Column(name = Constants.RegistrationPurpose.ID, nullable = false, columnDefinition = "serial")
     private Long purposeId;
 
     @NaturalId
-    @Column(name = Constants.RegistrationPurpose.PURPOSE_NAME, nullable = false)
+    @Column(name = Constants.RegistrationPurpose.NAME, nullable = false)
     private String purposeName;
 
     @Builder.Default

@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.NaturalId;
 import ua.kostenko.carinfo.common.database.Constants;
 
 import javax.persistence.*;
@@ -17,19 +16,18 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = Constants.SCHEMA, name = Constants.RegistrationBrand.TABLE, uniqueConstraints = {@UniqueConstraint(columnNames = Constants.RegistrationBrand.BRAND_NAME)})
+@Table(schema = Constants.SCHEMA, name = Constants.RegistrationBrand.TABLE, uniqueConstraints = {@UniqueConstraint(columnNames = Constants.RegistrationBrand.NAME)})
 public class RegistrationBrand implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = Constants.RegistrationBrand.BRAND_ID, nullable = false, columnDefinition = "serial")
+    @Column(name = Constants.RegistrationBrand.ID, nullable = false, columnDefinition = "serial")
     private Long brandId;
 
-    @NaturalId
-    @Column(name = Constants.RegistrationBrand.BRAND_NAME, nullable = false)
+    @Column(name = Constants.RegistrationBrand.NAME, nullable = false)
     private String brandName;
 
     @Builder.Default
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "registrationBrand", orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "registrationBrand", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<RegistrationVehicle> registrationVehicles = new HashSet<>();
 }

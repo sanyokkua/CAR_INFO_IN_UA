@@ -15,15 +15,15 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = Constants.SCHEMA, name = Constants.RegistrationKind.TABLE, uniqueConstraints = {@UniqueConstraint(columnNames = Constants.RegistrationKind.KIND_NAME)})
+@Table(schema = Constants.SCHEMA, name = Constants.RegistrationKind.TABLE, uniqueConstraints = {@UniqueConstraint(columnNames = Constants.RegistrationKind.NAME)})
 public class RegistrationKind implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = Constants.RegistrationKind.KIND_ID, nullable = false, columnDefinition = "serial")
+    @Column(name = Constants.RegistrationKind.ID, nullable = false, columnDefinition = "serial")
     private Long kindId;
 
     @NaturalId
-    @Column(name = Constants.RegistrationKind.KIND_NAME, nullable = false)
+    @Column(name = Constants.RegistrationKind.NAME, nullable = false)
     private String kindName;
 }

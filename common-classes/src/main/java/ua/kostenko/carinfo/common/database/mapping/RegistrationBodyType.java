@@ -17,16 +17,16 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = Constants.SCHEMA, name = Constants.RegistrationBodyType.TABLE, uniqueConstraints = {@UniqueConstraint(columnNames = Constants.RegistrationBodyType.BODY_TYPE_NAME)})
+@Table(schema = Constants.SCHEMA, name = Constants.RegistrationBodyType.TABLE, uniqueConstraints = {@UniqueConstraint(columnNames = Constants.RegistrationBodyType.NAME)})
 public class RegistrationBodyType implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = Constants.RegistrationBodyType.BODY_TYPE_ID, nullable = false, columnDefinition = "serial")
+    @Column(name = Constants.RegistrationBodyType.ID, nullable = false, columnDefinition = "serial")
     private Long bodyTypeId;
 
     @NaturalId
-    @Column(name = Constants.RegistrationBodyType.BODY_TYPE_NAME, nullable = false)
+    @Column(name = Constants.RegistrationBodyType.NAME, nullable = false)
     private String bodyTypeName;
 
     @Builder.Default

@@ -20,11 +20,11 @@ public class RegistrationRecord implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = Constants.AdminObject.ADMIN_OBJ_ID, nullable = false, columnDefinition = "serial")
+    @Column(name = Constants.RegistrationRecord.ID, nullable = false, columnDefinition = "serial")
     private Long registrationId;
 
     @ManyToOne
-    @JoinColumn(name = Constants.RegistrationRecord.ADMIN_OBJECT_ID)
+    @JoinColumn(name = Constants.RegistrationRecord.ADMIN_OBJ_ID)
     private AdministrativeObject administrativeObject;
 
     @ManyToOne
@@ -35,9 +35,23 @@ public class RegistrationRecord implements Serializable {
     @JoinColumn(name = Constants.RegistrationRecord.DEPARTMENT_CODE)
     private RegistrationDepartment registrationDepartment;
 
+
+
+
+
+
     @ManyToOne
-    @JoinColumn(name = Constants.RegistrationRecord.VEHICLE_ID)
+    @JoinColumns({
+            @JoinColumn(name = Constants.RegistrationRecord.BRAND_ID, referencedColumnName = Constants.RegistrationRecord.BRAND_ID),
+            @JoinColumn(name = Constants.RegistrationRecord.MODEL_ID, referencedColumnName = Constants.RegistrationRecord.MODEL_ID)
+    })
     private RegistrationVehicle registrationVehicle;
+
+
+
+
+
+
 
     @ManyToOne
     @JoinColumn(name = Constants.RegistrationRecord.COLOR_ID)

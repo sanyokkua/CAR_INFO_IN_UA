@@ -17,22 +17,22 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = Constants.SCHEMA, name = Constants.RegistrationDepartment.TABLE, uniqueConstraints = {@UniqueConstraint(columnNames = Constants.RegistrationDepartment.DEPARTMENT_NAME)})
+@Table(schema = Constants.SCHEMA, name = Constants.RegistrationDepartment.TABLE, uniqueConstraints = {@UniqueConstraint(columnNames = Constants.RegistrationDepartment.NAME)})
 public class RegistrationDepartment implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = Constants.RegistrationDepartment.DEPARTMENT_CODE, nullable = false, columnDefinition = "serial")
+    @Column(name = Constants.RegistrationDepartment.CODE, nullable = false, columnDefinition = "serial")
     private Long departmentCode;
 
     @NaturalId
-    @Column(name = Constants.RegistrationDepartment.DEPARTMENT_NAME, nullable = false)
+    @Column(name = Constants.RegistrationDepartment.NAME, nullable = false)
     private String departmentName;
 
-    @Column(name = Constants.RegistrationDepartment.DEPARTMENT_ADDRESS, nullable = false)
+    @Column(name = Constants.RegistrationDepartment.ADDRESS, nullable = false)
     private String departmentAddress;
 
-    @Column(name = Constants.RegistrationDepartment.DEPARTMENT_EMAIL, nullable = false)
+    @Column(name = Constants.RegistrationDepartment.EMAIL, nullable = false)
     private String departmentEmail;
 
     @Builder.Default

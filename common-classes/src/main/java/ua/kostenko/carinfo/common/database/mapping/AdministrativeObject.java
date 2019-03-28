@@ -17,19 +17,19 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = Constants.SCHEMA, name = Constants.AdminObject.TABLE, uniqueConstraints = {@UniqueConstraint(columnNames = Constants.AdminObject.ADMIN_OBJ_NAME)})
+@Table(schema = Constants.SCHEMA, name = Constants.AdminObject.TABLE, uniqueConstraints = {@UniqueConstraint(columnNames = Constants.AdminObject.NAME)})
 public class AdministrativeObject implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = Constants.AdminObject.ADMIN_OBJ_ID, nullable = false, columnDefinition = "serial")
+    @Column(name = Constants.AdminObject.ID, nullable = false, columnDefinition = "serial")
     private Long adminObjId;
 
-    @Column(name = Constants.AdminObject.ADMIN_OBJ_TYPE)
+    @Column(name = Constants.AdminObject.TYPE)
     private String adminObjType;
 
     @NaturalId
-    @Column(name = Constants.AdminObject.ADMIN_OBJ_NAME, nullable = false)
+    @Column(name = Constants.AdminObject.NAME, nullable = false)
     private String adminObjName;
 
     @Builder.Default

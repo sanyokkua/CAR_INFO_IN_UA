@@ -17,16 +17,16 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = Constants.SCHEMA, name = Constants.RegistrationOperation.TABLE, uniqueConstraints = {@UniqueConstraint(columnNames = Constants.RegistrationOperation.OPERATION_NAME)})
+@Table(schema = Constants.SCHEMA, name = Constants.RegistrationOperation.TABLE, uniqueConstraints = {@UniqueConstraint(columnNames = Constants.RegistrationOperation.NAME)})
 public class RegistrationOperation implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = Constants.RegistrationOperation.OPERATION_CODE, nullable = false, columnDefinition = "serial")
+    @Column(name = Constants.RegistrationOperation.CODE, nullable = false, columnDefinition = "serial")
     private Long operationCode;
 
     @NaturalId
-    @Column(name = Constants.RegistrationOperation.OPERATION_NAME, nullable = false)
+    @Column(name = Constants.RegistrationOperation.NAME, nullable = false)
     private String operationName;
 
     @Builder.Default

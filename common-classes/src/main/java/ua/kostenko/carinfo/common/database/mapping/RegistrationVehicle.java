@@ -23,14 +23,20 @@ public class RegistrationVehicle implements Serializable {
     private RegistrationVehicleId vehicleId;
 
     @ManyToOne
-    @JoinColumn(name = Constants.RegistrationVehicle.VEHICLE_BRAND_ID)
+    @MapsId("brandId")
     private RegistrationBrand registrationBrand;
 
     @ManyToOne
-    @JoinColumn(name = Constants.RegistrationVehicle.VEHICLE_MODEL_ID)
+    @MapsId("modelId")
     private RegistrationModel registrationModel;
 
     @Builder.Default
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "registrationVehicle", orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<RegistrationRecord> registrationRecords = new HashSet<>();
+
+    public RegistrationVehicle(RegistrationBrand registrationBrand, RegistrationModel registrationModel) {
+        this.registrationBrand = registrationBrand;
+        this.registrationModel = registrationModel;
+        this.vehicleId = RegistrationVehicleId.builder().brandId(registrationBrand.getBrandId()).modelId(registrationModel.getModelId()).build();
+    }
 }

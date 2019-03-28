@@ -17,16 +17,16 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = Constants.SCHEMA, name = Constants.RegistrationFuelType.TABLE, uniqueConstraints = {@UniqueConstraint(columnNames = Constants.RegistrationFuelType.FUEL_TYPE_NAME)})
+@Table(schema = Constants.SCHEMA, name = Constants.RegistrationFuelType.TABLE, uniqueConstraints = {@UniqueConstraint(columnNames = Constants.RegistrationFuelType.NAME)})
 public class RegistrationFuelType implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = Constants.RegistrationFuelType.FUEL_TYPE_ID, nullable = false, columnDefinition = "serial")
+    @Column(name = Constants.RegistrationFuelType.ID, nullable = false, columnDefinition = "serial")
     private Long fuelTypeId;
 
     @NaturalId
-    @Column(name = Constants.RegistrationFuelType.FUEL_TYPE_NAME, nullable = false)
+    @Column(name = Constants.RegistrationFuelType.NAME, nullable = false)
     private String fuelTypeName;
 
     @Builder.Default

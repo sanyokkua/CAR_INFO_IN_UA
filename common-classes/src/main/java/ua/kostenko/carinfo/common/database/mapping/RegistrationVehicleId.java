@@ -20,10 +20,10 @@ import static java.util.Objects.isNull;
 @Embeddable
 public class RegistrationVehicleId implements Serializable {
 
-    @Column(name = Constants.RegistrationBrand.BRAND_ID)
+    @Column(name = Constants.RegistrationVehicle.BRAND_ID)
     private Long brandId;
 
-    @Column(name = Constants.RegistrationModel.MODEL_ID)
+    @Column(name = Constants.RegistrationVehicle.MODEL_ID)
     private Long modelId;
 
     @Override
@@ -37,5 +37,10 @@ public class RegistrationVehicleId implements Serializable {
         RegistrationVehicleId that = (RegistrationVehicleId) o;
         return Objects.equal(brandId, that.brandId) &&
                 Objects.equal(modelId, that.modelId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(brandId, modelId);
     }
 }
