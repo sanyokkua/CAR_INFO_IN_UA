@@ -8,6 +8,6 @@ import ua.kostenko.carinfo.importing.importing.Persist;
 public class AdminObjPersist implements Persist<AdministrativeObject> {
     @Override
     public void persist(AdministrativeObject record) {
-
+        log.info(record.toString());
     }
 }

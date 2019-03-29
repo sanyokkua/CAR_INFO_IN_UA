@@ -19,24 +19,21 @@ import java.util.Set;
 @Table(schema = Constants.SCHEMA, name = Constants.RegistrationVehicle.TABLE)
 public class RegistrationVehicle implements Serializable {
 
-    @EmbeddedId
-    private RegistrationVehicleId vehicleId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = Constants.RegistrationVehicle.ID, nullable = false, columnDefinition = "serial")
+    private Long vehicleId;
 
     @ManyToOne
-    @MapsId("brandId")
+    @JoinColumn(name = Constants.RegistrationVehicle.BRAND_ID)
     private RegistrationBrand registrationBrand;
 
     @ManyToOne
-    @MapsId("modelId")
+    @JoinColumn(name = Constants.RegistrationVehicle.MODEL_ID)
     private RegistrationModel registrationModel;
 
     @Builder.Default
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "registrationVehicle", orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<RegistrationRecord> registrationRecords = new HashSet<>();
 
-    public RegistrationVehicle(RegistrationBrand registrationBrand, RegistrationModel registrationModel) {
-        this.registrationBrand = registrationBrand;
-        this.registrationModel = registrationModel;
-        this.vehicleId = RegistrationVehicleId.builder().brandId(registrationBrand.getBrandId()).modelId(registrationModel.getModelId()).build();
-    }
 }

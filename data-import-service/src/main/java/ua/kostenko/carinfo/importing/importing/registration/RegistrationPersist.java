@@ -10,9 +10,9 @@ public class RegistrationPersist implements Persist<Registration> {
 
     @Override
     public void persist(@NonNull Registration record) {
-        //log.info("persist: Thread N: {}", Thread.currentThread().getId());
-        //
-        // log.info("persist: Record: {}", record.toString());
+        log.info("persist: Thread N: {}", Thread.currentThread().getId());
+
+         log.info("persist: Record: {}", record.toString());
         /*
         String carModel = StringUtils.trim(record.get(CAR_MODEL.fieldName));
             String carBrand = StringUtils.trim(record.get(CAR_BRAND.fieldName));

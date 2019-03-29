@@ -9,6 +9,8 @@ import ua.kostenko.carinfo.common.database.Constants;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -26,4 +28,8 @@ public class RegistrationKind implements Serializable {
     @NaturalId
     @Column(name = Constants.RegistrationKind.NAME, nullable = false)
     private String kindName;
+
+    @Builder.Default
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "registrationKind", orphanRemoval = true, fetch = FetchType.EAGER)
+    private Set<RegistrationRecord> registrationRecords = new HashSet<>();
 }

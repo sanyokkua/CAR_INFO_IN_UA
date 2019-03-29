@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -23,8 +25,8 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 @Component
 @Slf4j
 public class ServiceCenterInitializer implements Initializer {
+    private final static Pattern DIGITS_ONLY = Pattern.compile("\\d+");
     private final ApplicationProperties applicationProperties;
-
     @Autowired
     public ServiceCenterInitializer(@NonNull ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
@@ -49,9 +51,14 @@ public class ServiceCenterInitializer implements Initializer {
                                               .collect(Collectors.toList());
                     if (childTd.size() > 4) {
                         String departmentId = childTd.get(0).text().trim();
+                        Matcher matcher = DIGITS_ONLY.matcher(departmentId);
+                        long depId = 0;
+                        if (matcher.find()){
+                            depId = Long.valueOf(matcher.group());
+                        }
                         String address = childTd.get(1).text().trim();
                         String email = childTd.get(4).text().trim();
-                        ServiceCenter serviceCenterEntity = new ServiceCenter(Long.valueOf(departmentId), address, email);
+                        ServiceCenter serviceCenterEntity = new ServiceCenter(depId, address, email);
                         resultList.add(serviceCenterEntity);
                     }
                 }

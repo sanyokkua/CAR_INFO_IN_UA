@@ -22,8 +22,8 @@ public class InitController {
     @Autowired
     public InitController(@NonNull ServiceCenterInitializer serviceCenterInitializer, @NonNull AdminObjImportInitializer adminObjImportInitializer, @NonNull RegistrationImportInitializer registrationImportInitializer) {
         initializers = new LinkedList<>();
-        initializers.add(serviceCenterInitializer);
         initializers.add(adminObjImportInitializer);
+        initializers.add(serviceCenterInitializer);
         initializers.add(registrationImportInitializer);
     }
 

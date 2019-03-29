@@ -11,86 +11,85 @@ public interface Constants {
     }
 
     interface RegistrationBodyType {
-        String TABLE = "reg_body_type";
-        String ID = "reg_body_type_id";
-        String NAME = "reg_body_type_name";
+        String TABLE = "body_type";
+        String ID = "body_type_id";
+        String NAME = "body_type_name";
     }
 
     interface RegistrationBrand {
-        String TABLE = "reg_brand";
-        String ID = "reg_brand_id";
-        String NAME = "reg_brand_name";
+        String TABLE = "brand";
+        String ID = "brand_id";
+        String NAME = "brand_name";
     }
 
     interface RegistrationColor {
-        String TABLE = "reg_color";
-        String ID = "reg_color_id";
-        String NAME = "reg_color_name";
+        String TABLE = "color";
+        String ID = "color_id";
+        String NAME = "color_name";
     }
 
     interface RegistrationDepartment {
-        String TABLE = "reg_dep";
-        String CODE = "reg_dep_code";
-        String NAME = "reg_dep_name";
-        String ADDRESS = "reg_dep_addr";
-        String EMAIL = "reg_dep_email";
+        String TABLE = "department";
+        String CODE = "dep_code";
+        String NAME = "dep_name";
+        String ADDRESS = "dep_addr";
+        String EMAIL = "dep_email";
     }
 
     interface RegistrationFuelType {
-        String TABLE = "reg_fuel_type";
-        String ID = "reg_fuel_type_id";
-        String NAME = "reg_fuel_type_name";
+        String TABLE = "fuel_type";
+        String ID = "fuel_type_id";
+        String NAME = "fuel_type_name";
     }
 
     interface RegistrationKind {
-        String TABLE = "reg_kind";
-        String ID = "reg_kind_id";
-        String NAME = "reg_kind_name";
+        String TABLE = "kind";
+        String ID = "kind_id";
+        String NAME = "kind_name";
     }
 
     interface RegistrationModel {
-        String TABLE = "reg_model";
-        String ID = "reg_model_id";
-        String NAME = "reg_model_name";
+        String TABLE = "model";
+        String ID = "model_id";
+        String NAME = "model_name";
     }
 
     interface RegistrationOperation {
-        String TABLE = "reg_op";
-        String CODE = "reg_op_code";
-        String NAME = "reg_op_name";
+        String TABLE = "operation";
+        String CODE = "op_code";
+        String NAME = "op_name";
     }
 
     interface RegistrationPurpose {
-        String TABLE = "reg_purpose";
-        String ID = "reg_purpose_id";
-        String NAME = "reg_purpose_name";
+        String TABLE = "purpose";
+        String ID = "purpose_id";
+        String NAME = "purpose_name";
     }
 
     interface RegistrationRecord {
-        String TABLE = "reg_record";
-        String ID = "reg_id";
+        String TABLE = "record";
+        String ID = "id";
         String ADMIN_OBJ_ID = "admin_obj_id";
-        String OPERATION_CODE = "reg_op_code";
-        String DEPARTMENT_CODE = "reg_dep_code";
-        String BRAND_ID = "reg_brand_id";
-        String MODEL_ID = "reg_model_id";
-        String COLOR_ID = "reg_color_id";
-        String BODY_TYPE_ID = "reg_body_type_id";
-        String PURPOSE_ID = "reg_purpose_id";
-        String FUEL_TYPE_ID = "reg_fuel_type_id";
-        String ENGINE_CAPACITY = "reg_engine_capacity";
-        String OWN_WEIGHT = "reg_own_weight";
-        String TOTAL_WEIGHT = "reg_total_weight";
-        String REGISTRATION_NUMBER = "reg_registration_number";
-        String REGISTRATION_DATE = "reg_registration_date";
-        String VEHICLE_ID = "reg_vehicle_id";
-        String MAKE_YEAR = "reg_make_year";
+        String OPERATION_CODE = "op_code";
+        String DEPARTMENT_CODE = "dep_code";
+        String COLOR_ID = "color_id";
+        String BODY_TYPE_ID = "body_type_id";
+        String PURPOSE_ID = "purpose_id";
+        String FUEL_TYPE_ID = "fuel_type_id";
+        String ENGINE_CAPACITY = "engine_capacity";
+        String OWN_WEIGHT = "own_weight";
+        String TOTAL_WEIGHT = "total_weight";
+        String REGISTRATION_NUMBER = "registration_number";
+        String REGISTRATION_DATE = "registration_date";
+        String VEHICLE_ID = "vehicle_id";
+        String KIND = "kind_id";
+        String MAKE_YEAR = "make_year";
     }
 
     interface RegistrationVehicle {
-        String TABLE = "reg_vehicle";
-        String ID = "reg_vehicle_id";
-        String BRAND_ID = "reg_brand_id";
-        String MODEL_ID = "reg_model_id";
+        String TABLE = "vehicle";
+        String ID = "vehicle_id";
+        String BRAND_ID = "brand_id";
+        String MODEL_ID = "model_id";
     }
 }

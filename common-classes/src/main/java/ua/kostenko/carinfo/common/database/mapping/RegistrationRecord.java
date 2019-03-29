@@ -35,23 +35,13 @@ public class RegistrationRecord implements Serializable {
     @JoinColumn(name = Constants.RegistrationRecord.DEPARTMENT_CODE)
     private RegistrationDepartment registrationDepartment;
 
-
-
-
-
+    @ManyToOne
+    @JoinColumn(name = Constants.RegistrationRecord.KIND)
+    private RegistrationKind registrationKind;
 
     @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = Constants.RegistrationRecord.BRAND_ID, referencedColumnName = Constants.RegistrationRecord.BRAND_ID),
-            @JoinColumn(name = Constants.RegistrationRecord.MODEL_ID, referencedColumnName = Constants.RegistrationRecord.MODEL_ID)
-    })
+    @JoinColumn(name = Constants.RegistrationRecord.VEHICLE_ID)
     private RegistrationVehicle registrationVehicle;
-
-
-
-
-
-
 
     @ManyToOne
     @JoinColumn(name = Constants.RegistrationRecord.COLOR_ID)

@@ -7,6 +7,6 @@ import ua.kostenko.carinfo.importing.importing.Persist;
 public class ServiceCenterPersist implements Persist<ServiceCenter> {
     @Override
     public void persist(ServiceCenter record) {
-
+        log.info(record.toString());
     }
 }
