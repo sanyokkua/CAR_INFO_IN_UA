@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import ua.kostenko.carinfo.common.database.Constants;
+import ua.kostenko.carinfo.common.database.Constants.AdminObject;
 import ua.kostenko.carinfo.common.database.mapping.AdministrativeObject;
 
 import javax.annotation.Nonnull;
@@ -34,7 +36,10 @@ public class AdminObjectRepository extends CachingJdbcRepository<AdministrativeO
     @Nullable
     @Override
     public AdministrativeObject create(@NonNull @Nonnull AdministrativeObject entity) {
-        return null;
+        String templateSql = "insert into %s.%s (%s, %s, %s) values (?,?,?)";
+        String sql = String.format(templateSql, Constants.SCHEMA, AdminObject.TABLE, AdminObject.ID, AdminObject.TYPE, AdminObject.NAME);
+        jdbcTemplate.update(sql, entity.getAdminObjId(), entity.getAdminObjType().toUpperCase(), entity.getAdminObjName().toUpperCase());
+        return findByField(entity.getAdminObjName().toUpperCase());
     }
 
     @Nullable

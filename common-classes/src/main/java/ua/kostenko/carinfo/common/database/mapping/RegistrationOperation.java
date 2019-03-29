@@ -21,8 +21,7 @@ import java.util.Set;
 public class RegistrationOperation implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = Constants.RegistrationOperation.CODE, nullable = false, columnDefinition = "serial")
+    @Column(name = Constants.RegistrationOperation.CODE, nullable = false)
     private Long operationCode;
 
     @NaturalId

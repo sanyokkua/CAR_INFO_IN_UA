@@ -21,8 +21,7 @@ import java.util.Set;
 public class RegistrationDepartment implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = Constants.RegistrationDepartment.CODE, nullable = false, columnDefinition = "serial")
+    @Column(name = Constants.RegistrationDepartment.CODE, nullable = false)
     private Long departmentCode;
 
     @NaturalId

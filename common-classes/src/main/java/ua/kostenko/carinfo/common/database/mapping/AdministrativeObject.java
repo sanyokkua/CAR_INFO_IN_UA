@@ -21,8 +21,7 @@ import java.util.Set;
 public class AdministrativeObject implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = Constants.AdminObject.ID, nullable = false, columnDefinition = "serial")
+    @Column(name = Constants.AdminObject.ID, nullable = false)
     private Long adminObjId;
 
     @Column(name = Constants.AdminObject.TYPE)
