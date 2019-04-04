@@ -7,14 +7,12 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import ua.kostenko.carinfo.importing.configuration.ApplicationProperties;
 import ua.kostenko.carinfo.importing.csv.mappers.administrative.AdministrativeObjectCsvMapper;
-import ua.kostenko.carinfo.importing.csv.pojo.AdministrativeObject;
 import ua.kostenko.carinfo.importing.csv.reader.CsvReader;
 import ua.kostenko.carinfo.importing.csv.reader.options.Options;
 import ua.kostenko.carinfo.importing.csv.structure.headers.administrative.AdministrativeHeaders;
 import ua.kostenko.carinfo.importing.csv.utils.CsvUtils;
 import ua.kostenko.carinfo.importing.csv.utils.administrative.AdminObjCsvUtils;
 import ua.kostenko.carinfo.importing.importing.Initializer;
-import ua.kostenko.carinfo.importing.importing.Persist;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -29,10 +27,12 @@ import static java.util.Objects.nonNull;
 @Slf4j
 public class AdminObjImportInitializer implements Initializer {
     private final ApplicationProperties properties;
+    private final AdminObjPersist persist;
 
     @Autowired
-    public AdminObjImportInitializer(@NonNull ApplicationProperties properties) {
+    public AdminObjImportInitializer(@NonNull ApplicationProperties properties, @NonNull AdminObjPersist persist) {
         this.properties = properties;
+        this.persist = persist;
     }
 
     @Override
@@ -54,7 +54,6 @@ public class AdminObjImportInitializer implements Initializer {
 
             if (Objects.nonNull(options)) {
                 AdministrativeObjectCsvMapper mapper = new AdministrativeObjectCsvMapper(options.getHeaders());
-                Persist<AdministrativeObject> persist = new AdminObjPersist();
                 CsvReader.readCsvFile(options.getReaderOptions(), mapper, persist);
             } else {
                 log.error("processExtractedFiles: Options is null");

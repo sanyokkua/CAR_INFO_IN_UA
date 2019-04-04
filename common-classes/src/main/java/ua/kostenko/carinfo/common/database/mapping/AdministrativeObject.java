@@ -17,8 +17,8 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = Constants.SCHEMA, name = Constants.AdminObject.TABLE, uniqueConstraints = {@UniqueConstraint(columnNames = Constants.AdminObject.NAME)})
-public class AdministrativeObject implements Serializable {
+@Table(schema = Constants.SCHEMA, name = Constants.AdminObject.TABLE)
+class AdministrativeObject implements Serializable {
 
     @Id
     @Column(name = Constants.AdminObject.ID, nullable = false)

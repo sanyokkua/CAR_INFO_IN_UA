@@ -16,7 +16,7 @@ import java.sql.Date;
 @Builder
 @Entity
 @Table(schema = Constants.SCHEMA, name = Constants.RegistrationRecord.TABLE)
-public class RegistrationRecord implements Serializable {
+class RegistrationRecord implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

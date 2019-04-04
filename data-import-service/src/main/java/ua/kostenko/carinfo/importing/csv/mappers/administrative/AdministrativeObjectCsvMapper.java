@@ -3,10 +3,10 @@ package ua.kostenko.carinfo.importing.csv.mappers.administrative;
 import lombok.NonNull;
 import org.apache.commons.csv.CSVRecord;
 import ua.kostenko.carinfo.importing.csv.mappers.CsvMapper;
-import ua.kostenko.carinfo.importing.csv.pojo.AdministrativeObject;
+import ua.kostenko.carinfo.importing.csv.pojo.AdministrativeObjectPojo;
 import ua.kostenko.carinfo.importing.csv.structure.headers.administrative.AdministrativeHeaders;
 
-public class AdministrativeObjectCsvMapper implements CsvMapper<AdministrativeObject> {
+public class AdministrativeObjectCsvMapper implements CsvMapper<AdministrativeObjectPojo> {
     private final AdministrativeHeaders headers;
 
     public AdministrativeObjectCsvMapper(@NonNull AdministrativeHeaders headers) {
@@ -14,11 +14,11 @@ public class AdministrativeObjectCsvMapper implements CsvMapper<AdministrativeOb
     }
 
     @Override
-    public AdministrativeObject map(CSVRecord csvRecord) {
-        return AdministrativeObject.builder()
-                                   .id(getLong(csvRecord, headers.getId()))
-                                   .type(getString(csvRecord, headers.getType()))
-                                   .name(getString(csvRecord, headers.getName()))
-                                   .build();
+    public AdministrativeObjectPojo map(CSVRecord csvRecord) {
+        return AdministrativeObjectPojo.builder()
+                                       .id(getLong(csvRecord, headers.getId()))
+                                       .type(getString(csvRecord, headers.getType()))
+                                       .name(getString(csvRecord, headers.getName()))
+                                       .build();
     }
 }

@@ -18,7 +18,7 @@ import java.util.Set;
 @Builder
 @Entity
 @Table(schema = Constants.SCHEMA, name = Constants.RegistrationPurpose.TABLE, uniqueConstraints = {@UniqueConstraint(columnNames = Constants.RegistrationPurpose.NAME)})
-public class RegistrationPurpose implements Serializable {
+class RegistrationPurpose implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

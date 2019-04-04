@@ -18,7 +18,7 @@ import java.util.Set;
 @Builder
 @Entity
 @Table(schema = Constants.SCHEMA, name = Constants.RegistrationDepartment.TABLE, uniqueConstraints = {@UniqueConstraint(columnNames = Constants.RegistrationDepartment.NAME)})
-public class RegistrationDepartment implements Serializable {
+class RegistrationDepartment implements Serializable {
 
     @Id
     @Column(name = Constants.RegistrationDepartment.CODE, nullable = false)

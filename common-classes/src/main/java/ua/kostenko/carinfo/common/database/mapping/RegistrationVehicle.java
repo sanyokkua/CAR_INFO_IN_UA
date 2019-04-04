@@ -17,7 +17,7 @@ import java.util.Set;
 @Builder
 @Entity
 @Table(schema = Constants.SCHEMA, name = Constants.RegistrationVehicle.TABLE)
-public class RegistrationVehicle implements Serializable {
+class RegistrationVehicle implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

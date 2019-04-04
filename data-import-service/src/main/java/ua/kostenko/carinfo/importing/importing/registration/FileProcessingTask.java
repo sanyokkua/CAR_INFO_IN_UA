@@ -2,14 +2,14 @@ package ua.kostenko.carinfo.importing.importing.registration;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import ua.kostenko.carinfo.importing.importing.Persist;
+import ua.kostenko.carinfo.importing.csv.mappers.registration.RegistrationCsvMapper;
+import ua.kostenko.carinfo.importing.csv.pojo.RegistrationPojo;
 import ua.kostenko.carinfo.importing.csv.reader.CsvReader;
 import ua.kostenko.carinfo.importing.csv.reader.options.Options;
+import ua.kostenko.carinfo.importing.csv.structure.headers.registration.RegistrationHeaders;
 import ua.kostenko.carinfo.importing.csv.utils.CsvUtils;
 import ua.kostenko.carinfo.importing.csv.utils.registration.RegistrationCsvUtils;
-import ua.kostenko.carinfo.importing.csv.mappers.registration.RegistrationCsvMapper;
-import ua.kostenko.carinfo.importing.csv.pojo.Registration;
-import ua.kostenko.carinfo.importing.csv.structure.headers.registration.RegistrationHeaders;
+import ua.kostenko.carinfo.importing.importing.Persist;
 import ua.kostenko.carinfo.importing.io.ArchiveUtils;
 import ua.kostenko.carinfo.importing.io.FileDownloader;
 import ua.kostenko.carinfo.importing.io.FileUtil;
@@ -66,7 +66,7 @@ public class FileProcessingTask implements Runnable {
             Options<RegistrationHeaders> options = csvUtils.getOptions();
             if (Objects.nonNull(options)){
                 RegistrationCsvMapper mapper = new RegistrationCsvMapper(options.getHeaders());
-                Persist<Registration> persist = new RegistrationPersist();
+                Persist<RegistrationPojo> persist = new RegistrationPersist();
                 CsvReader.readCsvFile(options.getReaderOptions(), mapper, persist);
             } else {
                 log.error("processExtractedFiles: Options is null");

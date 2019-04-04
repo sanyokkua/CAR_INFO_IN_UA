@@ -10,7 +10,14 @@ public interface Caching<T> {
     int DEFAULT_CACHE_TIME_SECONDS = 30;
 
     default T getFromCache(@NonNull @Nonnull String key) {
-        return getCache().getUnchecked(key);
+        LoadingCache<String, T> cache = getCache();
+        T result = null;
+        try {
+            result = cache.get(key);
+        } catch (Exception e) {
+            //ignoring
+        }
+        return result;
     }
 
     LoadingCache<String, T> getCache();

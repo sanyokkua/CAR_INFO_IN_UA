@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.common.database.services;
+package ua.kostenko.carinfo.common.services;
 
 import lombok.NonNull;
 
@@ -7,10 +7,6 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public interface CrudService<T> {
-    @Nullable
-    T findById(@Nonnull @NonNull Long id);
-    @Nullable
-    T findByField(@Nonnull @NonNull String field);
     @Nullable
     T create(@Nonnull @NonNull T entity);
     @Nullable
