@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.common.database.repositories.jdbc;
+package ua.kostenko.carinfo.common.database.repositories.jdbc.crud;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.collect.Lists;
@@ -11,9 +11,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ua.kostenko.carinfo.common.database.Constants;
-import ua.kostenko.carinfo.common.database.raw.RegistrationOperation;
 import ua.kostenko.carinfo.common.database.repositories.CrudRepository;
 import ua.kostenko.carinfo.common.database.repositories.FieldSearchable;
+import ua.kostenko.carinfo.common.records.Operation;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,29 +25,41 @@ import static java.util.Objects.nonNull;
 
 @Repository
 @Slf4j
-public class RegistrationOperationRepository extends CachingJdbcRepository<RegistrationOperation> implements FieldSearchable<RegistrationOperation> {
-    private static final RowMapper<RegistrationOperation> ROW_MAPPER = (resultSet, i) -> RegistrationOperation.builder()
-                                                                                                              .operationCode(resultSet.getLong(Constants.RegistrationOperation.CODE))
-                                                                                                              .operationName(resultSet.getString(Constants.RegistrationOperation.NAME))
-                                                                                                              .build();
+public class RegistrationOperationRepository extends CachingJdbcRepository<Operation> implements FieldSearchable<Operation> {
+    private static final RowMapper<Operation> ROW_MAPPER = (resultSet, i) -> Operation.builder()
+                                                                                      .operationCode(resultSet.getLong(Constants.RegistrationOperation.CODE))
+                                                                                      .operationName(resultSet.getString(Constants.RegistrationOperation.NAME))
+                                                                                      .build();
+
     @Autowired
     public RegistrationOperationRepository(@NonNull @Nonnull JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
     }
 
     @Override
-    CacheLoader<String, RegistrationOperation> getCacheLoader() {
-        return new CacheLoader<String, RegistrationOperation>() {
+    CacheLoader<String, Operation> getCacheLoader() {
+        return new CacheLoader<String, Operation>() {
             @Override
-            public RegistrationOperation load(@NonNull @Nonnull String key) {
+            public Operation load(@NonNull @Nonnull String key) {
                 return findByField(key);
             }
         };
     }
 
+    @Override
+    public Operation findByField(@NonNull @Nonnull String fieldValue) {
+        if (StringUtils.isBlank(fieldValue)) {
+            return null;
+        }
+        String jdbcTemplateSelect = "select * from carinfo.operation where op_name = ?;";
+        return CrudRepository.getNullableResultIfException(
+                () -> jdbcTemplate.queryForObject(jdbcTemplateSelect,
+                                                  ROW_MAPPER, fieldValue));
+    }
+
     @Nullable
     @Override
-    public RegistrationOperation create(@NonNull @Nonnull RegistrationOperation entity) {
+    public Operation create(@NonNull @Nonnull Operation entity) {
         String jdbcTemplateInsert = "insert into carinfo.operation (op_name) values (?);";
         jdbcTemplate.update(jdbcTemplateInsert, entity.getOperationName());
         return getFromCache(entity.getOperationName());
@@ -55,7 +67,7 @@ public class RegistrationOperationRepository extends CachingJdbcRepository<Regis
 
     @Nullable
     @Override
-    public RegistrationOperation update(@NonNull @Nonnull RegistrationOperation entity) {
+    public Operation update(@NonNull @Nonnull Operation entity) {
         getCache().invalidate(entity.getOperationName());
         String jdbcTemplateUpdate = "update carinfo.operation set op_name = ? where op_code = ?;";
         jdbcTemplate.update(jdbcTemplateUpdate, entity.getOperationName(), entity.getOperationCode());
@@ -64,7 +76,7 @@ public class RegistrationOperationRepository extends CachingJdbcRepository<Regis
 
     @Override
     public boolean delete(@NonNull @Nonnull Long id) {
-        RegistrationOperation operation = find(id);
+        Operation operation = find(id);
         if (nonNull(operation)) {
             getCache().invalidate(operation.getOperationName());
         }
@@ -75,16 +87,10 @@ public class RegistrationOperationRepository extends CachingJdbcRepository<Regis
 
     @Nullable
     @Override
-    public RegistrationOperation find(@NonNull @Nonnull Long id) {
+    public Operation find(@NonNull @Nonnull Long id) {
         String jdbcTemplateSelect = "select * from carinfo.operation where op_code = ?;";
         return CrudRepository.getNullableResultIfException(
                 () -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
-    }
-
-    @Override
-    public List<RegistrationOperation> findAll() {
-        String jdbcTemplateSelect = "select * from carinfo.operation;";
-        return jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER);
     }
 
     @Override
@@ -95,21 +101,27 @@ public class RegistrationOperationRepository extends CachingJdbcRepository<Regis
     }
 
     @Override
-    public boolean isExists(@NonNull @Nonnull RegistrationOperation entity) {
+    public List<Operation> findAll() {
+        String jdbcTemplateSelect = "select * from carinfo.operation;";
+        return jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER);
+    }
+
+    @Override
+    public boolean isExists(@NonNull @Nonnull Operation entity) {
         return nonNull(getFromCache(entity.getOperationName()));
     }
 
     @Override
-    public void createAll(Iterable<RegistrationOperation> entities) {
+    public void createAll(Iterable<Operation> entities) {
         final int batchSize = 100;
-        List<List<RegistrationOperation>> batchLists = Lists.partition(Lists.newArrayList(entities), batchSize);
-        for (List<RegistrationOperation> batch : batchLists) {
+        List<List<Operation>> batchLists = Lists.partition(Lists.newArrayList(entities), batchSize);
+        for (List<Operation> batch : batchLists) {
             String jdbcTemplateInsertAll = "insert into carinfo.operation (op_name) values (?);";
             jdbcTemplate.batchUpdate(jdbcTemplateInsertAll, new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(@Nonnull PreparedStatement ps, int i)
                         throws SQLException {
-                    RegistrationOperation object = batch.get(i);
+                    Operation object = batch.get(i);
                     ps.setString(1, object.getOperationName());
                 }
 
@@ -119,16 +131,5 @@ public class RegistrationOperationRepository extends CachingJdbcRepository<Regis
                 }
             });
         }
-    }
-
-    @Override
-    public RegistrationOperation findByField(@NonNull @Nonnull String fieldValue) {
-        if (StringUtils.isBlank(fieldValue)) {
-            return null;
-        }
-        String jdbcTemplateSelect = "select * from carinfo.operation where op_name = ?;";
-        return CrudRepository.getNullableResultIfException(
-                () -> jdbcTemplate.queryForObject(jdbcTemplateSelect,
-                                                  ROW_MAPPER, fieldValue));
     }
 }

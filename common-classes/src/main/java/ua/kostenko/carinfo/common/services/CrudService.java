@@ -1,6 +1,8 @@
 package ua.kostenko.carinfo.common.services;
 
 import lombok.NonNull;
+import org.springframework.data.domain.Page;
+import ua.kostenko.carinfo.common.ParamHolderBuilder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -11,7 +13,9 @@ public interface CrudService<T> {
     T create(@Nonnull @NonNull T entity);
     @Nullable
     T update(@Nonnull @NonNull T entity);
-    void delete(@Nonnull @NonNull Long id);
-    List<T> findAll();
+    boolean delete(@Nonnull @NonNull Long id);
     boolean isExists(@Nonnull @NonNull T entity);
+
+    List<T> findAll();
+    Page<T> find(ParamHolderBuilder paramHolder);
 }

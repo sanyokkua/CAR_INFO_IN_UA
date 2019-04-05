@@ -4,8 +4,8 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ua.kostenko.carinfo.common.database.raw.AdministrativeObject;
-import ua.kostenko.carinfo.common.database.repositories.jdbc.AdminObjectRepository;
+import ua.kostenko.carinfo.common.database.repositories.jdbc.crud.AdminObjectRepository;
+import ua.kostenko.carinfo.common.records.AdministrativeObject;
 import ua.kostenko.carinfo.importing.csv.pojo.AdministrativeObjectPojo;
 import ua.kostenko.carinfo.importing.importing.Persist;
 
@@ -28,8 +28,8 @@ public class AdminObjPersist implements Persist<AdministrativeObjectPojo> {
                                                          .adminObjName(record.getName())
                                                          .build();
         if (!repository.isExists(build)) {
-            AdministrativeObject administrativeObject = repository.create(build);
-            log.info("Created: {}", administrativeObject.toString());
+            AdministrativeObject adminObject = repository.create(build);
+            log.info("Created: {}", adminObject.toString());
         } else {
             log.info("Object exists: {}", build.toString());
         }

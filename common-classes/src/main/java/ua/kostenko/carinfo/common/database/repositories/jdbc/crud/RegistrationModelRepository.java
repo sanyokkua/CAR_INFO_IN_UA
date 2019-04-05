@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.common.database.repositories.jdbc;
+package ua.kostenko.carinfo.common.database.repositories.jdbc.crud;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.collect.Lists;
@@ -11,9 +11,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ua.kostenko.carinfo.common.database.Constants;
-import ua.kostenko.carinfo.common.database.raw.RegistrationModel;
 import ua.kostenko.carinfo.common.database.repositories.CrudRepository;
 import ua.kostenko.carinfo.common.database.repositories.FieldSearchable;
+import ua.kostenko.carinfo.common.records.Model;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,29 +25,39 @@ import static java.util.Objects.nonNull;
 
 @Repository
 @Slf4j
-public class RegistrationModelRepository extends CachingJdbcRepository<RegistrationModel> implements FieldSearchable<RegistrationModel> {
-    private static final RowMapper<RegistrationModel> ROW_MAPPER = (resultSet, i) -> RegistrationModel.builder()
-                                                                                                      .modelId(resultSet.getLong(Constants.RegistrationModel.ID))
-                                                                                                      .modelName(resultSet.getString(Constants.RegistrationModel.NAME))
-                                                                                                      .build();
+public class RegistrationModelRepository extends CachingJdbcRepository<Model> implements FieldSearchable<Model> {
+    private static final RowMapper<Model> ROW_MAPPER = (resultSet, i) -> Model.builder()
+                                                                              .modelId(resultSet.getLong(Constants.RegistrationModel.ID))
+                                                                              .modelName(resultSet.getString(Constants.RegistrationModel.NAME))
+                                                                              .build();
+
     @Autowired
     public RegistrationModelRepository(@NonNull @Nonnull JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
     }
 
     @Override
-    CacheLoader<String, RegistrationModel> getCacheLoader() {
-        return new CacheLoader<String, RegistrationModel>() {
+    CacheLoader<String, Model> getCacheLoader() {
+        return new CacheLoader<String, Model>() {
             @Override
-            public RegistrationModel load(@NonNull @Nonnull String key) {
+            public Model load(@NonNull @Nonnull String key) {
                 return findByField(key);
             }
         };
     }
 
+    @Override
+    public Model findByField(@NonNull @Nonnull String fieldValue) {
+        if (StringUtils.isBlank(fieldValue)) {
+            return null;
+        }
+        String jdbcTemplateSelect = "select * from carinfo.model where model_name = ?;";
+        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, fieldValue));
+    }
+
     @Nullable
     @Override
-    public RegistrationModel create(@NonNull @Nonnull RegistrationModel entity) {
+    public Model create(@NonNull @Nonnull Model entity) {
         String jdbcTemplateInsert = "insert into carinfo.model (model_name) values (?);";
         jdbcTemplate.update(jdbcTemplateInsert, entity.getModelName());
         return getFromCache(entity.getModelName());
@@ -55,7 +65,7 @@ public class RegistrationModelRepository extends CachingJdbcRepository<Registrat
 
     @Nullable
     @Override
-    public RegistrationModel update(@NonNull @Nonnull RegistrationModel entity) {
+    public Model update(@NonNull @Nonnull Model entity) {
         getCache().invalidate(entity.getModelName());
         String jdbcTemplateUpdate = "update carinfo.model set model_name = ? where model_id = ?;";
         jdbcTemplate.update(jdbcTemplateUpdate, entity.getModelName(), entity.getModelId());
@@ -64,7 +74,7 @@ public class RegistrationModelRepository extends CachingJdbcRepository<Registrat
 
     @Override
     public boolean delete(@NonNull @Nonnull Long id) {
-        RegistrationModel model = find(id);
+        Model model = find(id);
         if (nonNull(model)) {
             getCache().invalidate(model.getModelName());
         }
@@ -75,16 +85,10 @@ public class RegistrationModelRepository extends CachingJdbcRepository<Registrat
 
     @Nullable
     @Override
-    public RegistrationModel find(@NonNull @Nonnull Long id) {
+    public Model find(@NonNull @Nonnull Long id) {
         String jdbcTemplateSelect = "select * from carinfo.model where model_id = ?;";
         return CrudRepository.getNullableResultIfException(
                 () -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
-    }
-
-    @Override
-    public List<RegistrationModel> findAll() {
-        String jdbcTemplateSelect = "select * from carinfo.model;";
-        return jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER);
     }
 
     @Override
@@ -95,21 +99,27 @@ public class RegistrationModelRepository extends CachingJdbcRepository<Registrat
     }
 
     @Override
-    public boolean isExists(@NonNull @Nonnull RegistrationModel entity) {
+    public List<Model> findAll() {
+        String jdbcTemplateSelect = "select * from carinfo.model;";
+        return jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER);
+    }
+
+    @Override
+    public boolean isExists(@NonNull @Nonnull Model entity) {
         return nonNull(getFromCache(entity.getModelName()));
     }
 
     @Override
-    public void createAll(Iterable<RegistrationModel> entities) {
+    public void createAll(Iterable<Model> entities) {
         final int batchSize = 100;
-        List<List<RegistrationModel>> batchLists = Lists.partition(Lists.newArrayList(entities), batchSize);
-        for (List<RegistrationModel> batch : batchLists) {
+        List<List<Model>> batchLists = Lists.partition(Lists.newArrayList(entities), batchSize);
+        for (List<Model> batch : batchLists) {
             String jdbcTemplateInsertAll = "insert into carinfo.model (model_name) values (?);";
             jdbcTemplate.batchUpdate(jdbcTemplateInsertAll, new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(@Nonnull PreparedStatement ps, int i)
                         throws SQLException {
-                    RegistrationModel object = batch.get(i);
+                    Model object = batch.get(i);
                     ps.setString(1, object.getModelName());
                 }
 
@@ -119,14 +129,5 @@ public class RegistrationModelRepository extends CachingJdbcRepository<Registrat
                 }
             });
         }
-    }
-
-    @Override
-    public RegistrationModel findByField(@NonNull @Nonnull String fieldValue) {
-        if (StringUtils.isBlank(fieldValue)) {
-            return null;
-        }
-        String jdbcTemplateSelect = "select * from carinfo.model where model_name = ?;";
-        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, fieldValue));
     }
 }

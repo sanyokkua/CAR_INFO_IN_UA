@@ -1,11 +1,11 @@
-package ua.kostenko.carinfo.common.database.repositories.jdbc;
+package ua.kostenko.carinfo.common.database.repositories.jdbc.crud;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import lombok.NonNull;
 import org.springframework.jdbc.core.JdbcTemplate;
-import ua.kostenko.carinfo.common.database.cache.Caching;
+import ua.kostenko.carinfo.common.cache.Caching;
 
 import javax.annotation.Nonnull;
 import java.util.concurrent.TimeUnit;

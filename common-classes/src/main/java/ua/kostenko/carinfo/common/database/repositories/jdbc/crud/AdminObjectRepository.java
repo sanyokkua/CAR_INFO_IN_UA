@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.common.database.repositories.jdbc;
+package ua.kostenko.carinfo.common.database.repositories.jdbc.crud;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.collect.Lists;
@@ -6,14 +6,19 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import ua.kostenko.carinfo.common.database.Constants.AdminObject;
-import ua.kostenko.carinfo.common.database.raw.AdministrativeObject;
+import ua.kostenko.carinfo.common.ParamsHolder;
+import ua.kostenko.carinfo.common.database.Constants;
 import ua.kostenko.carinfo.common.database.repositories.CrudRepository;
 import ua.kostenko.carinfo.common.database.repositories.FieldSearchable;
+import ua.kostenko.carinfo.common.database.repositories.PageableRepository;
+import ua.kostenko.carinfo.common.records.AdministrativeObject;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,11 +30,11 @@ import static java.util.Objects.nonNull;
 
 @Repository
 @Slf4j
-public class AdminObjectRepository extends CachingJdbcRepository<AdministrativeObject> implements FieldSearchable<AdministrativeObject> {
+public class AdminObjectRepository extends CachingJdbcRepository<AdministrativeObject> implements PageableRepository<AdministrativeObject>, FieldSearchable<AdministrativeObject> {
     private static final RowMapper<AdministrativeObject> ROW_MAPPER = (resultSet, i) -> AdministrativeObject.builder()
-                                                                                                            .adminObjId(resultSet.getLong(AdminObject.ID))
-                                                                                                            .adminObjType(resultSet.getString(AdminObject.TYPE))
-                                                                                                            .adminObjName(resultSet.getString(AdminObject.NAME))
+                                                                                                            .adminObjId(resultSet.getLong(Constants.AdminObject.ID))
+                                                                                                            .adminObjType(resultSet.getString(Constants.AdminObject.TYPE))
+                                                                                                            .adminObjName(resultSet.getString(Constants.AdminObject.NAME))
                                                                                                             .build();
     @Autowired
     public AdminObjectRepository(@NonNull @Nonnull JdbcTemplate jdbcTemplate) {
@@ -65,9 +70,9 @@ public class AdminObjectRepository extends CachingJdbcRepository<AdministrativeO
 
     @Override
     public boolean delete(@NonNull @Nonnull Long id) {
-        AdministrativeObject administrativeObject = find(id);
-        if (nonNull(administrativeObject)) {
-            getCache().invalidate(administrativeObject.getAdminObjName());
+        AdministrativeObject adminObject = find(id);
+        if (nonNull(adminObject)) {
+            getCache().invalidate(adminObject.getAdminObjName());
         }
         String jdbcTemplateDelete = "delete from carinfo.admin_object where admin_obj_id = ?;";
         int updated = jdbcTemplate.update(jdbcTemplateDelete, id);
@@ -130,5 +135,22 @@ public class AdminObjectRepository extends CachingJdbcRepository<AdministrativeO
         }
         String jdbcTemplateSelect = "select * from carinfo.admin_object where admin_obj_name = ?;";
         return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, fieldValue));
+    }
+
+    @Override
+    public Page<AdministrativeObject> find(@Nonnull ParamsHolder searchParams) {
+        Pageable pageable = searchParams.getPage();
+        String select = "select * ";
+        String from = "from carinfo.admin_object a ";
+        String name = searchParams.getString(Constants.AdminObject.NAME);
+        String where = StringUtils.isNoneBlank(name) ? " where a.admin_obj_name = " + name : "";
+        String countQuery = "select count(1) as row_count " + from + where;
+        int total = jdbcTemplate.queryForObject(countQuery, (rs, rowNum) -> rs.getInt(1));
+
+        String querySql = select + from + where + " limit " + pageable.getPageSize() + " offset " + pageable.getOffset();
+        List<AdministrativeObject> result = jdbcTemplate.query(querySql, ROW_MAPPER);
+        return new PageImpl<>(result, pageable, total);
+
+//        return getPage(jdbcTemplate, ROW_MAPPER, pageable, select, from, where, total);
     }
 }

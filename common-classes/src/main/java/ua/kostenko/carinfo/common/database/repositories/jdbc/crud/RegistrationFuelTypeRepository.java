@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.common.database.repositories.jdbc;
+package ua.kostenko.carinfo.common.database.repositories.jdbc.crud;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.collect.Lists;
@@ -11,9 +11,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ua.kostenko.carinfo.common.database.Constants;
-import ua.kostenko.carinfo.common.database.raw.RegistrationFuelType;
 import ua.kostenko.carinfo.common.database.repositories.CrudRepository;
 import ua.kostenko.carinfo.common.database.repositories.FieldSearchable;
+import ua.kostenko.carinfo.common.records.FuelType;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,29 +25,39 @@ import static java.util.Objects.nonNull;
 
 @Repository
 @Slf4j
-public class RegistrationFuelTypeRepository extends CachingJdbcRepository<RegistrationFuelType> implements FieldSearchable<RegistrationFuelType> {
-    private static final RowMapper<RegistrationFuelType> ROW_MAPPER = (resultSet, i) -> RegistrationFuelType.builder()
-                                                                                                            .fuelTypeId(resultSet.getLong(Constants.RegistrationFuelType.ID))
-                                                                                                            .fuelTypeName(resultSet.getString(Constants.RegistrationFuelType.NAME))
-                                                                                                            .build();
+public class RegistrationFuelTypeRepository extends CachingJdbcRepository<FuelType> implements FieldSearchable<FuelType> {
+    private static final RowMapper<FuelType> ROW_MAPPER = (resultSet, i) -> FuelType.builder()
+                                                                                    .fuelTypeId(resultSet.getLong(Constants.RegistrationFuelType.ID))
+                                                                                    .fuelTypeName(resultSet.getString(Constants.RegistrationFuelType.NAME))
+                                                                                    .build();
+
     @Autowired
     public RegistrationFuelTypeRepository(@NonNull @Nonnull JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
     }
 
     @Override
-    CacheLoader<String, RegistrationFuelType> getCacheLoader() {
-        return new CacheLoader<String, RegistrationFuelType>() {
+    CacheLoader<String, FuelType> getCacheLoader() {
+        return new CacheLoader<String, FuelType>() {
             @Override
-            public RegistrationFuelType load(@NonNull @Nonnull String key) {
+            public FuelType load(@NonNull @Nonnull String key) {
                 return findByField(key);
             }
         };
     }
 
+    @Override
+    public FuelType findByField(@NonNull @Nonnull String fieldValue) {
+        if (StringUtils.isBlank(fieldValue)) {
+            return null;
+        }
+        String jdbcTemplateSelect = "select * from carinfo.fuel_type where fuel_type_name = ?;";
+        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, fieldValue));
+    }
+
     @Nullable
     @Override
-    public RegistrationFuelType create(@NonNull @Nonnull RegistrationFuelType entity) {
+    public FuelType create(@NonNull @Nonnull FuelType entity) {
         String jdbcTemplateInsert = "insert into carinfo.fuel_type (fuel_type_name) values (?);";
         jdbcTemplate.update(jdbcTemplateInsert, entity.getFuelTypeName());
         return getFromCache(entity.getFuelTypeName());
@@ -55,7 +65,7 @@ public class RegistrationFuelTypeRepository extends CachingJdbcRepository<Regist
 
     @Nullable
     @Override
-    public RegistrationFuelType update(@NonNull @Nonnull RegistrationFuelType entity) {
+    public FuelType update(@NonNull @Nonnull FuelType entity) {
         getCache().invalidate(entity.getFuelTypeName());
         String jdbcTemplateUpdate = "update carinfo.fuel_type set fuel_type_name = ? where fuel_type_id = ?;";
         jdbcTemplate.update(jdbcTemplateUpdate, entity.getFuelTypeName(), entity.getFuelTypeId());
@@ -64,7 +74,7 @@ public class RegistrationFuelTypeRepository extends CachingJdbcRepository<Regist
 
     @Override
     public boolean delete(@NonNull @Nonnull Long id) {
-        RegistrationFuelType fuelType = find(id);
+        FuelType fuelType = find(id);
         if (nonNull(fuelType)) {
             getCache().invalidate(fuelType.getFuelTypeName());
         }
@@ -75,15 +85,9 @@ public class RegistrationFuelTypeRepository extends CachingJdbcRepository<Regist
 
     @Nullable
     @Override
-    public RegistrationFuelType find(@NonNull @Nonnull Long id) {
+    public FuelType find(@NonNull @Nonnull Long id) {
         String jdbcTemplateSelect = "select * from carinfo.fuel_type ft where fuel_type_id = ?;";
         return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
-    }
-
-    @Override
-    public List<RegistrationFuelType> findAll() {
-        String jdbcTemplateSelect = "select * from carinfo.fuel_type;";
-        return jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER);
     }
 
     @Override
@@ -94,21 +98,27 @@ public class RegistrationFuelTypeRepository extends CachingJdbcRepository<Regist
     }
 
     @Override
-    public boolean isExists(@NonNull @Nonnull RegistrationFuelType entity) {
+    public List<FuelType> findAll() {
+        String jdbcTemplateSelect = "select * from carinfo.fuel_type;";
+        return jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER);
+    }
+
+    @Override
+    public boolean isExists(@NonNull @Nonnull FuelType entity) {
         return nonNull(getFromCache(entity.getFuelTypeName()));
     }
 
     @Override
-    public void createAll(Iterable<RegistrationFuelType> entities) {
+    public void createAll(Iterable<FuelType> entities) {
         final int batchSize = 100;
-        List<List<RegistrationFuelType>> batchLists = Lists.partition(Lists.newArrayList(entities), batchSize);
-        for (List<RegistrationFuelType> batch : batchLists) {
+        List<List<FuelType>> batchLists = Lists.partition(Lists.newArrayList(entities), batchSize);
+        for (List<FuelType> batch : batchLists) {
             String jdbcTemplateInsertAll = "insert into carinfo.fuel_type (fuel_type_name) values (?);";
             jdbcTemplate.batchUpdate(jdbcTemplateInsertAll, new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(@Nonnull PreparedStatement ps, int i)
                         throws SQLException {
-                    RegistrationFuelType object = batch.get(i);
+                    FuelType object = batch.get(i);
                     ps.setString(1, object.getFuelTypeName());
                 }
 
@@ -118,14 +128,5 @@ public class RegistrationFuelTypeRepository extends CachingJdbcRepository<Regist
                 }
             });
         }
-    }
-
-    @Override
-    public RegistrationFuelType findByField(@NonNull @Nonnull String fieldValue) {
-        if (StringUtils.isBlank(fieldValue)) {
-            return null;
-        }
-        String jdbcTemplateSelect = "select * from carinfo.fuel_type where fuel_type_name = ?;";
-        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, fieldValue));
     }
 }

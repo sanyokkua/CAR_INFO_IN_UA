@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.common.database.repositories.jdbc;
+package ua.kostenko.carinfo.common.database.repositories.jdbc.crud;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.collect.Lists;
@@ -11,9 +11,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ua.kostenko.carinfo.common.database.Constants;
-import ua.kostenko.carinfo.common.database.raw.RegistrationKind;
 import ua.kostenko.carinfo.common.database.repositories.CrudRepository;
 import ua.kostenko.carinfo.common.database.repositories.FieldSearchable;
+import ua.kostenko.carinfo.common.records.Kind;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,29 +25,39 @@ import static java.util.Objects.nonNull;
 
 @Repository
 @Slf4j
-public class RegistrationKindRepository extends CachingJdbcRepository<RegistrationKind> implements FieldSearchable<RegistrationKind> {
-    private static final RowMapper<RegistrationKind> ROW_MAPPER = (resultSet, i) -> RegistrationKind.builder()
-                                                                                                    .kindId(resultSet.getLong(Constants.RegistrationKind.ID))
-                                                                                                    .kindName(resultSet.getString(Constants.RegistrationKind.NAME))
-                                                                                                    .build();
+public class RegistrationKindRepository extends CachingJdbcRepository<Kind> implements FieldSearchable<Kind> {
+    private static final RowMapper<Kind> ROW_MAPPER = (resultSet, i) -> Kind.builder()
+                                                                            .kindId(resultSet.getLong(Constants.RegistrationKind.ID))
+                                                                            .kindName(resultSet.getString(Constants.RegistrationKind.NAME))
+                                                                            .build();
+
     @Autowired
     public RegistrationKindRepository(@NonNull @Nonnull JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
     }
 
     @Override
-    CacheLoader<String, RegistrationKind> getCacheLoader() {
-        return new CacheLoader<String, RegistrationKind>() {
+    CacheLoader<String, Kind> getCacheLoader() {
+        return new CacheLoader<String, Kind>() {
             @Override
-            public RegistrationKind load(@NonNull @Nonnull String key) {
+            public Kind load(@NonNull @Nonnull String key) {
                 return findByField(key);
             }
         };
     }
 
+    @Override
+    public Kind findByField(@NonNull @Nonnull String fieldValue) {
+        if (StringUtils.isBlank(fieldValue)) {
+            return null;
+        }
+        String jdbcTemplateSelect = "select * from carinfo.kind where kind_nameody_type_name = ?;";
+        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, fieldValue));
+    }
+
     @Nullable
     @Override
-    public RegistrationKind create(@NonNull @Nonnull RegistrationKind entity) {
+    public Kind create(@NonNull @Nonnull Kind entity) {
         String jdbcTemplateInsert = "insert into carinfo.kind (kind_name) values (?);";
         jdbcTemplate.update(jdbcTemplateInsert, entity.getKindName());
         return getFromCache(entity.getKindName());
@@ -55,7 +65,7 @@ public class RegistrationKindRepository extends CachingJdbcRepository<Registrati
 
     @Nullable
     @Override
-    public RegistrationKind update(@NonNull @Nonnull RegistrationKind entity) {
+    public Kind update(@NonNull @Nonnull Kind entity) {
         getCache().invalidate(entity.getKindName());
         String jdbcTemplateUpdate = "update carinfo.kind set kind_name = ? where kind_id = ?;";
         jdbcTemplate.update(jdbcTemplateUpdate, entity.getKindName(), entity.getKindId());
@@ -64,7 +74,7 @@ public class RegistrationKindRepository extends CachingJdbcRepository<Registrati
 
     @Override
     public boolean delete(@NonNull @Nonnull Long id) {
-        RegistrationKind kind = find(id);
+        Kind kind = find(id);
         if (nonNull(kind)) {
             getCache().invalidate(kind.getKindName());
         }
@@ -75,15 +85,9 @@ public class RegistrationKindRepository extends CachingJdbcRepository<Registrati
 
     @Nullable
     @Override
-    public RegistrationKind find(@NonNull @Nonnull Long id) {
+    public Kind find(@NonNull @Nonnull Long id) {
         String jdbcTemplateSelect = "select * from carinfo.kind where kind_id = ?;";
         return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
-    }
-
-    @Override
-    public List<RegistrationKind> findAll() {
-        String jdbcTemplateSelect = "select * from carinfo.kind;";
-        return jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER);
     }
 
     @Override
@@ -94,21 +98,27 @@ public class RegistrationKindRepository extends CachingJdbcRepository<Registrati
     }
 
     @Override
-    public boolean isExists(@NonNull @Nonnull RegistrationKind entity) {
+    public List<Kind> findAll() {
+        String jdbcTemplateSelect = "select * from carinfo.kind;";
+        return jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER);
+    }
+
+    @Override
+    public boolean isExists(@NonNull @Nonnull Kind entity) {
         return nonNull(getFromCache(entity.getKindName()));
     }
 
     @Override
-    public void createAll(Iterable<RegistrationKind> entities) {
+    public void createAll(Iterable<Kind> entities) {
         final int batchSize = 100;
-        List<List<RegistrationKind>> batchLists = Lists.partition(Lists.newArrayList(entities), batchSize);
-        for (List<RegistrationKind> batch : batchLists) {
+        List<List<Kind>> batchLists = Lists.partition(Lists.newArrayList(entities), batchSize);
+        for (List<Kind> batch : batchLists) {
             String jdbcTemplateInsertAll = "insert into carinfo.kind (kind_name) values (?);";
             jdbcTemplate.batchUpdate(jdbcTemplateInsertAll, new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(@Nonnull PreparedStatement ps, int i)
                         throws SQLException {
-                    RegistrationKind object = batch.get(i);
+                    Kind object = batch.get(i);
                     ps.setString(1, object.getKindName());
                 }
 
@@ -118,14 +128,5 @@ public class RegistrationKindRepository extends CachingJdbcRepository<Registrati
                 }
             });
         }
-    }
-
-    @Override
-    public RegistrationKind findByField(@NonNull @Nonnull String fieldValue) {
-        if (StringUtils.isBlank(fieldValue)) {
-            return null;
-        }
-        String jdbcTemplateSelect = "select * from carinfo.kind where kind_nameody_type_name = ?;";
-        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, fieldValue));
     }
 }

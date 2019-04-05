@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.common.database.repositories.jdbc;
+package ua.kostenko.carinfo.common.database.repositories.jdbc.crud;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.collect.Lists;
@@ -11,9 +11,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ua.kostenko.carinfo.common.database.Constants;
-import ua.kostenko.carinfo.common.database.raw.RegistrationBodyType;
 import ua.kostenko.carinfo.common.database.repositories.CrudRepository;
 import ua.kostenko.carinfo.common.database.repositories.FieldSearchable;
+import ua.kostenko.carinfo.common.records.BodyType;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,11 +25,11 @@ import static java.util.Objects.nonNull;
 
 @Repository
 @Slf4j
-public class RegistrationBodyTypeRepository extends CachingJdbcRepository<RegistrationBodyType> implements FieldSearchable<RegistrationBodyType> {
-    private static final RowMapper<RegistrationBodyType> ROW_MAPPER = (resultSet, i) -> RegistrationBodyType.builder()
-                                                                                                            .bodyTypeId(resultSet.getLong(Constants.RegistrationBodyType.ID))
-                                                                                                            .bodyTypeName(resultSet.getString(Constants.RegistrationBodyType.NAME))
-                                                                                                            .build();
+public class RegistrationBodyTypeRepository extends CachingJdbcRepository<BodyType> implements FieldSearchable<BodyType> {
+    private static final RowMapper<BodyType> ROW_MAPPER = (resultSet, i) -> BodyType.builder()
+                                                                                    .bodyTypeId(resultSet.getLong(Constants.RegistrationBodyType.ID))
+                                                                                    .bodyTypeName(resultSet.getString(Constants.RegistrationBodyType.NAME))
+                                                                                    .build();
 
     @Autowired
     public RegistrationBodyTypeRepository(@NonNull @Nonnull JdbcTemplate jdbcTemplate) {
@@ -37,17 +37,17 @@ public class RegistrationBodyTypeRepository extends CachingJdbcRepository<Regist
     }
 
     @Override
-    CacheLoader<String, RegistrationBodyType> getCacheLoader() {
-        return new CacheLoader<String, RegistrationBodyType>() {
+    CacheLoader<String, BodyType> getCacheLoader() {
+        return new CacheLoader<String, BodyType>() {
             @Override
-            public RegistrationBodyType load(@NonNull @Nonnull String key) {
+            public BodyType load(@NonNull @Nonnull String key) {
                 return findByField(key);
             }
         };
     }
 
     @Override
-    public RegistrationBodyType findByField(@Nonnull @NonNull String fieldValue) {
+    public BodyType findByField(@Nonnull @NonNull String fieldValue) {
         if (StringUtils.isBlank(fieldValue)) {
             return null;
         }
@@ -57,7 +57,7 @@ public class RegistrationBodyTypeRepository extends CachingJdbcRepository<Regist
 
     @Nullable
     @Override
-    public RegistrationBodyType create(@NonNull @Nonnull RegistrationBodyType entity) {
+    public BodyType create(@NonNull @Nonnull BodyType entity) {
         String jdbcTemplateInsert = "insert into carinfo.body_type (body_type_name) values (?);";
         jdbcTemplate.update(jdbcTemplateInsert, entity.getBodyTypeName());
         return getFromCache(entity.getBodyTypeName());
@@ -65,7 +65,7 @@ public class RegistrationBodyTypeRepository extends CachingJdbcRepository<Regist
 
     @Nullable
     @Override
-    public RegistrationBodyType update(@NonNull @Nonnull RegistrationBodyType entity) {
+    public BodyType update(@NonNull @Nonnull BodyType entity) {
         getCache().invalidate(entity.getBodyTypeName());
         String jdbcTemplateUpdate = "update carinfo.body_type set body_type_name = ? where body_type_id = ?;";
         jdbcTemplate.update(jdbcTemplateUpdate, entity.getBodyTypeName(), entity.getBodyTypeId());
@@ -74,7 +74,7 @@ public class RegistrationBodyTypeRepository extends CachingJdbcRepository<Regist
 
     @Override
     public boolean delete(@NonNull @Nonnull Long id) {
-        RegistrationBodyType administrativeObject = find(id);
+        BodyType administrativeObject = find(id);
         if (nonNull(administrativeObject)) {
             getCache().invalidate(administrativeObject.getBodyTypeName());
         }
@@ -85,13 +85,13 @@ public class RegistrationBodyTypeRepository extends CachingJdbcRepository<Regist
 
     @Nullable
     @Override
-    public RegistrationBodyType find(@NonNull @Nonnull Long id) {
+    public BodyType find(@NonNull @Nonnull Long id) {
         String jdbcTemplateSelect = "select * from carinfo.body_type where body_type_id = ?;";
         return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
     }
 
     @Override
-    public List<RegistrationBodyType> findAll() {
+    public List<BodyType> findAll() {
         String jdbcTemplateSelect = "select * from carinfo.body_type;";
         return jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER);
     }
@@ -104,21 +104,21 @@ public class RegistrationBodyTypeRepository extends CachingJdbcRepository<Regist
     }
 
     @Override
-    public boolean isExists(@NonNull @Nonnull RegistrationBodyType entity) {
+    public boolean isExists(@NonNull @Nonnull BodyType entity) {
         return nonNull(getFromCache(entity.getBodyTypeName()));
     }
 
     @Override
-    public void createAll(Iterable<RegistrationBodyType> entities) {
+    public void createAll(Iterable<BodyType> entities) {
         final int batchSize = 100;
-        List<List<RegistrationBodyType>> batchLists = Lists.partition(Lists.newArrayList(entities), batchSize);
-        for (List<RegistrationBodyType> batch : batchLists) {
+        List<List<BodyType>> batchLists = Lists.partition(Lists.newArrayList(entities), batchSize);
+        for (List<BodyType> batch : batchLists) {
             String jdbcTemplateInsertAll = "insert into carinfo.body_type (body_type_name) values (?);";
             jdbcTemplate.batchUpdate(jdbcTemplateInsertAll, new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(@Nonnull PreparedStatement ps, int i)
                         throws SQLException {
-                    RegistrationBodyType object = batch.get(i);
+                    BodyType object = batch.get(i);
                     ps.setString(1, object.getBodyTypeName());
                 }
 

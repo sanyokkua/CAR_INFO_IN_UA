@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.common.database.repositories.jdbc;
+package ua.kostenko.carinfo.common.database.repositories.jdbc.crud;
 
 import com.google.common.collect.Lists;
 import lombok.NonNull;
@@ -11,8 +11,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 import ua.kostenko.carinfo.common.database.Constants;
-import ua.kostenko.carinfo.common.database.raw.RegistrationVehicle;
 import ua.kostenko.carinfo.common.database.repositories.CrudRepository;
+import ua.kostenko.carinfo.common.records.Vehicle;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,12 +25,16 @@ import static java.util.Objects.nonNull;
 
 @Repository
 @Slf4j
-public class RegistrationVehicleRepository extends JdbcRepository<RegistrationVehicle> {
-    private static final RowMapper<RegistrationVehicle> ROW_MAPPER = (resultSet, i) -> RegistrationVehicle.builder()
-                                                                                                          .vehicleId(resultSet.getLong(Constants.RegistrationVehicle.ID))
-                                                                                                          .brandId(resultSet.getLong(Constants.RegistrationVehicle.BRAND_ID))
-                                                                                                          .modelId(resultSet.getLong(Constants.RegistrationVehicle.MODEL_ID))
-                                                                                                          .build();
+public class RegistrationVehicleRepository extends JdbcRepository<Vehicle> {
+    private static final String BRAND = "brand";
+    private static final String MODEL = "model";
+    private static final RowMapper<Vehicle> ROW_MAPPER = (resultSet, i) -> Vehicle.builder()
+                                                                                  .vehicleId(resultSet.getLong(Constants.RegistrationVehicle.ID))
+                                                                                  .brandId(resultSet.getLong(Constants.RegistrationVehicle.BRAND_ID))
+                                                                                  .modelId(resultSet.getLong(Constants.RegistrationVehicle.MODEL_ID))
+                                                                                  .registrationModel(resultSet.getString(MODEL))
+                                                                                  .registrationBrand(resultSet.getString(BRAND))
+                                                                                  .build();
 
     @Autowired
     public RegistrationVehicleRepository(@NonNull @Nonnull JdbcTemplate jdbcTemplate) {
@@ -39,7 +43,7 @@ public class RegistrationVehicleRepository extends JdbcRepository<RegistrationVe
 
     @Nullable
     @Override
-    public RegistrationVehicle create(@NonNull @Nonnull RegistrationVehicle entity) {
+    public Vehicle create(@NonNull @Nonnull Vehicle entity) {
         String jdbcTemplateInsert = "insert into carinfo.vehicle (brand_id, model_id) values (?, ?);";
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -54,7 +58,7 @@ public class RegistrationVehicleRepository extends JdbcRepository<RegistrationVe
 
     @Nullable
     @Override
-    public RegistrationVehicle update(@NonNull @Nonnull RegistrationVehicle entity) {
+    public Vehicle update(@NonNull @Nonnull Vehicle entity) {
         String jdbcTemplateUpdate = "update carinfo.vehicle set brand_id = ?, model_id = ? where vehicle_id = ?;";
         jdbcTemplate.update(jdbcTemplateUpdate, entity.getBrandId(), entity.getModelId(), entity.getVehicleId());
         return find(entity.getVehicleId());
@@ -70,14 +74,18 @@ public class RegistrationVehicleRepository extends JdbcRepository<RegistrationVe
     @Nullable
     @Override
     @Cacheable("vehicles_id")
-    public RegistrationVehicle find(@NonNull @Nonnull Long id) {
-        String jdbcTemplateSelect = "select * from carinfo.vehicle v where vehicle_id = ?;";
+    public Vehicle find(@NonNull @Nonnull Long id) {
+        String jdbcTemplateSelect = "select v.vehicle_id, v.model_id, v.brand_id, b.brand_name as brand, m.model_name as model " +
+                "from carinfo.vehicle v, carinfo.brand b, carinfo.model m " +
+                "where vehicle_id = ? and v.brand_id = b.brand_id and m.model_id = v.model_id;";
         return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
     }
 
     @Override
-    public List<RegistrationVehicle> findAll() {
-        String jdbcTemplateSelect = "select * from carinfo.vehicle;";
+    public List<Vehicle> findAll() {
+        String jdbcTemplateSelect = "select v.vehicle_id, v.model_id, v.brand_id, b.brand_name as brand, m.model_name as model " +
+                "from carinfo.vehicle v, carinfo.brand b, carinfo.model m " +
+                "where v.brand_id = b.brand_id and m.model_id = v.model_id;";
         return jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER);
     }
 
@@ -89,20 +97,20 @@ public class RegistrationVehicleRepository extends JdbcRepository<RegistrationVe
     }
 
     @Override
-    public boolean isExists(@NonNull @Nonnull RegistrationVehicle entity) {
+    public boolean isExists(@NonNull @Nonnull Vehicle entity) {
         return nonNull(findByFields(entity.getBrandId(), entity.getModelId()));
     }
 
     @Override
-    public void createAll(Iterable<RegistrationVehicle> entities) {
+    public void createAll(Iterable<Vehicle> entities) {
         final int batchSize = 100;
-        List<List<RegistrationVehicle>> batchLists = Lists.partition(Lists.newArrayList(entities), batchSize);
-        for (List<RegistrationVehicle> batch : batchLists) {
+        List<List<Vehicle>> batchLists = Lists.partition(Lists.newArrayList(entities), batchSize);
+        for (List<Vehicle> batch : batchLists) {
             String jdbcTemplateInsertAll = "insert into carinfo.vehicle (brand_id, model_id) values (?, ?);";
             jdbcTemplate.batchUpdate(jdbcTemplateInsertAll, new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(@Nonnull PreparedStatement ps, int i) throws SQLException {
-                    RegistrationVehicle object = batch.get(i);
+                    Vehicle object = batch.get(i);
                     ps.setLong(1, object.getBrandId());
                     ps.setLong(2, object.getModelId());
                 }
@@ -116,8 +124,10 @@ public class RegistrationVehicleRepository extends JdbcRepository<RegistrationVe
     }
 
     @Cacheable("vehicles")
-    public RegistrationVehicle findByFields(@NonNull Long brandId, @NonNull Long modelId) {
-        String jdbcTemplateSelect = "select * from carinfo.vehicle v where brand_id = ? and model_id = ?;";
+    public Vehicle findByFields(@NonNull Long brandId, @NonNull Long modelId) {
+        String jdbcTemplateSelect = "select v.vehicle_id, v.model_id, v.brand_id, b.brand_name as brand, m.model_name as model " +
+                "from carinfo.vehicle v, carinfo.brand b, carinfo.model m " +
+                "where v.brand_id = b.brand_id and m.model_id = v.model_id and v.brand_id = ? and v.model_id = ?;";
         return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, brandId, modelId));
     }
 }

@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.common.database.repositories.jdbc;
+package ua.kostenko.carinfo.common.database.repositories.jdbc.crud;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.collect.Lists;
@@ -11,9 +11,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ua.kostenko.carinfo.common.database.Constants;
-import ua.kostenko.carinfo.common.database.raw.RegistrationBrand;
 import ua.kostenko.carinfo.common.database.repositories.CrudRepository;
 import ua.kostenko.carinfo.common.database.repositories.FieldSearchable;
+import ua.kostenko.carinfo.common.records.Brand;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,28 +25,29 @@ import static java.util.Objects.nonNull;
 
 @Repository
 @Slf4j
-public class RegistrationBrandRepository extends CachingJdbcRepository<RegistrationBrand> implements FieldSearchable<RegistrationBrand> {
-    private static final RowMapper<RegistrationBrand> ROW_MAPPER = (resultSet, i) -> RegistrationBrand.builder()
-                                                                                                      .brandId(resultSet.getLong(Constants.RegistrationBrand.ID))
-                                                                                                      .brandName(resultSet.getString(Constants.RegistrationBrand.NAME))
-                                                                                                      .build();
+public class RegistrationBrandRepository extends CachingJdbcRepository<Brand> implements FieldSearchable<Brand> {
+    private static final RowMapper<Brand> ROW_MAPPER = (resultSet, i) -> Brand.builder()
+                                                                              .brandId(resultSet.getLong(Constants.RegistrationBrand.ID))
+                                                                              .brandName(resultSet.getString(Constants.RegistrationBrand.NAME))
+                                                                              .build();
+
     @Autowired
     public RegistrationBrandRepository(@NonNull @Nonnull JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
     }
 
     @Override
-    CacheLoader<String, RegistrationBrand> getCacheLoader() {
-        return new CacheLoader<String, RegistrationBrand>() {
+    CacheLoader<String, Brand> getCacheLoader() {
+        return new CacheLoader<String, Brand>() {
             @Override
-            public RegistrationBrand load(@NonNull @Nonnull String key) {
+            public Brand load(@NonNull @Nonnull String key) {
                 return findByField(key);
             }
         };
     }
 
     @Override
-    public RegistrationBrand findByField(@NonNull @Nonnull String fieldValue) {
+    public Brand findByField(@NonNull @Nonnull String fieldValue) {
         if (StringUtils.isBlank(fieldValue)) {
             return null;
         }
@@ -56,7 +57,7 @@ public class RegistrationBrandRepository extends CachingJdbcRepository<Registrat
 
     @Nullable
     @Override
-    public RegistrationBrand create(@NonNull @Nonnull RegistrationBrand entity) {
+    public Brand create(@NonNull @Nonnull Brand entity) {
         String jdbcTemplateInsert = "insert into carinfo.brand (brand_name) values (?);";
         jdbcTemplate.update(jdbcTemplateInsert, entity.getBrandName());
         return getFromCache(entity.getBrandName());
@@ -64,7 +65,7 @@ public class RegistrationBrandRepository extends CachingJdbcRepository<Registrat
 
     @Nullable
     @Override
-    public RegistrationBrand update(@NonNull @Nonnull RegistrationBrand entity) {
+    public Brand update(@NonNull @Nonnull Brand entity) {
         getCache().invalidate(entity.getBrandName());
         String jdbcTemplateUpdate = "update carinfo.brand set brand_name = ? where brand_id = ?;";
         jdbcTemplate.update(jdbcTemplateUpdate, entity.getBrandName(), entity.getBrandId());
@@ -73,7 +74,7 @@ public class RegistrationBrandRepository extends CachingJdbcRepository<Registrat
 
     @Override
     public boolean delete(@NonNull @Nonnull Long id) {
-        RegistrationBrand brand = find(id);
+        Brand brand = find(id);
         if (nonNull(brand)) {
             getCache().invalidate(brand.getBrandName());
         }
@@ -84,14 +85,14 @@ public class RegistrationBrandRepository extends CachingJdbcRepository<Registrat
 
     @Nullable
     @Override
-    public RegistrationBrand find(@NonNull @Nonnull Long id) {
+    public Brand find(@NonNull @Nonnull Long id) {
         String jdbcTemplateSelect = "select * from carinfo.brand where brand_id = ?;";
         return CrudRepository.getNullableResultIfException(
                 () -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
     }
 
     @Override
-    public List<RegistrationBrand> findAll() {
+    public List<Brand> findAll() {
         String jdbcTemplateSelect = "select * from carinfo.brand;";
         return jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER);
     }
@@ -104,21 +105,21 @@ public class RegistrationBrandRepository extends CachingJdbcRepository<Registrat
     }
 
     @Override
-    public boolean isExists(@NonNull @Nonnull RegistrationBrand entity) {
+    public boolean isExists(@NonNull @Nonnull Brand entity) {
         return nonNull(getFromCache(entity.getBrandName()));
     }
 
     @Override
-    public void createAll(Iterable<RegistrationBrand> entities) {
+    public void createAll(Iterable<Brand> entities) {
         final int batchSize = 100;
-        List<List<RegistrationBrand>> batchLists = Lists.partition(Lists.newArrayList(entities), batchSize);
-        for (List<RegistrationBrand> batch : batchLists) {
+        List<List<Brand>> batchLists = Lists.partition(Lists.newArrayList(entities), batchSize);
+        for (List<Brand> batch : batchLists) {
             String jdbcTemplateInsertAll = "insert into carinfo.brand (brand_name) values (?);";
             jdbcTemplate.batchUpdate(jdbcTemplateInsertAll, new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(@Nonnull PreparedStatement ps, int i)
                         throws SQLException {
-                    RegistrationBrand object = batch.get(i);
+                    Brand object = batch.get(i);
                     ps.setString(1, object.getBrandName());
                 }
 

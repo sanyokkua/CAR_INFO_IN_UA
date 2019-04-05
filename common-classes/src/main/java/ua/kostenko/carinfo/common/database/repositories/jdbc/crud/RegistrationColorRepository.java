@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.common.database.repositories.jdbc;
+package ua.kostenko.carinfo.common.database.repositories.jdbc.crud;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.collect.Lists;
@@ -11,9 +11,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ua.kostenko.carinfo.common.database.Constants;
-import ua.kostenko.carinfo.common.database.raw.RegistrationColor;
 import ua.kostenko.carinfo.common.database.repositories.CrudRepository;
 import ua.kostenko.carinfo.common.database.repositories.FieldSearchable;
+import ua.kostenko.carinfo.common.records.Color;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,29 +25,39 @@ import static java.util.Objects.nonNull;
 
 @Repository
 @Slf4j
-public class RegistrationColorRepository extends CachingJdbcRepository<RegistrationColor> implements FieldSearchable<RegistrationColor> {
-    private static final RowMapper<RegistrationColor> ROW_MAPPER = (resultSet, i) -> RegistrationColor.builder()
-                                                                                                      .colorId(resultSet.getLong(Constants.RegistrationColor.ID))
-                                                                                                      .colorName(resultSet.getString(Constants.RegistrationColor.NAME))
-                                                                                                      .build();
+public class RegistrationColorRepository extends CachingJdbcRepository<Color> implements FieldSearchable<Color> {
+    private static final RowMapper<Color> ROW_MAPPER = (resultSet, i) -> Color.builder()
+                                                                              .colorId(resultSet.getLong(Constants.RegistrationColor.ID))
+                                                                              .colorName(resultSet.getString(Constants.RegistrationColor.NAME))
+                                                                              .build();
+
     @Autowired
     public RegistrationColorRepository(@NonNull @Nonnull JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
     }
 
     @Override
-    CacheLoader<String, RegistrationColor> getCacheLoader() {
-        return new CacheLoader<String, RegistrationColor>() {
+    CacheLoader<String, Color> getCacheLoader() {
+        return new CacheLoader<String, Color>() {
             @Override
-            public RegistrationColor load(@NonNull @Nonnull String key) {
+            public Color load(@NonNull @Nonnull String key) {
                 return findByField(key);
             }
         };
     }
 
+    @Override
+    public Color findByField(@NonNull @Nonnull String fieldValue) {
+        if (StringUtils.isBlank(fieldValue)) {
+            return null;
+        }
+        String jdbcTemplateSelect = "select * from carinfo.color where color_name = ?;";
+        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, fieldValue));
+    }
+
     @Nullable
     @Override
-    public RegistrationColor create(@NonNull @Nonnull RegistrationColor entity) {
+    public Color create(@NonNull @Nonnull Color entity) {
         String jdbcTemplateInsert = "insert into carinfo.color (color_name) values (?);";
         jdbcTemplate.update(jdbcTemplateInsert, entity.getColorName());
         return getFromCache(entity.getColorName());
@@ -55,7 +65,7 @@ public class RegistrationColorRepository extends CachingJdbcRepository<Registrat
 
     @Nullable
     @Override
-    public RegistrationColor update(@NonNull @Nonnull RegistrationColor entity) {
+    public Color update(@NonNull @Nonnull Color entity) {
         getCache().invalidate(entity.getColorName());
         String jdbcTemplateUpdate = "update carinfo.color set color_name = ? where color_id = ?;";
         jdbcTemplate.update(jdbcTemplateUpdate, entity.getColorName(), entity.getColorId());
@@ -64,7 +74,7 @@ public class RegistrationColorRepository extends CachingJdbcRepository<Registrat
 
     @Override
     public boolean delete(@NonNull @Nonnull Long id) {
-        RegistrationColor color = find(id);
+        Color color = find(id);
         if (nonNull(color)) {
             getCache().invalidate(color.getColorName());
         }
@@ -75,15 +85,9 @@ public class RegistrationColorRepository extends CachingJdbcRepository<Registrat
 
     @Nullable
     @Override
-    public RegistrationColor find(@NonNull @Nonnull Long id) {
+    public Color find(@NonNull @Nonnull Long id) {
         String jdbcTemplateSelect = "select * from carinfo.color where color_id = ?;";
         return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
-    }
-
-    @Override
-    public List<RegistrationColor> findAll() {
-        String jdbcTemplateSelect = "select * from carinfo.color;";
-        return jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER);
     }
 
     @Override
@@ -94,21 +98,27 @@ public class RegistrationColorRepository extends CachingJdbcRepository<Registrat
     }
 
     @Override
-    public boolean isExists(@NonNull @Nonnull RegistrationColor entity) {
+    public List<Color> findAll() {
+        String jdbcTemplateSelect = "select * from carinfo.color;";
+        return jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER);
+    }
+
+    @Override
+    public boolean isExists(@NonNull @Nonnull Color entity) {
         return nonNull(getFromCache(entity.getColorName()));
     }
 
     @Override
-    public void createAll(Iterable<RegistrationColor> entities) {
+    public void createAll(Iterable<Color> entities) {
         final int batchSize = 100;
-        List<List<RegistrationColor>> batchLists = Lists.partition(Lists.newArrayList(entities), batchSize);
-        for (List<RegistrationColor> batch : batchLists) {
+        List<List<Color>> batchLists = Lists.partition(Lists.newArrayList(entities), batchSize);
+        for (List<Color> batch : batchLists) {
             String jdbcTemplateInsertAll = "insert into carinfo.color (color_name) values (?);";
             jdbcTemplate.batchUpdate(jdbcTemplateInsertAll, new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(@Nonnull PreparedStatement ps, int i)
                         throws SQLException {
-                    RegistrationColor object = batch.get(i);
+                    Color object = batch.get(i);
                     ps.setString(1, object.getColorName());
                 }
 
@@ -118,14 +128,5 @@ public class RegistrationColorRepository extends CachingJdbcRepository<Registrat
                 }
             });
         }
-    }
-
-    @Override
-    public RegistrationColor findByField(@NonNull @Nonnull String fieldValue) {
-        if (StringUtils.isBlank(fieldValue)) {
-            return null;
-        }
-        String jdbcTemplateSelect = "select * from carinfo.color where color_name = ?;";
-        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, fieldValue));
     }
 }

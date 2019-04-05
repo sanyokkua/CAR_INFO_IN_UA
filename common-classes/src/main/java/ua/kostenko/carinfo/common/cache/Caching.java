@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.common.database.cache;
+package ua.kostenko.carinfo.common.cache;
 
 import com.google.common.cache.LoadingCache;
 import lombok.NonNull;

@@ -1,6 +1,7 @@
 package ua.kostenko.carinfo.common.database.repositories;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import javax.annotation.Nonnull;
@@ -23,12 +24,16 @@ public interface CrudRepository<T> {
     void createAll(Iterable<T> entities);
 
     static <T> T getNullableResultIfException(Supplier<T> supplier) {
+        @Slf4j
+        class CrudRepositoryLoggerHolder {}
         T t = null;
         try {
             t = supplier.get();
         } catch (EmptyResultDataAccessException ex) {
             //TODO: ignored, returning null if any exception occurred
+            CrudRepositoryLoggerHolder.log.warn("Exception occurred due extracting value.", ex);
         }
         return t;
     }
+
 }
