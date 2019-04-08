@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import ua.kostenko.carinfo.common.ParamHolderBuilder;
-import ua.kostenko.carinfo.common.database.repositories.CrudRepository;
+import ua.kostenko.carinfo.common.database.repositories.PageableRepository;
 import ua.kostenko.carinfo.common.records.AdministrativeObject;
 
 import javax.annotation.Nonnull;
@@ -17,10 +17,10 @@ import java.util.Objects;
 @Slf4j
 @Service
 public class AdministrativeObjectService implements CrudService<AdministrativeObject> {
-    private final CrudRepository<AdministrativeObject> repository;
+    private final PageableRepository<AdministrativeObject> repository;
 
     @Autowired
-    public AdministrativeObjectService(@NonNull CrudRepository<AdministrativeObject> repository) {
+    public AdministrativeObjectService(@NonNull PageableRepository<AdministrativeObject> repository) {
         this.repository = repository;
     }
 
@@ -66,6 +66,6 @@ public class AdministrativeObjectService implements CrudService<AdministrativeOb
 
     @Override
     public Page<AdministrativeObject> find(ParamHolderBuilder queryBuilder) {
-        return null;
+        return repository.find(queryBuilder.build());
     }
 }

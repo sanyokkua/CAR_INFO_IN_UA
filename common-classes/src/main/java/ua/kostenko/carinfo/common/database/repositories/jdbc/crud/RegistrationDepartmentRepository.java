@@ -6,13 +6,18 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import ua.kostenko.carinfo.common.ParamsHolder;
 import ua.kostenko.carinfo.common.database.Constants;
 import ua.kostenko.carinfo.common.database.repositories.CrudRepository;
 import ua.kostenko.carinfo.common.database.repositories.FieldSearchable;
+import ua.kostenko.carinfo.common.database.repositories.PageableRepository;
 import ua.kostenko.carinfo.common.records.Department;
 
 import javax.annotation.Nonnull;
@@ -25,7 +30,7 @@ import static java.util.Objects.nonNull;
 
 @Repository
 @Slf4j
-public class RegistrationDepartmentRepository extends CachingJdbcRepository<Department> implements FieldSearchable<Department> {
+public class RegistrationDepartmentRepository extends CachingJdbcRepository<Department> implements PageableRepository<Department>, FieldSearchable<Department> {
     private static final RowMapper<Department> ROW_MAPPER = (resultSet, i) -> Department.builder()
                                                                                         .departmentCode(resultSet.getLong(Constants.RegistrationDepartment.CODE))
                                                                                         .departmentName(resultSet.getString(Constants.RegistrationDepartment.NAME))
@@ -132,5 +137,32 @@ public class RegistrationDepartmentRepository extends CachingJdbcRepository<Depa
                 }
             });
         }
+    }
+
+    @Override
+    public Page<Department> find(@Nonnull ParamsHolder searchParams) {
+        Pageable pageable = searchParams.getPage();
+        String select = "select * from carinfo.department d ";
+
+        Long code = searchParams.getLong(Constants.RegistrationDepartment.CODE);
+        String name = searchParams.getString(Constants.RegistrationDepartment.NAME);
+        String email = searchParams.getString(Constants.RegistrationDepartment.EMAIL);
+        String address = searchParams.getString(Constants.RegistrationDepartment.ADDRESS);
+
+        String where = buildWhere()
+                .add("d.dep_code", code)
+                .add("d.dep_name", name)
+                .add("d.dep_email", email)
+                .add("d.dep_addr", address)
+                .build();
+
+        String countQuery = "select count(1) as row_count " + " from carinfo.department d " + where;
+        int total = jdbcTemplate.queryForObject(countQuery, (rs, rowNum) -> rs.getInt(1));
+
+        int limit = pageable.getPageSize();
+        long offset = pageable.getOffset();
+        String querySql = select + where + " limit ? offset ?";
+        List<Department> result = jdbcTemplate.query(querySql, ROW_MAPPER, limit, offset);
+        return new PageImpl<>(result, pageable, total);
     }
 }

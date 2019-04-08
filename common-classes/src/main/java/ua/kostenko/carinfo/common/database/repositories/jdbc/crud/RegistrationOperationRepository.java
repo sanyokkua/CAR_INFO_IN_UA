@@ -6,13 +6,18 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import ua.kostenko.carinfo.common.ParamsHolder;
 import ua.kostenko.carinfo.common.database.Constants;
 import ua.kostenko.carinfo.common.database.repositories.CrudRepository;
 import ua.kostenko.carinfo.common.database.repositories.FieldSearchable;
+import ua.kostenko.carinfo.common.database.repositories.PageableRepository;
 import ua.kostenko.carinfo.common.records.Operation;
 
 import javax.annotation.Nonnull;
@@ -25,7 +30,7 @@ import static java.util.Objects.nonNull;
 
 @Repository
 @Slf4j
-public class RegistrationOperationRepository extends CachingJdbcRepository<Operation> implements FieldSearchable<Operation> {
+public class RegistrationOperationRepository extends CachingJdbcRepository<Operation> implements PageableRepository<Operation>, FieldSearchable<Operation> {
     private static final RowMapper<Operation> ROW_MAPPER = (resultSet, i) -> Operation.builder()
                                                                                       .operationCode(resultSet.getLong(Constants.RegistrationOperation.CODE))
                                                                                       .operationName(resultSet.getString(Constants.RegistrationOperation.NAME))
@@ -131,5 +136,21 @@ public class RegistrationOperationRepository extends CachingJdbcRepository<Opera
                 }
             });
         }
+    }
+
+    @Override
+    public Page<Operation> find(@Nonnull ParamsHolder searchParams) {
+        Pageable pageable = searchParams.getPage();
+        String select = "select * from carinfo.operation o ";
+        String name = searchParams.getString(Constants.RegistrationOperation.NAME);
+
+        String where = buildWhere().add("o.op_name", name).build();
+
+        String countQuery = "select count(1) as row_count " + "from carinfo.operation o " + where;
+        int total = jdbcTemplate.queryForObject(countQuery, (rs, rowNum) -> rs.getInt(1));
+
+        String querySql = select + where + " limit " + pageable.getPageSize() + " offset " + pageable.getOffset();
+        List<Operation> result = jdbcTemplate.query(querySql, ROW_MAPPER);
+        return new PageImpl<>(result, pageable, total);
     }
 }

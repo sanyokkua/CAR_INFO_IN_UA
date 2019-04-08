@@ -6,13 +6,18 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import ua.kostenko.carinfo.common.ParamsHolder;
 import ua.kostenko.carinfo.common.database.Constants;
 import ua.kostenko.carinfo.common.database.repositories.CrudRepository;
 import ua.kostenko.carinfo.common.database.repositories.FieldSearchable;
+import ua.kostenko.carinfo.common.database.repositories.PageableRepository;
 import ua.kostenko.carinfo.common.records.BodyType;
 
 import javax.annotation.Nonnull;
@@ -25,7 +30,7 @@ import static java.util.Objects.nonNull;
 
 @Repository
 @Slf4j
-public class RegistrationBodyTypeRepository extends CachingJdbcRepository<BodyType> implements FieldSearchable<BodyType> {
+public class RegistrationBodyTypeRepository extends CachingJdbcRepository<BodyType> implements PageableRepository<BodyType>, FieldSearchable<BodyType> {
     private static final RowMapper<BodyType> ROW_MAPPER = (resultSet, i) -> BodyType.builder()
                                                                                     .bodyTypeId(resultSet.getLong(Constants.RegistrationBodyType.ID))
                                                                                     .bodyTypeName(resultSet.getString(Constants.RegistrationBodyType.NAME))
@@ -128,5 +133,22 @@ public class RegistrationBodyTypeRepository extends CachingJdbcRepository<BodyTy
                 }
             });
         }
+    }
+
+    @Override
+    public Page<BodyType> find(@Nonnull ParamsHolder searchParams) {
+        Pageable pageable = searchParams.getPage();
+        String select = "select * ";
+        String from = "from carinfo.body_type bt ";
+        String name = searchParams.getString(Constants.RegistrationBodyType.NAME);
+
+        String where = buildWhere().add("bt.body_type_name", name).build();
+
+        String countQuery = "select count(1) as row_count " + from + where;
+        int total = jdbcTemplate.queryForObject(countQuery, (rs, rowNum) -> rs.getInt(1));
+
+        String querySql = select + from + where + " limit " + pageable.getPageSize() + " offset " + pageable.getOffset();
+        List<BodyType> result = jdbcTemplate.query(querySql, ROW_MAPPER);
+        return new PageImpl<>(result, pageable, total);
     }
 }

@@ -4,13 +4,18 @@ import com.google.common.collect.Lists;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
+import ua.kostenko.carinfo.common.ParamsHolder;
 import ua.kostenko.carinfo.common.database.Constants;
 import ua.kostenko.carinfo.common.database.repositories.CrudRepository;
+import ua.kostenko.carinfo.common.database.repositories.PageableRepository;
 import ua.kostenko.carinfo.common.records.Registration;
 
 import javax.annotation.Nonnull;
@@ -22,7 +27,7 @@ import java.util.List;
 
 @Repository
 @Slf4j
-public class RegistrationRecordRepository extends JdbcRepository<Registration> {
+public class RegistrationRecordRepository extends JdbcRepository<Registration> implements PageableRepository<Registration> {
     private static final RowMapper<Registration> ROW_MAPPER = (resultSet, i) -> Registration.builder()
                                                                                             .id(resultSet.getLong(Constants.RegistrationRecord.ID))
                                                                                             .adminObjectId(resultSet.getLong(Constants.RegistrationRecord.ADMIN_OBJ_ID))
@@ -216,5 +221,37 @@ public class RegistrationRecordRepository extends JdbcRepository<Registration> {
                 }
             });
         }
+    }
+
+    @Override
+    public Page<Registration> find(@Nonnull ParamsHolder searchParams) {
+        Pageable pageable = searchParams.getPage();
+        String select = "select * " +
+                "from carinfo.record r, carinfo.admin_object ao, carinfo.operation o, carinfo.department d, carinfo.kind k, carinfo.vehicle v, carinfo.color c, carinfo.body_type bt," +
+                " carinfo.purpose p, carinfo.fuel_type ft, carinfo.brand b, carinfo.model m " +
+                "where ao.admin_obj_id =  r.admin_obj_id and o.op_code = r.op_code and d.dep_code = r.dep_code and k.kind_id = r.kind_id and v.vehicle_id = r.vehicle_id " +
+                "and c.color_id = r.color_id and bt.body_type_id = r.body_type_id and p.purpose_id = r.purpose_id and ft.fuel_type_id = r.fuel_type_id and b.brand_id = v.brand_id " +
+                "and m.model_id = v.model_id;";
+
+        String modelName = searchParams.getString(Constants.RegistrationModel.NAME);
+        String brandName = searchParams.getString(Constants.RegistrationBrand.NAME);
+
+        buildWhere()
+//                .put("v.model_id", "m.model_id")
+//                .put("v.brand_id", "b.brand_id")
+//                .put("m.model_name", modelName)
+//                .put("b.brand_name", brandName)
+.build();
+
+        String where = buildWhere().build();
+
+        String countQuery = "select count(1) as row_count " + " from carinfo.vehicle v, carinfo.brand b, carinfo.model m  " + where;
+        int total = jdbcTemplate.queryForObject(countQuery, (rs, rowNum) -> rs.getInt(1));
+
+        int limit = pageable.getPageSize();
+        long offset = pageable.getOffset();
+        String querySql = select + where + " limit ? offset ?";
+        List<Registration> result = jdbcTemplate.query(querySql, ROW_MAPPER, limit, offset);
+        return new PageImpl<>(result, pageable, total);
     }
 }
