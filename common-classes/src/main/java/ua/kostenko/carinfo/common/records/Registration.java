@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.sql.Date;
+import java.util.Objects;
 
 @Data
 @NoArgsConstructor
@@ -52,6 +53,23 @@ public class Registration implements Serializable {
     private Long ownWeight;
     private Long totalWeight;
     private Long makeYear;
+    private String personType;
     private String registrationNumber;
     private Date registrationDate;
+
+    public Long getEngineCapacity() {
+        return Objects.isNull(engineCapacity)? 0 : engineCapacity;
+    }
+
+    public Long getOwnWeight() {
+        return Objects.isNull(ownWeight)? 0 : ownWeight;
+    }
+
+    public Long getTotalWeight() {
+        return Objects.isNull(totalWeight)? 0 : totalWeight;
+    }
+
+    public Long getMakeYear() {
+        return Objects.isNull(makeYear)? 0 : makeYear;
+    }
 }

@@ -64,6 +64,12 @@ public class RegistrationDepartmentRepository extends CachingJdbcRepository<Depa
 
     @Nullable
     @Override
+    public Department find(@Nonnull Department entity) {
+        return findByField(entity.getDepartmentName());
+    }
+
+    @Nullable
+    @Override
     public Department create(@NonNull @Nonnull Department entity) {
         String jdbcTemplateInsert = "insert into carinfo.department (dep_code, dep_name, dep_addr, dep_email) values (?, ?, ?, ?);";
         jdbcTemplate.update(jdbcTemplateInsert, entity.getDepartmentCode(), entity.getDepartmentName(), entity.getDepartmentAddress(), entity.getDepartmentEmail());

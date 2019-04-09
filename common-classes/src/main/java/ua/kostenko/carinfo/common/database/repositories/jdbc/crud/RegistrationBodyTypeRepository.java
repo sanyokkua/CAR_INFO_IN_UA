@@ -62,6 +62,12 @@ public class RegistrationBodyTypeRepository extends CachingJdbcRepository<BodyTy
 
     @Nullable
     @Override
+    public BodyType find(@Nonnull BodyType entity) {
+        return findByField(entity.getBodyTypeName());
+    }
+
+    @Nullable
+    @Override
     public BodyType create(@NonNull @Nonnull BodyType entity) {
         String jdbcTemplateInsert = "insert into carinfo.body_type (body_type_name) values (?);";
         jdbcTemplate.update(jdbcTemplateInsert, entity.getBodyTypeName());

@@ -68,4 +68,15 @@ public final class ParamHolderBuilder {
     private int getAmount(@Nullable Integer recordsPerPage) {
         return Objects.nonNull(recordsPerPage) && recordsPerPage > 0 ? recordsPerPage : DEFAULT_RECORDS_NUMBER;
     }
+
+    @Override
+    public String toString() {
+        return "Params{" +
+                "records=" + records +
+                ", page=" + page +
+                ", longValues=" + longValues.toString() +
+                ", integerValues=" + integerValues.toString() +
+                ", stringValues=" + stringValues.toString() +
+                '}';
+    }
 }

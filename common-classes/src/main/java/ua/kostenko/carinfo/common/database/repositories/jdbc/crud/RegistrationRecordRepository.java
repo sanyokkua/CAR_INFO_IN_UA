@@ -58,6 +58,7 @@ public class RegistrationRecordRepository extends JdbcRepository<Registration> i
                                                                                             .bodyType(Constants.RegistrationBodyType.NAME)
                                                                                             .purpose(Constants.RegistrationPurpose.NAME)
                                                                                             .fuelType(Constants.RegistrationFuelType.NAME)
+                                                                                            .personType(Constants.RegistrationRecord.PERSON_TYPE)
                                                                                             .build();
 
     @Autowired
@@ -83,8 +84,9 @@ public class RegistrationRecordRepository extends JdbcRepository<Registration> i
                 "engine_capacity, " +
                 "make_year, " +
                 "registration_date, " +
-                "registration_number " +
-                ") values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                "registration_number, " +
+                "person_type " +
+                ") values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement statement = connection.prepareStatement(jdbcTemplateInsert, Statement.RETURN_GENERATED_KEYS);
@@ -111,6 +113,7 @@ public class RegistrationRecordRepository extends JdbcRepository<Registration> i
         statement.setLong(13, entity.getMakeYear());
         statement.setDate(14, entity.getRegistrationDate());
         statement.setString(15, entity.getRegistrationNumber());
+        statement.setString(16, entity.getPersonType());
     }
 
     @Nullable
@@ -120,7 +123,7 @@ public class RegistrationRecordRepository extends JdbcRepository<Registration> i
                 " op_code = ?, dep_code = ?, kind_id = ?, vehicle_id = ?," +
                 " color_id = ?, body_type_id = ?, purpose_id = ?, fuel_type_id = ?," +
                 " own_weight = ?, total_weight = ?, engine_capacity = ?, make_year = ?," +
-                " registration_date = ?, registration_number = ? " +
+                " registration_date = ?, registration_number = ?, person_type = ? " +
                 "where id = ?;";
         jdbcTemplate.update(jdbcTemplateUpdate,
                             entity.getAdminObjectId(),
@@ -137,7 +140,10 @@ public class RegistrationRecordRepository extends JdbcRepository<Registration> i
                             entity.getEngineCapacity(),
                             entity.getMakeYear(),
                             entity.getRegistrationDate(),
-                            entity.getRegistrationNumber(), entity.getId());
+                            entity.getRegistrationNumber(),
+                            entity.getId(),
+                            entity.getPersonType()
+        );
         return find(entity.getVehicleId());
     }
 
@@ -206,8 +212,9 @@ public class RegistrationRecordRepository extends JdbcRepository<Registration> i
                     "engine_capacity, " +
                     "make_year, " +
                     "registration_date, " +
-                    "registration_number " +
-                    ") values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                    "registration_number, " +
+                    "person_type " +
+                    ") values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
             jdbcTemplate.batchUpdate(jdbcTemplateInsertAll, new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(@Nonnull PreparedStatement ps, int i) throws SQLException {
@@ -291,5 +298,11 @@ public class RegistrationRecordRepository extends JdbcRepository<Registration> i
         String querySql = select + where + " limit ? offset ?";
         List<Registration> result = jdbcTemplate.query(querySql, ROW_MAPPER, limit, offset);
         return new PageImpl<>(result, pageable, total);
+    }
+
+    @Nullable
+    @Override
+    public Registration find(@Nonnull Registration entity) {
+        return null;
     }
 }

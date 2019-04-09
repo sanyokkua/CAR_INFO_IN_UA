@@ -28,9 +28,12 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 public class ServiceCenterInitializer implements Initializer {
     private final static Pattern DIGITS_ONLY = Pattern.compile("\\d+");
     private final ApplicationProperties applicationProperties;
+    private final Persist<ServiceCenter> persist;
+
     @Autowired
-    public ServiceCenterInitializer(@NonNull @Nonnull ApplicationProperties applicationProperties) {
+    public ServiceCenterInitializer(@NonNull @Nonnull ApplicationProperties applicationProperties, @NonNull @Nonnull Persist<ServiceCenter> persist) {
         this.applicationProperties = applicationProperties;
+        this.persist = persist;
     }
 
     @Override
@@ -63,8 +66,7 @@ public class ServiceCenterInitializer implements Initializer {
                         resultList.add(serviceCenterEntity);
                     }
                 }
-                resultList.forEach(serviceCenterEntity -> log.info("init: Service center: id {}, address {}, email {}", serviceCenterEntity.getDepId(), serviceCenterEntity.getAddress(), serviceCenterEntity.getEmail()));
-                Persist<ServiceCenter> persist = new ServiceCenterPersist();
+                resultList.forEach(serviceCenterEntity -> log.info("init: Service center: {}", serviceCenterEntity.toString()));
                 resultList.stream().parallel().forEach(persist::persist);
                 log.info("init: All information parsed");
             }

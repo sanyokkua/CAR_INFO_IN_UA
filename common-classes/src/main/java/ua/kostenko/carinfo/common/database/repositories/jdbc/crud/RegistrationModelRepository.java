@@ -62,6 +62,12 @@ public class RegistrationModelRepository extends CachingJdbcRepository<Model> im
 
     @Nullable
     @Override
+    public Model find(@Nonnull Model entity) {
+        return findByField(entity.getModelName());
+    }
+
+    @Nullable
+    @Override
     public Model create(@NonNull @Nonnull Model entity) {
         String jdbcTemplateInsert = "insert into carinfo.model (model_name) values (?);";
         jdbcTemplate.update(jdbcTemplateInsert, entity.getModelName());

@@ -62,6 +62,12 @@ public class RegistrationColorRepository extends CachingJdbcRepository<Color> im
 
     @Nullable
     @Override
+    public Color find(@Nonnull Color entity) {
+        return findByField(entity.getColorName());
+    }
+
+    @Nullable
+    @Override
     public Color create(@NonNull @Nonnull Color entity) {
         String jdbcTemplateInsert = "insert into carinfo.color (color_name) values (?);";
         jdbcTemplate.update(jdbcTemplateInsert, entity.getColorName());

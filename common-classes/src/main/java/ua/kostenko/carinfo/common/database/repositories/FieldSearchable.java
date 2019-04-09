@@ -8,4 +8,6 @@ import javax.annotation.Nullable;
 public interface FieldSearchable<T> {
     @Nullable
     T findByField(@Nonnull @NonNull String fieldValue);
+    @Nullable
+    T find(@NonNull @Nonnull T entity);
 }

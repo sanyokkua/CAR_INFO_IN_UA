@@ -62,6 +62,12 @@ public class RegistrationFuelTypeRepository extends CachingJdbcRepository<FuelTy
 
     @Nullable
     @Override
+    public FuelType find(@Nonnull FuelType entity) {
+        return findByField(entity.getFuelTypeName());
+    }
+
+    @Nullable
+    @Override
     public FuelType create(@NonNull @Nonnull FuelType entity) {
         String jdbcTemplateInsert = "insert into carinfo.fuel_type (fuel_type_name) values (?);";
         jdbcTemplate.update(jdbcTemplateInsert, entity.getFuelTypeName());

@@ -2,6 +2,7 @@ package ua.kostenko.carinfo.common.services;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import ua.kostenko.carinfo.common.records.Vehicle;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -34,32 +36,96 @@ public class VehicleService implements CrudService<Vehicle> {
     @Nullable
     @Override
     public Vehicle create(@NonNull @Nonnull Vehicle entity) {
+        if (isValid(entity)) {
+            String brand = entity.getRegistrationBrand();
+            String model = entity.getRegistrationModel();
+            Brand brandFromDb = brandRepository.findByField(brand);
+            Model modelFromDb = modelRepository.findByField(model);
+            entity.setBrandId(brandFromDb.getBrandId());
+            entity.setModelId(modelFromDb.getModelId());
+            if (!isExists(entity)) {
+                Vehicle vehicle = vehicleRepository.create(entity);
+                if (Objects.nonNull(vehicle)) {
+                    log.info("create: created entity: {}", vehicle.toString());
+                } else {
+                    log.warn("create: entity is not created", entity.toString());
+                }
+                return vehicle;
+            } else {
+                log.info("create: entity exists. Updating entity");
+                return vehicleRepository.update(entity);
+            }
+        }
+        log.info("create: entity is not valid. Returning null");
         return null;
+    }
+
+    private boolean isValid(Vehicle entity) {
+        String brand = entity.getRegistrationBrand();
+        String model = entity.getRegistrationModel();
+        log.info("isValid: validating vehicle. Brand = {}, Model = {}", brand, model);
+        if (StringUtils.isNotBlank(brand) && StringUtils.isNotBlank(model)) {
+            boolean brandExists = brandRepository.isExists(Brand.builder().brandName(brand).build());
+            log.info("isValid: brand {} exists = {}", brand, brandExists);
+            boolean modelExists = modelRepository.isExists(Model.builder().modelName(model).build());
+            log.info("isValid: model {} exists = {}", model, modelExists);
+            return brandExists && modelExists;
+        }
+        return false;
     }
 
     @Nullable
     @Override
     public Vehicle update(@NonNull @Nonnull Vehicle entity) {
+        if (isValid(entity) && !isExists(entity)) {
+            log.info("update: entity doesn't exist. Throwing exception");
+            throw new IllegalArgumentException("Entity doesn't exist");
+        } else if (isValid(entity) && isExists(entity)) {
+            log.info("update: entity exists. Updating entity");
+            return vehicleRepository.update(entity);
+        }
+
+        log.info("update: entity is not valid. Returning null");
         return null;
     }
 
     @Override
     public boolean delete(@NonNull @Nonnull Long id) {
-        return false;
+        log.info("delete: deleting entity with id: {}", id);
+        boolean deleted = vehicleRepository.delete(id);
+        log.info("delete: entity with id: {} is deleted: ", id, deleted);
+        return deleted;
     }
 
     @Override
     public boolean isExists(@NonNull @Nonnull Vehicle entity) {
-        return false;
+        log.info("isExists: checking for existence entity = {}", entity.toString());
+        boolean exists = vehicleRepository.isExists(entity);
+        log.info("isExists: entity = {} exists: {}", entity.toString(), exists);
+        return exists;
     }
 
     @Override
     public List<Vehicle> findAll() {
-        return null;
+        log.info("findAll");
+        return vehicleRepository.findAll();
     }
 
     @Override
     public Page<Vehicle> find(@NonNull @Nonnull ParamHolderBuilder builder) {
-        return null;
+        log.info("find. Parameters: {}");
+        return vehicleRepository.find(builder.build());
+    }
+
+    @Nullable
+    @Override
+    public Vehicle find(@Nonnull Vehicle entity) {
+        return vehicleRepository.find(entity);
+    }
+
+    @Nullable
+    @Override
+    public Vehicle find(@Nonnull Long id) {
+        return vehicleRepository.find(id);
     }
 }

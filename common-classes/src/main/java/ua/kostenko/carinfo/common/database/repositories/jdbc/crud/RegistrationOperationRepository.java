@@ -57,16 +57,20 @@ public class RegistrationOperationRepository extends CachingJdbcRepository<Opera
             return null;
         }
         String jdbcTemplateSelect = "select * from carinfo.operation where op_name = ?;";
-        return CrudRepository.getNullableResultIfException(
-                () -> jdbcTemplate.queryForObject(jdbcTemplateSelect,
-                                                  ROW_MAPPER, fieldValue));
+        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, fieldValue));
+    }
+
+    @Nullable
+    @Override
+    public Operation find(@Nonnull Operation entity) {
+        return findByField(entity.getOperationName());
     }
 
     @Nullable
     @Override
     public Operation create(@NonNull @Nonnull Operation entity) {
-        String jdbcTemplateInsert = "insert into carinfo.operation (op_name) values (?);";
-        jdbcTemplate.update(jdbcTemplateInsert, entity.getOperationName());
+        String jdbcTemplateInsert = "insert into carinfo.operation (op_code, op_name) values (?, ?);";
+        jdbcTemplate.update(jdbcTemplateInsert, entity.getOperationCode(), entity.getOperationName());
         return getFromCache(entity.getOperationName());
     }
 

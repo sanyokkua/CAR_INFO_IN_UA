@@ -6,8 +6,10 @@ import ua.kostenko.carinfo.common.ParamHolderBuilder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.transaction.Transactional;
 import java.util.List;
 
+@Transactional
 public interface CrudService<T> {
     @Nullable
     T create(@Nonnull @NonNull T entity);
@@ -18,4 +20,8 @@ public interface CrudService<T> {
 
     List<T> findAll();
     Page<T> find(@NonNull @Nonnull ParamHolderBuilder builder);
+    @Nullable
+    T find(@NonNull @Nonnull T entity);
+    @Nullable
+    T find(@NonNull @Nonnull Long id);
 }

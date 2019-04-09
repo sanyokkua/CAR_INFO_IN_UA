@@ -64,6 +64,12 @@ public class RegistrationPurposeRepository extends CachingJdbcRepository<Purpose
 
     @Nullable
     @Override
+    public Purpose find(@Nonnull Purpose entity) {
+        return findByField(entity.getPurposeName());
+    }
+
+    @Nullable
+    @Override
     public Purpose create(@NonNull @Nonnull Purpose entity) {
         String jdbcTemplateInsert = "insert into carinfo.purpose (purpose_name) values (?);";
         jdbcTemplate.update(jdbcTemplateInsert, entity.getPurposeName());

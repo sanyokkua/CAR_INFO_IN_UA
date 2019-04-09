@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 @Transactional
-public interface CrudRepository<T> {
+public interface CrudRepository<T> extends FieldSearchable<T> {
     @Nullable
     T create(@NonNull @Nonnull T entity);
     @Nullable
@@ -35,4 +35,10 @@ public interface CrudRepository<T> {
         return t;
     }
 
+    @Nullable
+    @Override
+    default T findByField(@Nonnull @NonNull String fieldValue) {
+        //TODO: STUB
+        return null;
+    }
 }

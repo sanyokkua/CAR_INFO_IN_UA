@@ -76,4 +76,7 @@ class RegistrationRecord implements Serializable {
 
     @Column(name = Constants.RegistrationRecord.REGISTRATION_DATE)
     private Date registrationDate;
+
+    @Column(name = Constants.RegistrationRecord.PERSON_TYPE)
+    private String personType;
 }

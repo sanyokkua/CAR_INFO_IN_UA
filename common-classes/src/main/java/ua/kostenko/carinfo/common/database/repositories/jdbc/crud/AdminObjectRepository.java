@@ -137,6 +137,12 @@ public class AdminObjectRepository extends CachingJdbcRepository<AdministrativeO
         return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, fieldValue));
     }
 
+    @Nullable
+    @Override
+    public AdministrativeObject find(@Nonnull AdministrativeObject entity) {
+        return findByField(entity.getAdminObjName());
+    }
+
     @Override
     public Page<AdministrativeObject> find(@NonNull @Nonnull ParamsHolder searchParams) {
         Pageable pageable = searchParams.getPage();

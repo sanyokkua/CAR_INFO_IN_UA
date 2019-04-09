@@ -56,8 +56,14 @@ public class RegistrationKindRepository extends CachingJdbcRepository<Kind> impl
         if (StringUtils.isBlank(fieldValue)) {
             return null;
         }
-        String jdbcTemplateSelect = "select * from carinfo.kind where kind_nameody_type_name = ?;";
+        String jdbcTemplateSelect = "select * from carinfo.kind where kind_name = ?;";
         return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, fieldValue));
+    }
+
+    @Nullable
+    @Override
+    public Kind find(@Nonnull Kind entity) {
+        return findByField(entity.getKindName());
     }
 
     @Nullable

@@ -62,6 +62,12 @@ public class RegistrationBrandRepository extends CachingJdbcRepository<Brand> im
 
     @Nullable
     @Override
+    public Brand find(@Nonnull Brand entity) {
+        return findByField(entity.getBrandName());
+    }
+
+    @Nullable
+    @Override
     public Brand create(@NonNull @Nonnull Brand entity) {
         String jdbcTemplateInsert = "insert into carinfo.brand (brand_name) values (?);";
         jdbcTemplate.update(jdbcTemplateInsert, entity.getBrandName());

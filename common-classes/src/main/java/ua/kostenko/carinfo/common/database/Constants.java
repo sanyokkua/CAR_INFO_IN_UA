@@ -84,6 +84,7 @@ public interface Constants {
         String VEHICLE_ID = "vehicle_id";
         String KIND = "kind_id";
         String MAKE_YEAR = "make_year";
+        String PERSON_TYPE = "person_type";
     }
 
     interface RegistrationVehicle {

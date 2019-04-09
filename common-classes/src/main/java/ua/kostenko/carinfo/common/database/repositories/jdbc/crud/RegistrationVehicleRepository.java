@@ -139,7 +139,7 @@ public class RegistrationVehicleRepository extends JdbcRepository<Vehicle> imple
     @Override
     public Page<Vehicle> find(@NonNull @Nonnull ParamsHolder searchParams) {
         Pageable pageable = searchParams.getPage();
-        String select = "select * from carinfo.vehicle v, carinfo.brand b, carinfo.model m ";
+        String select = "select v.vehicle_id, v.model_id, v.brand_id, b.brand_name as brand, m.model_name as model from carinfo.vehicle v, carinfo.brand b, carinfo.model m ";
 
         String modelName = searchParams.getString(Constants.RegistrationModel.NAME);
         String brandName = searchParams.getString(Constants.RegistrationBrand.NAME);
@@ -159,5 +159,11 @@ public class RegistrationVehicleRepository extends JdbcRepository<Vehicle> imple
         String querySql = select + where + " limit ? offset ?";
         List<Vehicle> result = jdbcTemplate.query(querySql, ROW_MAPPER, limit, offset);
         return new PageImpl<>(result, pageable, total);
+    }
+
+    @Nullable
+    @Override
+    public Vehicle find(@Nonnull Vehicle entity) {
+        return findByFields(entity.getBrandId(), entity.getModelId());
     }
 }
