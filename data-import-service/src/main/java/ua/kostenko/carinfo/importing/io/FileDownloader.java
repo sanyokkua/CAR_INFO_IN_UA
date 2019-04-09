@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -14,7 +15,7 @@ import java.nio.file.StandardCopyOption;
 @Slf4j
 public class FileDownloader {
 
-    public synchronized static File downloadFile(@NonNull String downloadUrl, @NonNull String pathToFileForSave) {
+    public synchronized static File downloadFile(@NonNull @Nonnull String downloadUrl, @NonNull @Nonnull String pathToFileForSave) {
         Path targetPath = null;
         try {
             log.info("downloadFile: Downloading archive from URL: {}", downloadUrl);

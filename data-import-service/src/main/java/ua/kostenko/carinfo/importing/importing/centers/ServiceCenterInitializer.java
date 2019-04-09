@@ -12,6 +12,7 @@ import ua.kostenko.carinfo.importing.configuration.ApplicationProperties;
 import ua.kostenko.carinfo.importing.importing.Initializer;
 import ua.kostenko.carinfo.importing.importing.Persist;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,7 @@ public class ServiceCenterInitializer implements Initializer {
     private final static Pattern DIGITS_ONLY = Pattern.compile("\\d+");
     private final ApplicationProperties applicationProperties;
     @Autowired
-    public ServiceCenterInitializer(@NonNull ApplicationProperties applicationProperties) {
+    public ServiceCenterInitializer(@NonNull @Nonnull ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
     }
 

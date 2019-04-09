@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.NonNull;
 import org.springframework.data.domain.Pageable;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Objects;
@@ -25,7 +26,7 @@ public class ParamsHolder {
     }
 
     @Nullable
-    public Long getLong(@NonNull String key) {
+    public Long getLong(@NonNull @Nonnull String key) {
         if (Objects.nonNull(longValues)) {
             longValues.getOrDefault(key, null);
         }
@@ -33,7 +34,7 @@ public class ParamsHolder {
     }
 
     @Nullable
-    public Integer getInt(@NonNull String key) {
+    public Integer getInt(@NonNull @Nonnull String key) {
         if (Objects.nonNull(integerValues)) {
             integerValues.getOrDefault(key, null);
         }
@@ -41,7 +42,7 @@ public class ParamsHolder {
     }
 
     @Nullable
-    public String getString(@NonNull String key) {
+    public String getString(@NonNull @Nonnull String key) {
         if (Objects.nonNull(stringValues)) {
             stringValues.getOrDefault(key, null);
         }

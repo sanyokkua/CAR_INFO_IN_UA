@@ -20,13 +20,13 @@ public class AdministrativeObjectService implements CrudService<AdministrativeOb
     private final PageableRepository<AdministrativeObject> repository;
 
     @Autowired
-    public AdministrativeObjectService(@NonNull PageableRepository<AdministrativeObject> repository) {
+    public AdministrativeObjectService(@NonNull @Nonnull PageableRepository<AdministrativeObject> repository) {
         this.repository = repository;
     }
 
     @Nullable
     @Override
-    public AdministrativeObject create(@Nonnull AdministrativeObject entity) {
+    public AdministrativeObject create(@NonNull @Nonnull AdministrativeObject entity) {
         boolean exists = repository.isExists(entity);
         if (exists) {
             AdministrativeObject updated = repository.update(entity);
@@ -39,7 +39,7 @@ public class AdministrativeObjectService implements CrudService<AdministrativeOb
 
     @Nullable
     @Override
-    public AdministrativeObject update(@Nonnull AdministrativeObject entity) {
+    public AdministrativeObject update(@NonNull @Nonnull AdministrativeObject entity) {
         boolean exists = repository.isExists(entity);
         if (exists) {
             AdministrativeObject updated = repository.update(entity);
@@ -50,12 +50,12 @@ public class AdministrativeObjectService implements CrudService<AdministrativeOb
     }
 
     @Override
-    public boolean delete(@Nonnull Long id) {
+    public boolean delete(@NonNull @Nonnull Long id) {
         return repository.delete(id);
     }
 
     @Override
-    public boolean isExists(@Nonnull AdministrativeObject entity) {
+    public boolean isExists(@NonNull @Nonnull AdministrativeObject entity) {
         return repository.isExists(entity);
     }
 
@@ -65,7 +65,7 @@ public class AdministrativeObjectService implements CrudService<AdministrativeOb
     }
 
     @Override
-    public Page<AdministrativeObject> find(ParamHolderBuilder queryBuilder) {
-        return repository.find(queryBuilder.build());
+    public Page<AdministrativeObject> find(@NonNull @Nonnull ParamHolderBuilder builder) {
+        return repository.find(builder.build());
     }
 }

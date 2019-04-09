@@ -136,7 +136,7 @@ public class RegistrationFuelTypeRepository extends CachingJdbcRepository<FuelTy
     }
 
     @Override
-    public Page<FuelType> find(@Nonnull ParamsHolder searchParams) {
+    public Page<FuelType> find(@NonNull @Nonnull ParamsHolder searchParams) {
         Pageable pageable = searchParams.getPage();
         String select = "select * from carinfo.fuel_type ft ";
         String name = searchParams.getString(Constants.RegistrationFuelType.NAME);

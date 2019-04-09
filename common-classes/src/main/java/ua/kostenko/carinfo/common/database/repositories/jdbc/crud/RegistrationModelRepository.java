@@ -137,7 +137,7 @@ public class RegistrationModelRepository extends CachingJdbcRepository<Model> im
     }
 
     @Override
-    public Page<Model> find(@Nonnull ParamsHolder searchParams) {
+    public Page<Model> find(@NonNull @Nonnull ParamsHolder searchParams) {
         Pageable pageable = searchParams.getPage();
         String select = "select * from carinfo.model m ";
         String name = searchParams.getString(Constants.RegistrationModel.NAME);

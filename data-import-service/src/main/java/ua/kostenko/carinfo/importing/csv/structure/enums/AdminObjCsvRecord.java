@@ -2,6 +2,8 @@ package ua.kostenko.carinfo.importing.csv.structure.enums;
 
 import lombok.NonNull;
 
+import javax.annotation.Nonnull;
+
 public enum AdminObjCsvRecord {
     TE("TE"),
     NP("NP"),
@@ -9,7 +11,7 @@ public enum AdminObjCsvRecord {
 
     final String fieldName;
 
-    AdminObjCsvRecord(@NonNull String fieldName) {
+    AdminObjCsvRecord(@NonNull @Nonnull String fieldName) {
         this.fieldName = fieldName;
     }
 

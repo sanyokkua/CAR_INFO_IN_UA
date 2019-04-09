@@ -5,9 +5,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.function.Supplier;
 
+@Transactional
 public interface CrudRepository<T> {
     @Nullable
     T create(@NonNull @Nonnull T entity);

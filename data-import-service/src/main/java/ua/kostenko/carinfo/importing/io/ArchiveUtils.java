@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -12,7 +13,7 @@ import java.util.stream.Stream;
 @Slf4j
 public class ArchiveUtils {
 
-    public synchronized static File extractZipArchive(@NonNull File archiveFile, @NonNull File destinationDirectory) {
+    public synchronized static File extractZipArchive(@NonNull @Nonnull File archiveFile, @NonNull @Nonnull File destinationDirectory) {
         try {
             log.info("extractZipArchive: Extracting zip archive...");
             log.info("extractZipArchive: Archive file: {}", archiveFile.getAbsolutePath());

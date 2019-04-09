@@ -5,6 +5,7 @@ import ua.kostenko.carinfo.importing.csv.structure.enums.AdminObjCsvRecord;
 import ua.kostenko.carinfo.importing.csv.structure.headers.administrative.AdministrativeHeaders;
 import ua.kostenko.carinfo.importing.csv.utils.CsvUtils;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 
 @Slf4j
@@ -15,7 +16,7 @@ public class AdminObjCsvUtils extends CsvUtils<AdministrativeHeaders> {
     }
 
     @Override
-    protected AdministrativeHeaders getCorrectHeaders(String headerString) {
+    protected AdministrativeHeaders getCorrectHeaders(@Nonnull String headerString) {
         if (headerString.contains(AdminObjCsvRecord.NP.getFieldName())) {
             log.info("Csv contains headers");
             return new AdministrativeHeaders();

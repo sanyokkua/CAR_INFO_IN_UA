@@ -6,10 +6,12 @@ import ua.kostenko.carinfo.importing.csv.mappers.CsvMapper;
 import ua.kostenko.carinfo.importing.csv.pojo.AdministrativeObjectPojo;
 import ua.kostenko.carinfo.importing.csv.structure.headers.administrative.AdministrativeHeaders;
 
+import javax.annotation.Nonnull;
+
 public class AdministrativeObjectCsvMapper implements CsvMapper<AdministrativeObjectPojo> {
     private final AdministrativeHeaders headers;
 
-    public AdministrativeObjectCsvMapper(@NonNull AdministrativeHeaders headers) {
+    public AdministrativeObjectCsvMapper(@NonNull @Nonnull AdministrativeHeaders headers) {
         this.headers = headers;
     }
 

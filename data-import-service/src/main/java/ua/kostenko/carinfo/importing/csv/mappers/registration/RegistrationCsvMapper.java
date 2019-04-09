@@ -6,10 +6,12 @@ import ua.kostenko.carinfo.importing.csv.mappers.CsvMapper;
 import ua.kostenko.carinfo.importing.csv.pojo.RegistrationPojo;
 import ua.kostenko.carinfo.importing.csv.structure.headers.registration.RegistrationHeaders;
 
+import javax.annotation.Nonnull;
+
 public class RegistrationCsvMapper implements CsvMapper<RegistrationPojo> {
     private final RegistrationHeaders headers;
 
-    public RegistrationCsvMapper(@NonNull RegistrationHeaders headers) {
+    public RegistrationCsvMapper(@NonNull @Nonnull RegistrationHeaders headers) {
         this.headers = headers;
     }
 

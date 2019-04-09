@@ -129,7 +129,7 @@ public class RegistrationVehicleRepository extends JdbcRepository<Vehicle> imple
     }
 
     @Cacheable("vehicles")
-    public Vehicle findByFields(@NonNull Long brandId, @NonNull Long modelId) {
+    public Vehicle findByFields(@NonNull @Nonnull Long brandId, @NonNull @Nonnull Long modelId) {
         String jdbcTemplateSelect = "select v.vehicle_id, v.model_id, v.brand_id, b.brand_name as brand, m.model_name as model " +
                 "from carinfo.vehicle v, carinfo.brand b, carinfo.model m " +
                 "where v.brand_id = b.brand_id and m.model_id = v.model_id and v.brand_id = ? and v.model_id = ?;";
@@ -137,7 +137,7 @@ public class RegistrationVehicleRepository extends JdbcRepository<Vehicle> imple
     }
 
     @Override
-    public Page<Vehicle> find(@Nonnull ParamsHolder searchParams) {
+    public Page<Vehicle> find(@NonNull @Nonnull ParamsHolder searchParams) {
         Pageable pageable = searchParams.getPage();
         String select = "select * from carinfo.vehicle v, carinfo.brand b, carinfo.model m ";
 

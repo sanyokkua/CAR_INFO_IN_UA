@@ -224,7 +224,7 @@ public class RegistrationRecordRepository extends JdbcRepository<Registration> i
     }
 
     @Override
-    public Page<Registration> find(@Nonnull ParamsHolder searchParams) {
+    public Page<Registration> find(@NonNull @Nonnull ParamsHolder searchParams) {
         Pageable pageable = searchParams.getPage();
         String select = "select * ";
         String from = "from carinfo.record r, carinfo.admin_object ao, carinfo.operation o, carinfo.department d," +

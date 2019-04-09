@@ -5,11 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import ua.kostenko.carinfo.importing.csv.pojo.RegistrationPojo;
 import ua.kostenko.carinfo.importing.importing.Persist;
 
+import javax.annotation.Nonnull;
+
 @Slf4j
 public class RegistrationPersist implements Persist<RegistrationPojo> {
 
     @Override
-    public void persist(@NonNull RegistrationPojo record) {
+    public void persist(@NonNull @Nonnull RegistrationPojo record) {
         log.info("persist: Thread N: {}", Thread.currentThread().getId());
 
          log.info("persist: Record: {}", record.toString());

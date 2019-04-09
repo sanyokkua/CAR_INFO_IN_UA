@@ -8,6 +8,7 @@ import ua.kostenko.carinfo.importing.csv.reader.options.Options;
 import ua.kostenko.carinfo.importing.csv.structure.headers.CsvHeaders;
 import ua.kostenko.carinfo.importing.io.EncodingUtils;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +19,7 @@ import java.util.Objects;
 public abstract class CsvUtils <T extends CsvHeaders> {
     private final File file;
 
-    public CsvUtils(@NonNull File file) {
+    public CsvUtils(@NonNull @Nonnull File file) {
         this.file = file;
     }
 
@@ -53,7 +54,7 @@ public abstract class CsvUtils <T extends CsvHeaders> {
         return new Options<>(new ReaderOptions(delimiter, encoding, file), correctHeaders);
     }
 
-    private char getDelimiter(@NonNull String firstColumn, @NonNull String headerString) {
+    private char getDelimiter(@NonNull @Nonnull String firstColumn, @NonNull @Nonnull String headerString) {
         log.info("getDelimiter: trying to figure out delimiter in this csv file");
         String resultString = headerString.replaceFirst(firstColumn, "");
         char delimiter = resultString.charAt(0);
@@ -61,6 +62,6 @@ public abstract class CsvUtils <T extends CsvHeaders> {
         return delimiter;
     }
 
-    protected abstract T getCorrectHeaders(String headerString);
+    protected abstract T getCorrectHeaders(@Nonnull String headerString);
 
 }

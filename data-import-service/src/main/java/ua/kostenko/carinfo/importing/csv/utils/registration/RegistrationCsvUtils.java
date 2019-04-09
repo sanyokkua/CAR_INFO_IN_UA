@@ -7,6 +7,7 @@ import ua.kostenko.carinfo.importing.csv.structure.headers.registration.Registra
 import ua.kostenko.carinfo.importing.csv.structure.headers.registration.UpperCaseRegistrationHeaders;
 import ua.kostenko.carinfo.importing.csv.utils.CsvUtils;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 
 @Slf4j
@@ -16,7 +17,7 @@ public class RegistrationCsvUtils extends CsvUtils<RegistrationHeaders> {
         super(file);
     }
 
-    protected RegistrationHeaders getCorrectHeaders(String headerString) {
+    protected RegistrationHeaders getCorrectHeaders(@Nonnull String headerString) {
         if (headerString.contains(RegistrationCsvRecord.PERSON.getLowerCase())) {
             log.info("Csv contains lowerCaseHeaders");
             return new LowerCaseRegistrationHeaders();

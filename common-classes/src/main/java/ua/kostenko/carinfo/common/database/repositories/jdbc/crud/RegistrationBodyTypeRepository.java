@@ -136,7 +136,7 @@ public class RegistrationBodyTypeRepository extends CachingJdbcRepository<BodyTy
     }
 
     @Override
-    public Page<BodyType> find(@Nonnull ParamsHolder searchParams) {
+    public Page<BodyType> find(@NonNull @Nonnull ParamsHolder searchParams) {
         Pageable pageable = searchParams.getPage();
         String select = "select * ";
         String from = "from carinfo.body_type bt ";

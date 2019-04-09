@@ -17,5 +17,5 @@ public interface CrudService<T> {
     boolean isExists(@Nonnull @NonNull T entity);
 
     List<T> findAll();
-    Page<T> find(ParamHolderBuilder paramHolder);
+    Page<T> find(@NonNull @Nonnull ParamHolderBuilder builder);
 }

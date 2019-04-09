@@ -14,6 +14,7 @@ import ua.kostenko.carinfo.importing.csv.utils.CsvUtils;
 import ua.kostenko.carinfo.importing.csv.utils.administrative.AdminObjCsvUtils;
 import ua.kostenko.carinfo.importing.importing.Initializer;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,7 +31,7 @@ public class AdminObjImportInitializer implements Initializer {
     private final AdminObjPersist persist;
 
     @Autowired
-    public AdminObjImportInitializer(@NonNull ApplicationProperties properties, @NonNull AdminObjPersist persist) {
+    public AdminObjImportInitializer(@NonNull @Nonnull ApplicationProperties properties, @NonNull @Nonnull AdminObjPersist persist) {
         this.properties = properties;
         this.persist = persist;
     }

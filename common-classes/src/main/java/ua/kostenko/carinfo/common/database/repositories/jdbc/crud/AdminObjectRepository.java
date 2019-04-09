@@ -138,7 +138,7 @@ public class AdminObjectRepository extends CachingJdbcRepository<AdministrativeO
     }
 
     @Override
-    public Page<AdministrativeObject> find(@Nonnull ParamsHolder searchParams) {
+    public Page<AdministrativeObject> find(@NonNull @Nonnull ParamsHolder searchParams) {
         Pageable pageable = searchParams.getPage();
         String select = "select * ";
         String from = "from carinfo.admin_object a ";

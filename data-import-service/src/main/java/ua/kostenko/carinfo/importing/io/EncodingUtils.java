@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.mozilla.universalchardet.UniversalDetector;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +13,7 @@ import java.io.IOException;
 public class EncodingUtils {
 
     @Nullable
-    public synchronized static String getEncoding(@NonNull File textFile) {
+    public synchronized static String getEncoding(@NonNull @Nonnull File textFile) {
         String encoding = null;
         try {
             log.info("getEncoding: Trying to distinguish encoding of file: {}", textFile.getAbsolutePath());

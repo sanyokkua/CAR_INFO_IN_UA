@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +35,7 @@ public class FileUtil {
     }
 
     @Nullable
-    public synchronized static File createDirectory(@NonNull String filePath) {
+    public synchronized static File createDirectory(@NonNull @Nonnull String filePath) {
         log.info("createDirectory: Creating directory by path: " + filePath);
         File directory = new File(filePath);
         if (directory.exists()) {
@@ -63,7 +64,7 @@ public class FileUtil {
     }
 
     @Nullable
-    public synchronized static String getTextFromFile(@NonNull File file) {
+    public synchronized static String getTextFromFile(@NonNull @Nonnull File file) {
         if (file.exists()) {
             String encoding = EncodingUtils.getEncoding(file);
             String resultString = null;

@@ -11,6 +11,7 @@ import ua.kostenko.carinfo.importing.importing.administrative.AdminObjImportInit
 import ua.kostenko.carinfo.importing.importing.centers.ServiceCenterInitializer;
 import ua.kostenko.carinfo.importing.importing.registration.RegistrationImportInitializer;
 
+import javax.annotation.Nonnull;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,7 +21,9 @@ public class InitController {
     private final List<Initializer> initializers;
 
     @Autowired
-    public InitController(@NonNull ServiceCenterInitializer serviceCenterInitializer, @NonNull AdminObjImportInitializer adminObjImportInitializer, @NonNull RegistrationImportInitializer registrationImportInitializer) {
+    public InitController(@NonNull @Nonnull ServiceCenterInitializer serviceCenterInitializer,
+                          @NonNull @Nonnull AdminObjImportInitializer adminObjImportInitializer,
+                          @NonNull @Nonnull RegistrationImportInitializer registrationImportInitializer) {
         initializers = new LinkedList<>();
         initializers.add(adminObjImportInitializer);
         initializers.add(serviceCenterInitializer);

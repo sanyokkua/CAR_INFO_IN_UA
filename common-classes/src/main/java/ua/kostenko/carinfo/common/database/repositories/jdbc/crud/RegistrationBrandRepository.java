@@ -137,7 +137,7 @@ public class RegistrationBrandRepository extends CachingJdbcRepository<Brand> im
     }
 
     @Override
-    public Page<Brand> find(@Nonnull ParamsHolder searchParams) {
+    public Page<Brand> find(@NonNull @Nonnull ParamsHolder searchParams) {
         Pageable pageable = searchParams.getPage();
         String select = "select * ";
         String from = "from carinfo.brand b ";

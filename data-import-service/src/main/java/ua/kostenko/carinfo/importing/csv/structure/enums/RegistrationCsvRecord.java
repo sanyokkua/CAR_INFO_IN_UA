@@ -2,6 +2,8 @@ package ua.kostenko.carinfo.importing.csv.structure.enums;
 
 import lombok.NonNull;
 
+import javax.annotation.Nonnull;
+
 public enum RegistrationCsvRecord {
     PERSON("person", "PERSON"),
     REG_ADDR_KOATUU("reg_addr_koatuu", "REG_ADDR_KOATUU"),
@@ -26,7 +28,7 @@ public enum RegistrationCsvRecord {
     private final String lowerCase;
     private final String upperCase;
 
-    RegistrationCsvRecord(@NonNull String lowerCase, @NonNull String upperCase) {
+    RegistrationCsvRecord(@NonNull @Nonnull String lowerCase, @NonNull @Nonnull String upperCase) {
         this.lowerCase = lowerCase;
         this.upperCase = upperCase;
     }

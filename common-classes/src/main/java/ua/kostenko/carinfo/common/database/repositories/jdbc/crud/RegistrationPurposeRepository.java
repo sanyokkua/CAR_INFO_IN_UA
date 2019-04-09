@@ -139,7 +139,7 @@ public class RegistrationPurposeRepository extends CachingJdbcRepository<Purpose
     }
 
     @Override
-    public Page<Purpose> find(@Nonnull ParamsHolder searchParams) {
+    public Page<Purpose> find(@NonNull @Nonnull ParamsHolder searchParams) {
         Pageable pageable = searchParams.getPage();
         String select = "select * from carinfo.purpose p ";
         String name = searchParams.getString(Constants.RegistrationPurpose.NAME);

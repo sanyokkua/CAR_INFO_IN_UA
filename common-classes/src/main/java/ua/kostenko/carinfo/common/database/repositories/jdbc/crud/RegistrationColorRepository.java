@@ -136,7 +136,7 @@ public class RegistrationColorRepository extends CachingJdbcRepository<Color> im
     }
 
     @Override
-    public Page<Color> find(@Nonnull ParamsHolder searchParams) {
+    public Page<Color> find(@NonNull @Nonnull ParamsHolder searchParams) {
         Pageable pageable = searchParams.getPage();
         String select = "select * ";
         String from = "from carinfo.color c ";

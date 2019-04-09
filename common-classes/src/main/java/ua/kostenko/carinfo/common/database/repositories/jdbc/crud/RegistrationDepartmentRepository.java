@@ -140,7 +140,7 @@ public class RegistrationDepartmentRepository extends CachingJdbcRepository<Depa
     }
 
     @Override
-    public Page<Department> find(@Nonnull ParamsHolder searchParams) {
+    public Page<Department> find(@NonNull @Nonnull ParamsHolder searchParams) {
         Pageable pageable = searchParams.getPage();
         String select = "select * from carinfo.department d ";
 

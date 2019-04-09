@@ -14,6 +14,7 @@ import ua.kostenko.carinfo.importing.io.ArchiveUtils;
 import ua.kostenko.carinfo.importing.io.FileDownloader;
 import ua.kostenko.carinfo.importing.io.FileUtil;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.Objects;
@@ -24,7 +25,7 @@ public class FileProcessingTask implements Runnable {
     private final String link;
     private final File tempDirectory;
 
-    public FileProcessingTask(@NonNull String link, @NonNull File tempDirectory) {
+    public FileProcessingTask(@NonNull @Nonnull String link, @NonNull @Nonnull File tempDirectory) {
         this.link = link;
         this.tempDirectory = tempDirectory;
     }
@@ -34,7 +35,7 @@ public class FileProcessingTask implements Runnable {
         doInBackground(tempDirectory, link);
     }
 
-    private void doInBackground(@NonNull File tempDirectory, @NonNull String link) {
+    private void doInBackground(@NonNull @Nonnull File tempDirectory, @NonNull @Nonnull String link) {
         String fileName = getFileName(link);
         String downloadFilePath = tempDirectory.getAbsoluteFile() + File.separator + fileName;
         File file = FileDownloader.downloadFile(link, downloadFilePath);
@@ -45,11 +46,11 @@ public class FileProcessingTask implements Runnable {
         }
     }
 
-    private String getFileName(@NonNull String link) {
+    private String getFileName(@NonNull @Nonnull String link) {
         return link.substring(link.lastIndexOf("/"));
     }
 
-    private void extractArchive(@NonNull File file, @NonNull String fileName) {
+    private void extractArchive(@NonNull @Nonnull File file, @NonNull @Nonnull String fileName) {
         File tempDirectory = FileUtil.getTempDirectory();
         if (Objects.nonNull(tempDirectory)) {
             String name = fileName.substring(0, fileName.lastIndexOf("."));
@@ -60,7 +61,7 @@ public class FileProcessingTask implements Runnable {
         }
     }
 
-    private void processExtractedFiles(@NonNull File destinationDirectory) {
+    private void processExtractedFiles(@NonNull @Nonnull File destinationDirectory) {
         Stream.of(destinationDirectory.listFiles()).forEach(fileInDirectory -> {
             CsvUtils<RegistrationHeaders> csvUtils = new RegistrationCsvUtils(fileInDirectory);
             Options<RegistrationHeaders> options = csvUtils.getOptions();

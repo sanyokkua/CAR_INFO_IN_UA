@@ -139,7 +139,7 @@ public class RegistrationOperationRepository extends CachingJdbcRepository<Opera
     }
 
     @Override
-    public Page<Operation> find(@Nonnull ParamsHolder searchParams) {
+    public Page<Operation> find(@NonNull @Nonnull ParamsHolder searchParams) {
         Pageable pageable = searchParams.getPage();
         String select = "select * from carinfo.operation o ";
         String name = searchParams.getString(Constants.RegistrationOperation.NAME);

@@ -136,7 +136,7 @@ public class RegistrationKindRepository extends CachingJdbcRepository<Kind> impl
     }
 
     @Override
-    public Page<Kind> find(@Nonnull ParamsHolder searchParams) {
+    public Page<Kind> find(@NonNull @Nonnull ParamsHolder searchParams) {
         Pageable pageable = searchParams.getPage();
         String select = "select * from carinfo.kind k ";
         String name = searchParams.getString(Constants.RegistrationKind.NAME);

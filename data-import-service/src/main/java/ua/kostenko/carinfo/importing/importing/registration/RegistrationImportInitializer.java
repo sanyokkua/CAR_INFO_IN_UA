@@ -14,6 +14,7 @@ import ua.kostenko.carinfo.importing.io.FileUtil;
 import ua.kostenko.carinfo.importing.json.registration.RegistrationDataPackage;
 import ua.kostenko.carinfo.importing.json.registration.ResourceDataPackage;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Collections;
@@ -31,7 +32,7 @@ public class RegistrationImportInitializer implements Initializer {
     private final ApplicationProperties properties;
 
     @Autowired
-    public RegistrationImportInitializer(@NonNull ApplicationProperties properties) {
+    public RegistrationImportInitializer(@NonNull @Nonnull ApplicationProperties properties) {
         this.properties = properties;
         int coresNumber = Runtime.getRuntime().availableProcessors();
         executorService = Executors.newFixedThreadPool(coresNumber);
@@ -52,7 +53,7 @@ public class RegistrationImportInitializer implements Initializer {
     }
 
     @Nullable
-    private File downloadMetadataJson(@NonNull String metadataJsonUrl) {
+    private File downloadMetadataJson(@NonNull @Nonnull String metadataJsonUrl) {
         File tempDirectory = FileUtil.getTempDirectory();
         if (Objects.nonNull(tempDirectory)) {
             File metadataJsonFile = new File(tempDirectory.getAbsoluteFile() + File.pathSeparator + METADATA_JSON_FILE_NAME);
@@ -61,7 +62,7 @@ public class RegistrationImportInitializer implements Initializer {
         return null;
     }
 
-    private List<String> getDownloadLinks(@NonNull String metadataJson) {
+    private List<String> getDownloadLinks(@NonNull @Nonnull String metadataJson) {
         Gson gson = new Gson();
         RegistrationDataPackage pojo = gson.fromJson(metadataJson, RegistrationDataPackage.class);
         try {
