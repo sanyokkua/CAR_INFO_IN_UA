@@ -226,26 +226,64 @@ public class RegistrationRecordRepository extends JdbcRepository<Registration> i
     @Override
     public Page<Registration> find(@Nonnull ParamsHolder searchParams) {
         Pageable pageable = searchParams.getPage();
-        String select = "select * " +
-                "from carinfo.record r, carinfo.admin_object ao, carinfo.operation o, carinfo.department d, carinfo.kind k, carinfo.vehicle v, carinfo.color c, carinfo.body_type bt," +
-                " carinfo.purpose p, carinfo.fuel_type ft, carinfo.brand b, carinfo.model m " +
-                "where ao.admin_obj_id =  r.admin_obj_id and o.op_code = r.op_code and d.dep_code = r.dep_code and k.kind_id = r.kind_id and v.vehicle_id = r.vehicle_id " +
-                "and c.color_id = r.color_id and bt.body_type_id = r.body_type_id and p.purpose_id = r.purpose_id and ft.fuel_type_id = r.fuel_type_id and b.brand_id = v.brand_id " +
-                "and m.model_id = v.model_id;";
+        String select = "select * ";
+        String from = "from carinfo.record r, carinfo.admin_object ao, carinfo.operation o, carinfo.department d," +
+                " carinfo.kind k, carinfo.vehicle v, carinfo.color c, carinfo.body_type bt," +
+                " carinfo.purpose p, carinfo.fuel_type ft, carinfo.brand b, carinfo.model m ";
 
-        String modelName = searchParams.getString(Constants.RegistrationModel.NAME);
-        String brandName = searchParams.getString(Constants.RegistrationBrand.NAME);
+        String adminObjName = searchParams.getString(Constants.AdminObject.NAME);
+        String adminObjType = searchParams.getString(Constants.AdminObject.TYPE);
+        String operation = searchParams.getString(Constants.RegistrationOperation.NAME);
+        String departmentName = searchParams.getString(Constants.RegistrationDepartment.NAME);
+        String departmentAddress = searchParams.getString(Constants.RegistrationDepartment.ADDRESS);
+        String departmentEmail = searchParams.getString(Constants.RegistrationDepartment.EMAIL);
+        String kind = searchParams.getString(Constants.RegistrationKind.NAME);
+        String brand = searchParams.getString(Constants.RegistrationBrand.NAME);
+        String model = searchParams.getString(Constants.RegistrationModel.NAME);
+        String color = searchParams.getString(Constants.RegistrationColor.NAME);
+        String bodyType = searchParams.getString(Constants.RegistrationBodyType.NAME);
+        String purpose = searchParams.getString(Constants.RegistrationPurpose.NAME);
+        String fuelType = searchParams.getString(Constants.RegistrationFuelType.NAME);
+        Long engineCapacity = searchParams.getLong(Constants.RegistrationRecord.ENGINE_CAPACITY);
+        Long ownWeight = searchParams.getLong(Constants.RegistrationRecord.OWN_WEIGHT);
+        Long totalWeight = searchParams.getLong(Constants.RegistrationRecord.TOTAL_WEIGHT);
+        Long makeYear = searchParams.getLong(Constants.RegistrationRecord.MAKE_YEAR);
+        String registrationNumber = searchParams.getString(Constants.RegistrationRecord.REGISTRATION_NUMBER);
+//        Date registrationDate; //TODO:
 
-        buildWhere()
-//                .put("v.model_id", "m.model_id")
-//                .put("v.brand_id", "b.brand_id")
-//                .put("m.model_name", modelName)
-//                .put("b.brand_name", brandName)
-.build();
+        String where = buildWhere()
+                .add("ao.admin_obj_id", "r.admin_obj_id")
+                .add("o.op_code", "r.op_code")
+                .add("d.dep_code", "r.dep_code")
+                .add("k.kind_id", "r.kind_id")
+                .add("v.vehicle_id", "r.vehicle_id")
+                .add("c.color_id", "r.color_id")
+                .add("bt.body_type_id", "r.body_type_id")
+                .add("p.purpose_id", "r.purpose_id")
+                .add("ft.fuel_type_id", "r.fuel_type_id")
+                .add("b.brand_id", "v.brand_id")
+                .add("m.model_id", "v.model_id")
+                .add("ao.admin_obj_id", adminObjName)
+                .add("ao.admin_obj_type", adminObjType)
+                .add("o.op_name", operation)
+                .add("d.dep_name", departmentName)
+                .add("d.dep_addr", departmentAddress)
+                .add("d.dep_email", departmentEmail)
+                .add("k.kind_name", kind)
+                .add("b.brand_name", brand)
+                .add("m.model_name", model)
+                .add("c.color_name", color)
+                .add("bt.body_type_name", bodyType)
+                .add("p.purpose_name", purpose)
+                .add("ft.fuel_type_name", fuelType)
+                .add("r.engine_capacity", engineCapacity)
+                .add("r.own_weight", ownWeight)
+                .add("r.total_weight", totalWeight)
+                .add("r.make_year", makeYear)
+                .add("r.registration_number", registrationNumber)
+                .build();
 
-        String where = buildWhere().build();
-
-        String countQuery = "select count(1) as row_count " + " from carinfo.vehicle v, carinfo.brand b, carinfo.model m  " + where;
+        String countQuery = "select count(1) as row_count " + from + where;
         int total = jdbcTemplate.queryForObject(countQuery, (rs, rowNum) -> rs.getInt(1));
 
         int limit = pageable.getPageSize();

@@ -9,22 +9,11 @@ import org.springframework.jdbc.core.RowMapper;
 import ua.kostenko.carinfo.common.ParamsHolder;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
 
 public interface PageableSearch<T> {
-    int DEFAULT_PAGE_SIZE = 10;
 
     Page<T> find(@Nonnull @NonNull ParamsHolder searchParams);
-
-    default int getPage(@Nullable Integer uiPageNumber) {
-        int page = Objects.nonNull(uiPageNumber) && uiPageNumber >= 0 ? uiPageNumber : 0;
-        return page > 0 ? page - 1 : page;
-    }
-
-    default int getAmount(@Nullable Integer recordsPerPage) {
-        return Objects.nonNull(recordsPerPage) && recordsPerPage > 0 ? recordsPerPage : DEFAULT_PAGE_SIZE;
-    }
 
     default Page<T> getPage(JdbcTemplate jdbcTemplate, RowMapper<T> rowMapper, Pageable pageable, String select, String from, String where, int total) {
         String querySql = select + from + where + " limit " + pageable.getPageSize() + " offset " + pageable.getOffset();

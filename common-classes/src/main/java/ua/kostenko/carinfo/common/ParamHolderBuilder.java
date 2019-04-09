@@ -50,11 +50,22 @@ public final class ParamHolderBuilder {
     }
 
     public ParamsHolder build() {
+        int pageNumber = getPage(page);
+        int recordsPerPage = getAmount(records);
         return ParamsHolder.builder()
-                           .page(PageRequest.of(page, records))
+                           .page(PageRequest.of(pageNumber, recordsPerPage))
                            .longValues(longValues)
                            .integerValues(integerValues)
                            .stringValues(stringValues)
                            .build();
+    }
+
+    private int getPage(@Nullable Integer uiPageNumber) {
+        int page = Objects.nonNull(uiPageNumber) && uiPageNumber >= 0 ? uiPageNumber : 0;
+        return page > 0 ? page - 1 : page;
+    }
+
+    private int getAmount(@Nullable Integer recordsPerPage) {
+        return Objects.nonNull(recordsPerPage) && recordsPerPage > 0 ? recordsPerPage : DEFAULT_RECORDS_NUMBER;
     }
 }
