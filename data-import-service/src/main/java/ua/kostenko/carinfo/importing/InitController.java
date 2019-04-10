@@ -12,6 +12,8 @@ import ua.kostenko.carinfo.importing.importing.centers.ServiceCenterInitializer;
 import ua.kostenko.carinfo.importing.importing.registration.RegistrationImportInitializer;
 
 import javax.annotation.Nonnull;
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,15 +26,30 @@ public class InitController {
     public InitController(@NonNull @Nonnull ServiceCenterInitializer serviceCenterInitializer,
                           @NonNull @Nonnull AdminObjImportInitializer adminObjImportInitializer,
                           @NonNull @Nonnull RegistrationImportInitializer registrationImportInitializer) {
+
         initializers = new LinkedList<>();
-//        initializers.add(adminObjImportInitializer);
-//        initializers.add(serviceCenterInitializer);
+        initializers.add(adminObjImportInitializer);
+        initializers.add(serviceCenterInitializer);
         initializers.add(registrationImportInitializer);
     }
 
     @EventListener(ApplicationReadyEvent.class)
     public void initDatabase() {
-        initializers.forEach(Initializer::init);
+        initializers.forEach(InitController::initialize);
+    }
+
+    private static void initialize(Initializer initializer) {
+        String className = initializer.getClass().getSimpleName();
+        LocalTime before = LocalTime.now();
+        log.info("Initializing of {}. Start time: {}", className, before.toString());
+        initializer.init();
+        LocalTime after = LocalTime.now();
+        log.info("Initialization of {} finished. Finish Time: {}, duration: in minutes {}, in seconds, in millis {}", className,
+                 after.toString(),
+                 Duration.between(before, after).toMinutes(),
+                 Duration.between(before, after).getSeconds(),
+                 Duration.between(before, after).toMillis()
+        );
     }
 
 }

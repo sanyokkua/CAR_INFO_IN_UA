@@ -74,7 +74,7 @@ public class RegistrationImportInitializer implements Initializer {
         this.purposeRepository = purposeRepository;
         this.vehicleRepository = vehicleRepository;
         int coresNumber = Runtime.getRuntime().availableProcessors();
-        executorService = Executors.newFixedThreadPool(1);
+        executorService = Executors.newFixedThreadPool(coresNumber);
     }
 
     @Override

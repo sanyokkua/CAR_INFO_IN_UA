@@ -63,7 +63,7 @@ public class RegistrationColorRepository extends CachingJdbcRepository<Color> im
     @Nullable
     @Override
     public Color find(@Nonnull Color entity) {
-        return findByField(entity.getColorName());
+        return getFromCache(entity.getColorName());
     }
 
     @Nullable

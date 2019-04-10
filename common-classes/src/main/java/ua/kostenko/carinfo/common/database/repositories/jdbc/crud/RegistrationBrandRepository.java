@@ -63,7 +63,7 @@ public class RegistrationBrandRepository extends CachingJdbcRepository<Brand> im
     @Nullable
     @Override
     public Brand find(@Nonnull Brand entity) {
-        return findByField(entity.getBrandName());
+        return getFromCache(entity.getBrandName());
     }
 
     @Nullable

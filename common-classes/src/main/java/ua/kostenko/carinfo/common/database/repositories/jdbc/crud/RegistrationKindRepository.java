@@ -63,7 +63,7 @@ public class RegistrationKindRepository extends CachingJdbcRepository<Kind> impl
     @Nullable
     @Override
     public Kind find(@Nonnull Kind entity) {
-        return findByField(entity.getKindName());
+        return getFromCache(entity.getKindName());
     }
 
     @Nullable

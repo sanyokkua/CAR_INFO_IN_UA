@@ -65,7 +65,7 @@ public class RegistrationPurposeRepository extends CachingJdbcRepository<Purpose
     @Nullable
     @Override
     public Purpose find(@Nonnull Purpose entity) {
-        return findByField(entity.getPurposeName());
+        return getFromCache(entity.getPurposeName());
     }
 
     @Nullable

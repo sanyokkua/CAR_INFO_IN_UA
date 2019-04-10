@@ -18,7 +18,7 @@ public class Vehicle implements Serializable {
     private Long brandId;
     @JsonIgnore
     private Long modelId;
-    private String registrationBrand;
-    private String registrationModel;
+    private String brandName;
+    private String modelName;
 
 }

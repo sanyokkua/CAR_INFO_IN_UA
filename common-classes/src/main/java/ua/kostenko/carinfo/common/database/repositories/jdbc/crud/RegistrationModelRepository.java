@@ -63,7 +63,7 @@ public class RegistrationModelRepository extends CachingJdbcRepository<Model> im
     @Nullable
     @Override
     public Model find(@Nonnull Model entity) {
-        return findByField(entity.getModelName());
+        return getFromCache(entity.getModelName());
     }
 
     @Nullable

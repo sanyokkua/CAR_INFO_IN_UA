@@ -63,7 +63,7 @@ public class RegistrationOperationRepository extends CachingJdbcRepository<Opera
     @Nullable
     @Override
     public Operation find(@Nonnull Operation entity) {
-        return findByField(entity.getOperationName());
+        return getFromCache(entity.getOperationName());
     }
 
     @Nullable
@@ -98,8 +98,7 @@ public class RegistrationOperationRepository extends CachingJdbcRepository<Opera
     @Override
     public Operation find(@NonNull @Nonnull Long id) {
         String jdbcTemplateSelect = "select * from carinfo.operation where op_code = ?;";
-        return CrudRepository.getNullableResultIfException(
-                () -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
+        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
     }
 
     @Override

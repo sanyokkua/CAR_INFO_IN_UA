@@ -37,8 +37,8 @@ public class RegistrationVehicleRepository extends JdbcRepository<Vehicle> imple
                                                                                   .vehicleId(resultSet.getLong(Constants.RegistrationVehicle.ID))
                                                                                   .brandId(resultSet.getLong(Constants.RegistrationVehicle.BRAND_ID))
                                                                                   .modelId(resultSet.getLong(Constants.RegistrationVehicle.MODEL_ID))
-                                                                                  .registrationModel(resultSet.getString(MODEL))
-                                                                                  .registrationBrand(resultSet.getString(BRAND))
+                                                                                  .modelName(resultSet.getString(MODEL))
+                                                                                  .brandName(resultSet.getString(BRAND))
                                                                                   .build();
 
     @Autowired
@@ -53,8 +53,8 @@ public class RegistrationVehicleRepository extends JdbcRepository<Vehicle> imple
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement statement = connection.prepareStatement(jdbcTemplateInsert, Statement.RETURN_GENERATED_KEYS);
-            statement.setLong(1, entity.getModelId());
-            statement.setLong(2, entity.getBrandId());
+            statement.setLong(1, entity.getBrandId());
+            statement.setLong(2, entity.getModelId());
             return statement;
         }, keyHolder);
         Object id = keyHolder.getKeys().get(Constants.RegistrationVehicle.ID);

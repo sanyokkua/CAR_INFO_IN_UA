@@ -63,7 +63,7 @@ public class RegistrationBodyTypeRepository extends CachingJdbcRepository<BodyTy
     @Nullable
     @Override
     public BodyType find(@Nonnull BodyType entity) {
-        return findByField(entity.getBodyTypeName());
+        return getFromCache(entity.getBodyTypeName());
     }
 
     @Nullable

@@ -58,18 +58,18 @@ public class Registration implements Serializable {
     private Date registrationDate;
 
     public Long getEngineCapacity() {
-        return Objects.isNull(engineCapacity)? 0 : engineCapacity;
+        return Objects.isNull(engineCapacity) ? 0 : engineCapacity;
     }
 
     public Long getOwnWeight() {
-        return Objects.isNull(ownWeight)? 0 : ownWeight;
+        return Objects.isNull(ownWeight) ? 0 : ownWeight;
     }
 
     public Long getTotalWeight() {
-        return Objects.isNull(totalWeight)? 0 : totalWeight;
+        return Objects.isNull(totalWeight) ? 0 : totalWeight;
     }
 
     public Long getMakeYear() {
-        return Objects.isNull(makeYear)? 0 : makeYear;
+        return Objects.isNull(makeYear) ? 0 : makeYear;
     }
 }

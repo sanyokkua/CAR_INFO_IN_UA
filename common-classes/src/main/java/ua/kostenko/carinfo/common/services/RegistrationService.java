@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import ua.kostenko.carinfo.common.ParamHolderBuilder;
 import ua.kostenko.carinfo.common.database.Constants;
 import ua.kostenko.carinfo.common.database.repositories.PageableRepository;
+import ua.kostenko.carinfo.common.database.repositories.jdbc.crud.RegistrationVehicleRepository;
 import ua.kostenko.carinfo.common.records.*;
 
 import javax.annotation.Nonnull;
@@ -29,7 +30,7 @@ public class RegistrationService implements CrudService<Registration> {
     private final PageableRepository<Model> modelRepository;
     private final PageableRepository<Operation> operationRepository;
     private final PageableRepository<Purpose> purposeRepository;
-    private final PageableRepository<Vehicle> vehicleRepository;
+    private final RegistrationVehicleRepository vehicleRepository;
     private final PageableRepository<Registration> registrationRepository;
 
     @Autowired
@@ -43,7 +44,7 @@ public class RegistrationService implements CrudService<Registration> {
                                @NonNull @Nonnull PageableRepository<Model> modelRepository,
                                @NonNull @Nonnull PageableRepository<Operation> operationRepository,
                                @NonNull @Nonnull PageableRepository<Purpose> purposeRepository,
-                               @NonNull @Nonnull PageableRepository<Vehicle> vehicleRepository,
+                               @NonNull @Nonnull RegistrationVehicleRepository vehicleRepository,
                                @NonNull @Nonnull PageableRepository<Registration> registrationRepository) {
         this.adminRepository = adminRepository;
         this.bodyTypeRepository = bodyTypeRepository;
@@ -74,20 +75,20 @@ public class RegistrationService implements CrudService<Registration> {
             Operation operation = operationRepository.findByField(entity.getOperation());
             Purpose purpose = purposeRepository.findByField(entity.getPurpose());
             if (isNotNull(administrativeObject, bodyType, brand, color, department, fuelType, kind, model, operation, purpose)) {
-                Page<Vehicle> vehicles = vehicleRepository.find(new ParamHolderBuilder()
-                                                                        .param(Constants.RegistrationBrand.NAME, brand.getBrandName())
-                                                                        .param(Constants.RegistrationModel.NAME, model.getModelName())
-                                                                        .build());
-                Vehicle vehicle = vehicles.get().findFirst().orElseGet(null);
-                entity.setColorId(color.getColorId());
-                entity.setKindId(kind.getKindId());
-                entity.setPurposeId(purpose.getPurposeId());
-                entity.setAdminObjectId(administrativeObject.getAdminObjId());
-                entity.setBodyTypeId(bodyType.getBodyTypeId());
-                entity.setFuelTypeId(fuelType.getFuelTypeId());
-                entity.setVehicleId(vehicle.getVehicleId());
-                Registration result = registrationRepository.create(entity);
-                return result;
+                Vehicle vehicle = vehicleRepository.findByFields(brand.getBrandId(), model.getModelId());
+                if (Objects.nonNull(vehicle)) {
+                    entity.setColorId(color.getColorId());
+                    entity.setKindId(kind.getKindId());
+                    entity.setPurposeId(purpose.getPurposeId());
+                    entity.setAdminObjectId(administrativeObject.getAdminObjId());
+                    entity.setBodyTypeId(bodyType.getBodyTypeId());
+                    entity.setFuelTypeId(fuelType.getFuelTypeId());
+                    entity.setVehicleId(vehicle.getVehicleId());
+                    Registration result = registrationRepository.create(entity);
+                    return result;
+                } else {
+                    return null;
+                }
             } else {
                 return null;
             }
@@ -112,7 +113,7 @@ public class RegistrationService implements CrudService<Registration> {
         String departmentName = entity.getDepartmentName();
 //        String departmentAddress = entity.getDepartmentAddress();
 //        String departmentEmail = entity.getDepartmentEmail();
-        String kind = entity.getKind();
+//        String kind = entity.getKind();
         String brand = entity.getBrand();
         String model = entity.getModel();
         String color = entity.getColor();
@@ -126,15 +127,13 @@ public class RegistrationService implements CrudService<Registration> {
         String registrationNumber = entity.getRegistrationNumber();
 //        Date registrationDate = entity.getRegistrationDate();
 
-        boolean operationExists = operationRepository.isExists(Operation.builder().operationName(operation).build());
-        boolean departmentNameExists = departmentRepository.isExists(Department.builder().departmentName(departmentName).build());
-        boolean brandExists = brandRepository.isExists(Brand.builder().brandName(brand).build());
-        boolean modelExists = modelRepository.isExists(Model.builder().modelName(model).build());
+        boolean operationExists = operationRepository.isExistsId(entity.getOpCode());
+        boolean departmentExists = departmentRepository.isExistsId(entity.getDepCode());
         boolean colorExists = colorRepository.isExists(Color.builder().colorName(color).build());
         boolean bodyTypeExists = bodyTypeRepository.isExists(BodyType.builder().bodyTypeName(bodyType).build());
         boolean fuelTypeExists = fuelTypeRepository.isExists(FuelType.builder().fuelTypeName(fuelType).build());
         boolean isRegistrationNumberValid = StringUtils.isNotBlank(registrationNumber);
-        return operationExists && departmentNameExists && brandExists && modelExists && colorExists && bodyTypeExists && fuelTypeExists && isRegistrationNumberValid;
+        return operationExists && departmentExists && colorExists && bodyTypeExists && fuelTypeExists && isRegistrationNumberValid;
     }
 
     @Nullable

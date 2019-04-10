@@ -140,7 +140,7 @@ public class AdminObjectRepository extends CachingJdbcRepository<AdministrativeO
     @Nullable
     @Override
     public AdministrativeObject find(@Nonnull AdministrativeObject entity) {
-        return findByField(entity.getAdminObjName());
+        return getFromCache(entity.getAdminObjName());
     }
 
     @Override

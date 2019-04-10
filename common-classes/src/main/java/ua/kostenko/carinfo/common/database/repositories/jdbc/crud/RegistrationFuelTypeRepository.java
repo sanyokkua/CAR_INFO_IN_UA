@@ -63,7 +63,7 @@ public class RegistrationFuelTypeRepository extends CachingJdbcRepository<FuelTy
     @Nullable
     @Override
     public FuelType find(@Nonnull FuelType entity) {
-        return findByField(entity.getFuelTypeName());
+        return getFromCache(entity.getFuelTypeName());
     }
 
     @Nullable

@@ -37,10 +37,14 @@ public class VehicleService implements CrudService<Vehicle> {
     @Override
     public Vehicle create(@NonNull @Nonnull Vehicle entity) {
         if (isValid(entity)) {
-            String brand = entity.getRegistrationBrand();
-            String model = entity.getRegistrationModel();
+            String brand = entity.getBrandName();
+            String model = entity.getModelName();
             Brand brandFromDb = brandRepository.findByField(brand);
             Model modelFromDb = modelRepository.findByField(model);
+            if (Objects.isNull(brandFromDb) || Objects.isNull(modelFromDb)) {
+                log.warn("create: Vehicle can't be created. Model or Brand (from db) is null. Model = {}, Brand = {}", modelFromDb, brandFromDb);
+                return null;
+            }
             entity.setBrandId(brandFromDb.getBrandId());
             entity.setModelId(modelFromDb.getModelId());
             if (!isExists(entity)) {
@@ -53,7 +57,7 @@ public class VehicleService implements CrudService<Vehicle> {
                 return vehicle;
             } else {
                 log.info("create: entity exists. Updating entity");
-                return vehicleRepository.update(entity);
+                return vehicleRepository.find(entity);
             }
         }
         log.info("create: entity is not valid. Returning null");
@@ -61,8 +65,8 @@ public class VehicleService implements CrudService<Vehicle> {
     }
 
     private boolean isValid(Vehicle entity) {
-        String brand = entity.getRegistrationBrand();
-        String model = entity.getRegistrationModel();
+        String brand = entity.getBrandName();
+        String model = entity.getModelName();
         log.info("isValid: validating vehicle. Brand = {}, Model = {}", brand, model);
         if (StringUtils.isNotBlank(brand) && StringUtils.isNotBlank(model)) {
             boolean brandExists = brandRepository.isExists(Brand.builder().brandName(brand).build());
@@ -82,6 +86,16 @@ public class VehicleService implements CrudService<Vehicle> {
             throw new IllegalArgumentException("Entity doesn't exist");
         } else if (isValid(entity) && isExists(entity)) {
             log.info("update: entity exists. Updating entity");
+            Brand brandFromDb = brandRepository.findByField(entity.getBrandName());
+            Model modelFromDb = modelRepository.findByField(entity.getModelName());
+            if (Objects.isNull(brandFromDb) || Objects.isNull(modelFromDb)) {
+                log.warn("update: Vehicle can't be updated. Model or Brand (from db) is null. Model = {}, Brand = {}", modelFromDb, brandFromDb);
+                return null;
+            }
+            entity.setModelId(modelFromDb.getModelId());
+            entity.setBrandName(modelFromDb.getModelName());
+            entity.setBrandId(brandFromDb.getBrandId());
+            entity.setBrandName(brandFromDb.getBrandName());
             return vehicleRepository.update(entity);
         }
 

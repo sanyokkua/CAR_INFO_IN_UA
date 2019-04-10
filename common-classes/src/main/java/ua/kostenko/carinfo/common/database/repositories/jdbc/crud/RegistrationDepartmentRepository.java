@@ -65,7 +65,7 @@ public class RegistrationDepartmentRepository extends CachingJdbcRepository<Depa
     @Nullable
     @Override
     public Department find(@Nonnull Department entity) {
-        return findByField(entity.getDepartmentName());
+        return getFromCache(entity.getDepartmentName());
     }
 
     @Nullable
