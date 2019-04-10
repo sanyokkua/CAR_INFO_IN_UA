@@ -21,11 +21,11 @@ import java.util.Set;
 class RegistrationOperation implements Serializable {
 
     @Id
-    @Column(name = Constants.RegistrationOperation.CODE, nullable = false)
+    @Column(name = Constants.RegistrationOperation.CODE, nullable = false)//non NULLABLE
     private Long operationCode;
 
     @NaturalId
-    @Column(name = Constants.RegistrationOperation.NAME, nullable = false)
+    @Column(name = Constants.RegistrationOperation.NAME, nullable = false)//non NULLABLE
     private String operationName;
 
     @Builder.Default

@@ -20,7 +20,7 @@ abstract class DefaultCrudService<T> implements CrudService<T> {
 
     @Nullable
     @Override
-    public T create(@Nonnull T entity) {
+    public synchronized T create(@Nonnull T entity) {
         log.info("create: entity = {}", entity.toString());
         if (isValid(entity)) {
             log.info("create: entity is valid");
@@ -40,7 +40,7 @@ abstract class DefaultCrudService<T> implements CrudService<T> {
 
     @Nullable
     @Override
-    public T update(@Nonnull T entity) {
+    public synchronized T update(@Nonnull T entity) {
         log.info("update: entity = {}", entity.toString());
         if (isValid(entity)) {
             log.info("update: entity is valid");
@@ -57,7 +57,7 @@ abstract class DefaultCrudService<T> implements CrudService<T> {
     }
 
     @Override
-    public boolean delete(@NonNull @Nonnull Long id) {
+    public synchronized boolean delete(@NonNull @Nonnull Long id) {
         log.info("delete: deleting entity with id: {}", id);
         boolean deleted = repository.delete(id);
         log.info("delete: entity with id: {} is deleted: ", id, deleted);
@@ -65,7 +65,7 @@ abstract class DefaultCrudService<T> implements CrudService<T> {
     }
 
     @Override
-    public boolean isExists(@NonNull @Nonnull T entity) {
+    public synchronized boolean isExists(@NonNull @Nonnull T entity) {
         log.info("isExists: checking for existence entity = {}", entity.toString());
         boolean exists = repository.isExists(entity);
         log.info("isExists: entity = {} exists: {}", entity.toString(), exists);
@@ -73,26 +73,26 @@ abstract class DefaultCrudService<T> implements CrudService<T> {
     }
 
     @Override
-    public List<T> findAll() {
+    public synchronized List<T> findAll() {
         log.info("findAll");
         return repository.findAll();
     }
 
     @Override
-    public Page<T> find(@NonNull @Nonnull ParamHolderBuilder builder) {
+    public synchronized Page<T> find(@NonNull @Nonnull ParamHolderBuilder builder) {
         log.info("find. Parameters: {}");
         return repository.find(builder.build());
     }
 
     @Nullable
     @Override
-    public T find(@Nonnull T entity) {
+    public synchronized T find(@Nonnull T entity) {
         return repository.find(entity);
     }
 
     @Nullable
     @Override
-    public T find(@Nonnull Long id) {
+    public synchronized T find(@Nonnull Long id) {
         return repository.find(id);
     }
 }

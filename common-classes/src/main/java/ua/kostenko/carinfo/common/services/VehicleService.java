@@ -35,7 +35,7 @@ public class VehicleService implements CrudService<Vehicle> {
 
     @Nullable
     @Override
-    public Vehicle create(@NonNull @Nonnull Vehicle entity) {
+    public synchronized Vehicle create(@NonNull @Nonnull Vehicle entity) {
         if (isValid(entity)) {
             String brand = entity.getBrandName();
             String model = entity.getModelName();
@@ -80,7 +80,7 @@ public class VehicleService implements CrudService<Vehicle> {
 
     @Nullable
     @Override
-    public Vehicle update(@NonNull @Nonnull Vehicle entity) {
+    public synchronized Vehicle update(@NonNull @Nonnull Vehicle entity) {
         if (isValid(entity) && !isExists(entity)) {
             log.info("update: entity doesn't exist. Throwing exception");
             throw new IllegalArgumentException("Entity doesn't exist");
@@ -104,7 +104,7 @@ public class VehicleService implements CrudService<Vehicle> {
     }
 
     @Override
-    public boolean delete(@NonNull @Nonnull Long id) {
+    public synchronized boolean delete(@NonNull @Nonnull Long id) {
         log.info("delete: deleting entity with id: {}", id);
         boolean deleted = vehicleRepository.delete(id);
         log.info("delete: entity with id: {} is deleted: ", id, deleted);
@@ -112,7 +112,7 @@ public class VehicleService implements CrudService<Vehicle> {
     }
 
     @Override
-    public boolean isExists(@NonNull @Nonnull Vehicle entity) {
+    public synchronized boolean isExists(@NonNull @Nonnull Vehicle entity) {
         log.info("isExists: checking for existence entity = {}", entity.toString());
         boolean exists = vehicleRepository.isExists(entity);
         log.info("isExists: entity = {} exists: {}", entity.toString(), exists);
@@ -120,26 +120,26 @@ public class VehicleService implements CrudService<Vehicle> {
     }
 
     @Override
-    public List<Vehicle> findAll() {
+    public synchronized List<Vehicle> findAll() {
         log.info("findAll");
         return vehicleRepository.findAll();
     }
 
     @Override
-    public Page<Vehicle> find(@NonNull @Nonnull ParamHolderBuilder builder) {
+    public synchronized Page<Vehicle> find(@NonNull @Nonnull ParamHolderBuilder builder) {
         log.info("find. Parameters: {}");
         return vehicleRepository.find(builder.build());
     }
 
     @Nullable
     @Override
-    public Vehicle find(@Nonnull Vehicle entity) {
+    public synchronized Vehicle find(@Nonnull Vehicle entity) {
         return vehicleRepository.find(entity);
     }
 
     @Nullable
     @Override
-    public Vehicle find(@Nonnull Long id) {
+    public synchronized Vehicle find(@Nonnull Long id) {
         return vehicleRepository.find(id);
     }
 }

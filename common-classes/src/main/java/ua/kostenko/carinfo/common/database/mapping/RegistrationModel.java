@@ -21,7 +21,7 @@ class RegistrationModel implements Serializable {
     @Column(name = Constants.RegistrationModel.ID, nullable = false, columnDefinition = "serial")
     private Long modelId;
 
-    @Column(name = Constants.RegistrationModel.NAME, nullable = false)
+    @Column(name = Constants.RegistrationModel.NAME, nullable = false)//non NULLABLE
     private String modelName;
 
     @Builder.Default

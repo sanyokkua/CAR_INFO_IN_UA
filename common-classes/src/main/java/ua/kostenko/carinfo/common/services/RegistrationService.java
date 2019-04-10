@@ -202,13 +202,13 @@ public class RegistrationService implements CrudService<Registration> {
 
     @Nullable
     @Override
-    public Registration find(@Nonnull Registration entity) {
+    public synchronized Registration find(@Nonnull Registration entity) {
         return registrationRepository.find(entity);
     }
 
     @Nullable
     @Override
-    public Registration find(@Nonnull Long id) {
+    public synchronized Registration find(@Nonnull Long id) {
         return registrationRepository.find(id);
     }
 }

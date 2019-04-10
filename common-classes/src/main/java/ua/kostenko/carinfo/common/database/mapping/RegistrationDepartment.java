@@ -21,17 +21,17 @@ import java.util.Set;
 class RegistrationDepartment implements Serializable {
 
     @Id
-    @Column(name = Constants.RegistrationDepartment.CODE, nullable = false)
+    @Column(name = Constants.RegistrationDepartment.CODE, nullable = false)//non NULLABLE
     private Long departmentCode;
 
     @NaturalId
-    @Column(name = Constants.RegistrationDepartment.NAME, nullable = false)
+    @Column(name = Constants.RegistrationDepartment.NAME)//NULLABLE
     private String departmentName;
 
-    @Column(name = Constants.RegistrationDepartment.ADDRESS, nullable = false)
+    @Column(name = Constants.RegistrationDepartment.ADDRESS)//NULLABLE
     private String departmentAddress;
 
-    @Column(name = Constants.RegistrationDepartment.EMAIL, nullable = false)
+    @Column(name = Constants.RegistrationDepartment.EMAIL)//NULLABLE
     private String departmentEmail;
 
     @Builder.Default

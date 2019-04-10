@@ -43,16 +43,18 @@ public class Registration implements Serializable {
     private String departmentAddress;
     private String departmentEmail;
     private String kind;
-    private String brand;
-    private String model;
     private String color;
     private String bodyType;
     private String purpose;
+
+    private String brand;
+    private String model;
     private String fuelType;
     private Long engineCapacity;
+    private Long makeYear;
     private Long ownWeight;
     private Long totalWeight;
-    private Long makeYear;
+
     private String personType;
     private String registrationNumber;
     private Date registrationDate;

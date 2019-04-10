@@ -31,7 +31,7 @@ public class AdminObjPersist implements Persist<AdministrativeObjectPojo> {
                                                          .build();
         if (!repository.isExists(build)) {
             AdministrativeObject adminObject = repository.create(build);
-            log.info("Created: {}", adminObject.toString());
+            log.info("Created: {}", adminObject);
         } else {
             log.info("Object exists: {}", build.toString());
         }

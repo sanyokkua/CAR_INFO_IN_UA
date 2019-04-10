@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 @Slf4j
 public final class PathUtils {
 
-    public static Path getPath(String path) {
+    public synchronized static Path getPath(String path) {
         Path destination = null;
         try {
             destination = Paths.get(new ClassPathResource(path).getFile().getAbsolutePath());

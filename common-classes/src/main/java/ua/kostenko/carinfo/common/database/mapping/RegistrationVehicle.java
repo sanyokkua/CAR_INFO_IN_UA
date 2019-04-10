@@ -25,11 +25,11 @@ class RegistrationVehicle implements Serializable {
     private Long vehicleId;
 
     @ManyToOne
-    @JoinColumn(name = Constants.RegistrationVehicle.BRAND_ID)
+    @JoinColumn(name = Constants.RegistrationVehicle.BRAND_ID)//non NULLABLE
     private RegistrationBrand registrationBrand;
 
     @ManyToOne
-    @JoinColumn(name = Constants.RegistrationVehicle.MODEL_ID)
+    @JoinColumn(name = Constants.RegistrationVehicle.MODEL_ID)//non NULLABLE
     private RegistrationModel registrationModel;
 
     @Builder.Default

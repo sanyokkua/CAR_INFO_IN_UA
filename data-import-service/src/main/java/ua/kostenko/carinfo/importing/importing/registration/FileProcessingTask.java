@@ -2,7 +2,6 @@ package ua.kostenko.carinfo.importing.importing.registration;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import ua.kostenko.carinfo.common.database.repositories.PageableRepository;
 import ua.kostenko.carinfo.common.records.*;
 import ua.kostenko.carinfo.common.services.CrudService;
 import ua.kostenko.carinfo.importing.csv.mappers.registration.RegistrationCsvMapper;
@@ -27,47 +26,47 @@ import java.util.stream.Stream;
 public class FileProcessingTask implements Runnable {
     private final String link;
     private final File tempDirectory;
-    private final CrudService<Registration> service;
-    private final CrudService<AdministrativeObject> adminRepository;
-    private final CrudService<BodyType> bodyTypeRepository;
-    private final CrudService<Brand> brandRepository;
-    private final CrudService<Color> colorRepository;
-    private final CrudService<Department> departmentRepository;
-    private final CrudService<FuelType> fuelTypeRepository;
-    private final CrudService<Kind> kindRepository;
-    private final CrudService<Model> modelRepository;
-    private final CrudService<Operation> operationRepository;
-    private final CrudService<Purpose> purposeRepository;
-    private final CrudService<Vehicle> vehicleRepository;
+    private final CrudService<Registration> registrationCrudService;
+    private final CrudService<AdministrativeObject> administrativeObjectCrudService;
+    private final CrudService<BodyType> bodyTypeCrudService;
+    private final CrudService<Brand> brandCrudService;
+    private final CrudService<Color> colorCrudService;
+    private final CrudService<Department> departmentCrudService;
+    private final CrudService<FuelType> fuelTypeCrudService;
+    private final CrudService<Kind> kindCrudService;
+    private final CrudService<Model> modelCrudService;
+    private final CrudService<Operation> operationCrudService;
+    private final CrudService<Purpose> purposeCrudService;
+    private final CrudService<Vehicle> vehicleCrudService;
 
     public FileProcessingTask(@NonNull @Nonnull String link,
                               @NonNull @Nonnull File tempDirectory,
-                              @NonNull @Nonnull CrudService<Registration> service,
-                              @NonNull @Nonnull CrudService<AdministrativeObject> adminRepository,
-                              @NonNull @Nonnull CrudService<BodyType> bodyTypeRepository,
-                              @NonNull @Nonnull CrudService<Brand> brandRepository,
-                              @NonNull @Nonnull CrudService<Color> colorRepository,
-                              @NonNull @Nonnull CrudService<Department> departmentRepository,
-                              @NonNull @Nonnull CrudService<FuelType> fuelTypeRepository,
-                              @NonNull @Nonnull CrudService<Kind> kindRepository,
-                              @NonNull @Nonnull CrudService<Model> modelRepository,
-                              @NonNull @Nonnull CrudService<Operation> operationRepository,
-                              @NonNull @Nonnull CrudService<Purpose> purposeRepository,
-                              @NonNull @Nonnull CrudService<Vehicle> vehicleRepository) {
+                              @NonNull @Nonnull CrudService<Registration> registrationCrudService,
+                              @NonNull @Nonnull CrudService<AdministrativeObject> administrativeObjectCrudService,
+                              @NonNull @Nonnull CrudService<BodyType> bodyTypeCrudService,
+                              @NonNull @Nonnull CrudService<Brand> brandCrudService,
+                              @NonNull @Nonnull CrudService<Color> colorCrudService,
+                              @NonNull @Nonnull CrudService<Department> departmentCrudService,
+                              @NonNull @Nonnull CrudService<FuelType> fuelTypeCrudService,
+                              @NonNull @Nonnull CrudService<Kind> kindCrudService,
+                              @NonNull @Nonnull CrudService<Model> modelCrudService,
+                              @NonNull @Nonnull CrudService<Operation> operationCrudService,
+                              @NonNull @Nonnull CrudService<Purpose> purposeCrudService,
+                              @NonNull @Nonnull CrudService<Vehicle> vehicleCrudService) {
         this.link = link;
         this.tempDirectory = tempDirectory;
-        this.service = service;
-        this.adminRepository = adminRepository;
-        this.bodyTypeRepository = bodyTypeRepository;
-        this.brandRepository = brandRepository;
-        this.colorRepository = colorRepository;
-        this.departmentRepository = departmentRepository;
-        this.fuelTypeRepository = fuelTypeRepository;
-        this.kindRepository = kindRepository;
-        this.modelRepository = modelRepository;
-        this.operationRepository = operationRepository;
-        this.purposeRepository = purposeRepository;
-        this.vehicleRepository = vehicleRepository;
+        this.registrationCrudService = registrationCrudService;
+        this.administrativeObjectCrudService = administrativeObjectCrudService;
+        this.bodyTypeCrudService = bodyTypeCrudService;
+        this.brandCrudService = brandCrudService;
+        this.colorCrudService = colorCrudService;
+        this.departmentCrudService = departmentCrudService;
+        this.fuelTypeCrudService = fuelTypeCrudService;
+        this.kindCrudService = kindCrudService;
+        this.modelCrudService = modelCrudService;
+        this.operationCrudService = operationCrudService;
+        this.purposeCrudService = purposeCrudService;
+        this.vehicleCrudService = vehicleCrudService;
     }
 
     @Override
@@ -107,18 +106,18 @@ public class FileProcessingTask implements Runnable {
             Options<RegistrationHeaders> options = csvUtils.getOptions();
             if (Objects.nonNull(options)) {
                 RegistrationCsvMapper mapper = new RegistrationCsvMapper(options.getHeaders());
-                Persist<RegistrationPojo> persist = new RegistrationPersist(service,
-                                                                            adminRepository,
-                                                                            bodyTypeRepository,
-                                                                            brandRepository,
-                                                                            colorRepository,
-                                                                            departmentRepository,
-                                                                            fuelTypeRepository,
-                                                                            kindRepository,
-                                                                            modelRepository,
-                                                                            operationRepository,
-                                                                            purposeRepository,
-                                                                            vehicleRepository);
+                Persist<RegistrationPojo> persist = new RegistrationPersist(registrationCrudService,
+                                                                            administrativeObjectCrudService,
+                                                                            bodyTypeCrudService,
+                                                                            brandCrudService,
+                                                                            colorCrudService,
+                                                                            departmentCrudService,
+                                                                            fuelTypeCrudService,
+                                                                            kindCrudService,
+                                                                            modelCrudService,
+                                                                            operationCrudService,
+                                                                            purposeCrudService,
+                                                                            vehicleCrudService);
                 CsvReader.readCsvFile(options.getReaderOptions(), mapper, persist);
             } else {
                 log.error("processExtractedFiles: Options is null");

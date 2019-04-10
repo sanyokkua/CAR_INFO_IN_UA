@@ -9,6 +9,7 @@ import ua.kostenko.carinfo.importing.csv.pojo.RegistrationPojo;
 import ua.kostenko.carinfo.importing.importing.Persist;
 
 import javax.annotation.Nonnull;
+import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.Objects;
 
@@ -141,6 +142,26 @@ public class RegistrationPersist implements Persist<RegistrationPojo> {
         return Objects.nonNull(foundVehicle) ? foundVehicle : vehicleCrudService.create(vehicle);
     }
 
+    private Date getDate(@Nonnull @NonNull RegistrationPojo record) {
+        String registrationDate = record.getRegistrationDate().toUpperCase();
+        Date resultDate = null;
+        try {
+            java.util.Date date = FORMAT_FIRST.parse(registrationDate);
+            resultDate = new Date(date.getTime());
+        } catch (Exception ex) {
+            log.warn("Problem with parsing date with first formatter: {}", registrationDate);
+        }
+        if (Objects.isNull(resultDate)) {
+            try {
+                java.util.Date date = FORMAT_SECOND.parse(registrationDate);
+                resultDate = new Date(date.getTime());
+            } catch (Exception ex) {
+                log.warn("Problem with parsing date with second formatter: {}", registrationDate);
+            }
+        }
+        return resultDate;
+    }
+
     @Override
     public void persist(@NonNull @Nonnull RegistrationPojo record) {
         log.info("persist: Thread N: {}", Thread.currentThread().getId());
@@ -157,39 +178,35 @@ public class RegistrationPersist implements Persist<RegistrationPojo> {
             AdministrativeObject administrativeObject = getAdministrativeObject(record);
             Department department = getDepartment(record);
 
-            if (Objects.isNull(administrativeObject) || Objects.isNull(department)) {
-                log.warn("AdminObject or department is null");
+            if (Objects.isNull(administrativeObject)) {
+                log.warn("AdminObject is null");
                 return;
             }
-            if (Objects.isNull(operation) || Objects.isNull(brand) || Objects.isNull(model)) {
-                log.warn("operation or brand or model is null");
+            if (Objects.isNull(department)) {
+                log.warn("Department is null");
+                return;
+            }
+            if (Objects.isNull(brand)) {
+                log.warn("Brand is null");
+                return;
+            }
+            if (Objects.isNull(model)) {
+                log.warn("Model is null");
+                return;
+            }
+            if (Objects.isNull(operation)) {
+                log.warn("Operation is null");
                 return;
             }
 
             Vehicle createdVehicle = getVehicle(model, brand);
 
             if (Objects.isNull(createdVehicle)) {
-                log.info("createdVehicle is null");
+                log.warn("createdVehicle is null");
                 return;
             }
 
-            java.sql.Date resultDate = null;
-            String registrationDate = record.getRegistrationDate().toUpperCase();
-
-            try {
-                java.util.Date date = FORMAT_FIRST.parse(registrationDate);
-                resultDate = new java.sql.Date(date.getTime());
-            } catch (Exception ex) {
-                log.warn("Problem with parsing date with first formatter: {}", registrationDate);
-            }
-            if (Objects.isNull(resultDate)) {
-                try {
-                    java.util.Date date = FORMAT_SECOND.parse(registrationDate);
-                    resultDate = new java.sql.Date(date.getTime());
-                } catch (Exception ex) {
-                    log.warn("Problem with parsing date with second formatter: {}", registrationDate);
-                }
-            }
+            java.sql.Date resultDate = getDate(record);
             String personType = record.getPersonType().toUpperCase();
             Long vehicleMakeYear = record.getVehicleMakeYear();
             Long vehicleEngineCapacity = record.getVehicleEngineCapacity();

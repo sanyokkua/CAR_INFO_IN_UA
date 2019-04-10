@@ -24,7 +24,7 @@ class RegistrationBrand implements Serializable {
     @Column(name = Constants.RegistrationBrand.ID, nullable = false, columnDefinition = "serial")
     private Long brandId;
 
-    @Column(name = Constants.RegistrationBrand.NAME, nullable = false)
+    @Column(name = Constants.RegistrationBrand.NAME, nullable = false)//non NULLABLE
     private String brandName;
 
     @Builder.Default

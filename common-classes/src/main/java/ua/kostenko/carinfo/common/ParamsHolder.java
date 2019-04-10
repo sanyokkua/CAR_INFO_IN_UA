@@ -1,6 +1,5 @@
 package ua.kostenko.carinfo.common;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NonNull;
 import org.springframework.data.domain.Pageable;
@@ -11,7 +10,6 @@ import java.util.Map;
 import java.util.Objects;
 
 @Builder
-@AllArgsConstructor
 public class ParamsHolder {
     private Pageable page;
     private Map<String, Long> longValues;
@@ -19,6 +17,13 @@ public class ParamsHolder {
     private Map<String, String> stringValues;
 
     private ParamsHolder() {
+    }
+
+    private ParamsHolder(Pageable page, Map<String, Long> longValues, Map<String, Integer> integerValues, Map<String, String> stringValues) {
+        this.page = page;
+        this.longValues = longValues;
+        this.integerValues = integerValues;
+        this.stringValues = stringValues;
     }
 
     public Pageable getPage() {
