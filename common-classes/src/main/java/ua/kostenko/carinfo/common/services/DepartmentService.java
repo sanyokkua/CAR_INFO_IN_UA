@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ua.kostenko.carinfo.common.database.repositories.PageableRepository;
-import ua.kostenko.carinfo.common.records.Department;
+import ua.kostenko.carinfo.common.api.records.Department;
+import ua.kostenko.carinfo.common.database.repositories.jdbc.crud.PageableRepository;
 
 import javax.annotation.Nonnull;
 

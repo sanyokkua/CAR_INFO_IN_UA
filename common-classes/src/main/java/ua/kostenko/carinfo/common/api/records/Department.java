@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.common.records;
+package ua.kostenko.carinfo.common.api.records;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,8 +12,10 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Builder
 public class Department implements Serializable {
+    public static final String DEPARTMENT_CODE = "departmentCode";
+    public static final String DEPARTMENT_ADDRESS = "departmentAddress";
+    public static final String DEPARTMENT_EMAIL = "departmentEmail";
     private Long departmentCode;
-    private String departmentName;
     private String departmentAddress;
     private String departmentEmail;
 }

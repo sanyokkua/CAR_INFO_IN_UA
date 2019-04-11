@@ -12,11 +12,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
-import ua.kostenko.carinfo.common.ParamsHolder;
-import ua.kostenko.carinfo.common.database.Constants;
-import ua.kostenko.carinfo.common.database.repositories.CrudRepository;
-import ua.kostenko.carinfo.common.database.repositories.PageableRepository;
-import ua.kostenko.carinfo.common.records.Registration;
+import ua.kostenko.carinfo.common.api.Constants;
+import ua.kostenko.carinfo.common.api.ParamsHolder;
+import ua.kostenko.carinfo.common.api.records.Registration;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -30,15 +28,15 @@ import java.util.List;
 public class RegistrationRecordRepository extends JdbcRepository<Registration> implements PageableRepository<Registration> {
     private static final RowMapper<Registration> ROW_MAPPER = (resultSet, i) -> Registration.builder()
                                                                                             .id(resultSet.getLong(Constants.RegistrationRecord.ID))
-                                                                                            .adminObjectId(resultSet.getLong(Constants.RegistrationRecord.ADMIN_OBJ_ID))
-                                                                                            .vehicleId(resultSet.getLong(Constants.RegistrationRecord.VEHICLE_ID))
-                                                                                            .opCode(resultSet.getLong(Constants.RegistrationRecord.OPERATION_CODE))
-                                                                                            .depCode(resultSet.getLong(Constants.RegistrationRecord.DEPARTMENT_CODE))
-                                                                                            .kindId(resultSet.getLong(Constants.RegistrationRecord.KIND))
-                                                                                            .colorId(resultSet.getLong(Constants.RegistrationRecord.COLOR_ID))
-                                                                                            .bodyTypeId(resultSet.getLong(Constants.RegistrationRecord.BODY_TYPE_ID))
-                                                                                            .purposeId(resultSet.getLong(Constants.RegistrationRecord.PURPOSE_ID))
-                                                                                            .fuelTypeId(resultSet.getLong(Constants.RegistrationRecord.FUEL_TYPE_ID))
+//                                                                                            .adminObjectId(resultSet.getLong(Constants.RegistrationRecord.ADMIN_OBJ_ID))
+//                                                                                            .vehicleId(resultSet.getLong(Constants.RegistrationRecord.VEHICLE_ID))
+//                                                                                            .opCode(resultSet.getLong(Constants.RegistrationRecord.OPERATION_CODE))
+//                                                                                            .depCode(resultSet.getLong(Constants.RegistrationRecord.DEPARTMENT_CODE))
+//                                                                                            .kindId(resultSet.getLong(Constants.RegistrationRecord.KIND))
+//                                                                                            .colorId(resultSet.getLong(Constants.RegistrationRecord.COLOR_ID))
+//                                                                                            .bodyTypeId(resultSet.getLong(Constants.RegistrationRecord.BODY_TYPE_ID))
+//                                                                                            .purposeId(resultSet.getLong(Constants.RegistrationRecord.PURPOSE_ID))
+//                                                                                            .fuelTypeId(resultSet.getLong(Constants.RegistrationRecord.FUEL_TYPE_ID))
                                                                                             .engineCapacity(resultSet.getLong(Constants.RegistrationRecord.ENGINE_CAPACITY))
                                                                                             .ownWeight(resultSet.getLong(Constants.RegistrationRecord.OWN_WEIGHT))
                                                                                             .totalWeight(resultSet.getLong(Constants.RegistrationRecord.TOTAL_WEIGHT))
@@ -47,8 +45,8 @@ public class RegistrationRecordRepository extends JdbcRepository<Registration> i
                                                                                             .registrationDate(resultSet.getDate(Constants.RegistrationRecord.REGISTRATION_DATE))
                                                                                             .adminObjName(Constants.AdminObject.NAME)
                                                                                             .adminObjType(Constants.AdminObject.TYPE)
-                                                                                            .operation(Constants.RegistrationOperation.NAME)
-                                                                                            .departmentName(Constants.RegistrationDepartment.NAME)
+//                                                                                            .operation(Constants.RegistrationOperation.NAME)
+                                                                                            .departmentCode(Constants.RegistrationDepartment.NAME)
                                                                                             .departmentAddress(Constants.RegistrationDepartment.ADDRESS)
                                                                                             .departmentEmail(Constants.RegistrationDepartment.EMAIL)
                                                                                             .kind(Constants.RegistrationKind.NAME)
@@ -98,15 +96,15 @@ public class RegistrationRecordRepository extends JdbcRepository<Registration> i
     }
 
     private void setParamsForStatement(@Nonnull @NonNull Registration entity, @NonNull PreparedStatement statement) throws SQLException {
-        statement.setLong(1, entity.getAdminObjectId());
-        statement.setLong(2, entity.getOpCode());
-        statement.setLong(3, entity.getDepCode());
-        statement.setLong(4, entity.getKindId());
-        statement.setLong(5, entity.getVehicleId());
-        statement.setLong(6, entity.getColorId());
-        statement.setLong(7, entity.getBodyTypeId());
-        statement.setLong(8, entity.getPurposeId());
-        statement.setLong(9, entity.getFuelTypeId());
+//        statement.setLong(1, entity.getAdminObjectId());
+//        statement.setLong(2, entity.getOpCode());
+//        statement.setLong(3, entity.getDepCode());
+//        statement.setLong(4, entity.getKindId());
+//        statement.setLong(5, entity.getVehicleId());
+//        statement.setLong(6, entity.getColorId());
+//        statement.setLong(7, entity.getBodyTypeId());
+//        statement.setLong(8, entity.getPurposeId());
+//        statement.setLong(9, entity.getFuelTypeId());
         statement.setLong(10, entity.getOwnWeight());
         statement.setLong(11, entity.getTotalWeight());
         statement.setLong(12, entity.getEngineCapacity());
@@ -126,15 +124,15 @@ public class RegistrationRecordRepository extends JdbcRepository<Registration> i
                 " registration_date = ?, registration_number = ?, person_type = ? " +
                 "where id = ?;";
         jdbcTemplate.update(jdbcTemplateUpdate,
-                            entity.getAdminObjectId(),
-                            entity.getOpCode(),
-                            entity.getDepCode(),
-                            entity.getKindId(),
-                            entity.getVehicleId(),
-                            entity.getColorId(),
-                            entity.getBodyTypeId(),
-                            entity.getPurposeId(),
-                            entity.getFuelTypeId(),
+//                            entity.getAdminObjectId(),
+//                            entity.getOpCode(),
+//                            entity.getDepCode(),
+//                            entity.getKindId(),
+//                            entity.getVehicleId(),
+//                            entity.getColorId(),
+//                            entity.getBodyTypeId(),
+//                            entity.getPurposeId(),
+//                            entity.getFuelTypeId(),
                             entity.getOwnWeight(),
                             entity.getTotalWeight(),
                             entity.getEngineCapacity(),
@@ -144,7 +142,8 @@ public class RegistrationRecordRepository extends JdbcRepository<Registration> i
                             entity.getId(),
                             entity.getPersonType()
         );
-        return find(entity.getVehicleId());
+//        return find(entity.getVehicleId());
+        return null;
     }
 
     @Override

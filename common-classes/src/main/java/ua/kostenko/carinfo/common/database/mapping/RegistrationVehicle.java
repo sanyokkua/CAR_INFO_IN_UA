@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ua.kostenko.carinfo.common.database.Constants;
+import ua.kostenko.carinfo.common.api.Constants;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -25,11 +25,11 @@ class RegistrationVehicle implements Serializable {
     private Long vehicleId;
 
     @ManyToOne
-    @JoinColumn(name = Constants.RegistrationVehicle.BRAND_ID)//non NULLABLE
+    @JoinColumn(name = Constants.RegistrationVehicle.BRAND_ID, nullable = false)//non NULLABLE
     private RegistrationBrand registrationBrand;
 
     @ManyToOne
-    @JoinColumn(name = Constants.RegistrationVehicle.MODEL_ID)//non NULLABLE
+    @JoinColumn(name = Constants.RegistrationVehicle.MODEL_ID, nullable = false)//non NULLABLE
     private RegistrationModel registrationModel;
 
     @Builder.Default

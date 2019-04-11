@@ -13,11 +13,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
-import ua.kostenko.carinfo.common.ParamsHolder;
-import ua.kostenko.carinfo.common.database.Constants;
-import ua.kostenko.carinfo.common.database.repositories.CrudRepository;
-import ua.kostenko.carinfo.common.database.repositories.PageableRepository;
-import ua.kostenko.carinfo.common.records.Vehicle;
+import ua.kostenko.carinfo.common.api.Constants;
+import ua.kostenko.carinfo.common.api.ParamsHolder;
+import ua.kostenko.carinfo.common.api.records.Vehicle;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -26,8 +24,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import static java.util.Objects.nonNull;
-
 @Repository
 @Slf4j
 public class RegistrationVehicleRepository extends JdbcRepository<Vehicle> implements PageableRepository<Vehicle> {
@@ -35,8 +31,8 @@ public class RegistrationVehicleRepository extends JdbcRepository<Vehicle> imple
     private static final String MODEL = "model";
     private static final RowMapper<Vehicle> ROW_MAPPER = (resultSet, i) -> Vehicle.builder()
                                                                                   .vehicleId(resultSet.getLong(Constants.RegistrationVehicle.ID))
-                                                                                  .brandId(resultSet.getLong(Constants.RegistrationVehicle.BRAND_ID))
-                                                                                  .modelId(resultSet.getLong(Constants.RegistrationVehicle.MODEL_ID))
+//                                                                                  .brandId(resultSet.getLong(Constants.RegistrationVehicle.BRAND_ID))
+//                                                                                  .modelId(resultSet.getLong(Constants.RegistrationVehicle.MODEL_ID))
                                                                                   .modelName(resultSet.getString(MODEL))
                                                                                   .brandName(resultSet.getString(BRAND))
                                                                                   .build();
@@ -53,8 +49,8 @@ public class RegistrationVehicleRepository extends JdbcRepository<Vehicle> imple
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement statement = connection.prepareStatement(jdbcTemplateInsert, Statement.RETURN_GENERATED_KEYS);
-            statement.setLong(1, entity.getBrandId());
-            statement.setLong(2, entity.getModelId());
+//            statement.setLong(1, entity.getBrandId());
+//            statement.setLong(2, entity.getModelId());
             return statement;
         }, keyHolder);
         Object id = keyHolder.getKeys().get(Constants.RegistrationVehicle.ID);
@@ -65,7 +61,7 @@ public class RegistrationVehicleRepository extends JdbcRepository<Vehicle> imple
     @Override
     public Vehicle update(@NonNull @Nonnull Vehicle entity) {
         String jdbcTemplateUpdate = "update carinfo.vehicle set brand_id = ?, model_id = ? where vehicle_id = ?;";
-        jdbcTemplate.update(jdbcTemplateUpdate, entity.getBrandId(), entity.getModelId(), entity.getVehicleId());
+//        jdbcTemplate.update(jdbcTemplateUpdate, entity.getBrandId(), entity.getModelId(), entity.getVehicleId());
         return find(entity.getVehicleId());
     }
 
@@ -103,7 +99,8 @@ public class RegistrationVehicleRepository extends JdbcRepository<Vehicle> imple
 
     @Override
     public boolean isExists(@NonNull @Nonnull Vehicle entity) {
-        return nonNull(findByFields(entity.getBrandId(), entity.getModelId()));
+//        return nonNull(findByFields(entity.getBrandId(), entity.getModelId()));
+        return false;
     }
 
     @Override
@@ -116,8 +113,8 @@ public class RegistrationVehicleRepository extends JdbcRepository<Vehicle> imple
                 @Override
                 public void setValues(@Nonnull PreparedStatement ps, int i) throws SQLException {
                     Vehicle object = batch.get(i);
-                    ps.setLong(1, object.getBrandId());
-                    ps.setLong(2, object.getModelId());
+//                    ps.setLong(1, object.getBrandId());
+//                    ps.setLong(2, object.getModelId());
                 }
 
                 @Override
@@ -164,6 +161,7 @@ public class RegistrationVehicleRepository extends JdbcRepository<Vehicle> imple
     @Nullable
     @Override
     public Vehicle find(@Nonnull Vehicle entity) {
-        return findByFields(entity.getBrandId(), entity.getModelId());
+//        return findByFields(entity.getBrandId(), entity.getModelId());
+        return null;
     }
 }

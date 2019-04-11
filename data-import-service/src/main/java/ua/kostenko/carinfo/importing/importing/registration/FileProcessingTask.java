@@ -2,7 +2,7 @@ package ua.kostenko.carinfo.importing.importing.registration;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import ua.kostenko.carinfo.common.records.*;
+import ua.kostenko.carinfo.common.api.records.*;
 import ua.kostenko.carinfo.common.services.CrudService;
 import ua.kostenko.carinfo.importing.csv.mappers.registration.RegistrationCsvMapper;
 import ua.kostenko.carinfo.importing.csv.pojo.RegistrationPojo;

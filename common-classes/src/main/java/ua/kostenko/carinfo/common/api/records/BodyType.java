@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.common.records;
+package ua.kostenko.carinfo.common.api.records;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +12,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Builder
 public class BodyType implements Serializable {
+    public static final String BODY_TYPE_NAME = "bodyTypeName";
     private Long bodyTypeId;
     private String bodyTypeName;
 }

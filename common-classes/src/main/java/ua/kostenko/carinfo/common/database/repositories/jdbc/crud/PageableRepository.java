@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.common.database.repositories;
+package ua.kostenko.carinfo.common.database.repositories.jdbc.crud;
 
 import ua.kostenko.carinfo.common.database.PageableSearch;
 

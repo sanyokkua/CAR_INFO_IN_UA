@@ -2,7 +2,7 @@ package ua.kostenko.carinfo.common.services;
 
 import lombok.NonNull;
 import org.springframework.data.domain.Page;
-import ua.kostenko.carinfo.common.ParamHolderBuilder;
+import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -19,7 +19,7 @@ public interface CrudService<T> {
     boolean isExists(@Nonnull @NonNull T entity);
 
     List<T> findAll();
-    Page<T> find(@NonNull @Nonnull ParamHolderBuilder builder);
+    Page<T> find(@NonNull @Nonnull ParamsHolderBuilder builder);
     @Nullable
     T find(@NonNull @Nonnull T entity);
     @Nullable

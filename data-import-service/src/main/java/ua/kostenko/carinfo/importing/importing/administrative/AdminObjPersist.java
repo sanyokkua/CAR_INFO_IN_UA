@@ -4,7 +4,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ua.kostenko.carinfo.common.records.AdministrativeObject;
+import ua.kostenko.carinfo.common.api.records.AdministrativeObject;
 import ua.kostenko.carinfo.common.services.CrudService;
 import ua.kostenko.carinfo.importing.csv.pojo.AdministrativeObjectPojo;
 import ua.kostenko.carinfo.importing.importing.Persist;

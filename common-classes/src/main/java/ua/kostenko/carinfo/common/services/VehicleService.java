@@ -6,11 +6,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import ua.kostenko.carinfo.common.ParamHolderBuilder;
-import ua.kostenko.carinfo.common.database.repositories.PageableRepository;
-import ua.kostenko.carinfo.common.records.Brand;
-import ua.kostenko.carinfo.common.records.Model;
-import ua.kostenko.carinfo.common.records.Vehicle;
+import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
+import ua.kostenko.carinfo.common.api.records.Brand;
+import ua.kostenko.carinfo.common.api.records.Model;
+import ua.kostenko.carinfo.common.api.records.Vehicle;
+import ua.kostenko.carinfo.common.database.repositories.jdbc.crud.PageableRepository;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -37,27 +37,23 @@ public class VehicleService implements CrudService<Vehicle> {
     @Override
     public synchronized Vehicle create(@NonNull @Nonnull Vehicle entity) {
         if (isValid(entity)) {
-            String brand = entity.getBrandName();
-            String model = entity.getModelName();
-            Brand brandFromDb = brandRepository.findByField(brand);
-            Model modelFromDb = modelRepository.findByField(model);
+            Brand brandFromDb = brandRepository.findByField(entity.getBrandName());
+            Model modelFromDb = modelRepository.findByField(entity.getModelName());
             if (Objects.isNull(brandFromDb) || Objects.isNull(modelFromDb)) {
                 log.warn("create: Vehicle can't be created. Model or Brand (from db) is null. Model = {}, Brand = {}", modelFromDb, brandFromDb);
                 return null;
             }
-            entity.setBrandId(brandFromDb.getBrandId());
-            entity.setModelId(modelFromDb.getModelId());
-            if (!isExists(entity)) {
-                Vehicle vehicle = vehicleRepository.create(entity);
-                if (Objects.nonNull(vehicle)) {
-                    log.info("create: created entity: {}", vehicle.toString());
-                } else {
-                    log.warn("create: entity is not created", entity.toString());
-                }
-                return vehicle;
-            } else {
+            if (isExists(entity)) {
                 log.info("create: entity exists. Updating entity");
                 return vehicleRepository.find(entity);
+            } else {
+                Vehicle vehicle = vehicleRepository.create(entity);
+                if (Objects.nonNull(vehicle)) {
+                    log.info("create: created entity: {}", vehicle);
+                } else {
+                    log.warn("create: entity is not created, {}", entity);
+                }
+                return vehicle;
             }
         }
         log.info("create: entity is not valid. Returning null");
@@ -92,13 +88,10 @@ public class VehicleService implements CrudService<Vehicle> {
                 log.warn("update: Vehicle can't be updated. Model or Brand (from db) is null. Model = {}, Brand = {}", modelFromDb, brandFromDb);
                 return null;
             }
-            entity.setModelId(modelFromDb.getModelId());
             entity.setBrandName(modelFromDb.getModelName());
-            entity.setBrandId(brandFromDb.getBrandId());
             entity.setBrandName(brandFromDb.getBrandName());
             return vehicleRepository.update(entity);
         }
-
         log.info("update: entity is not valid. Returning null");
         return null;
     }
@@ -126,7 +119,7 @@ public class VehicleService implements CrudService<Vehicle> {
     }
 
     @Override
-    public synchronized Page<Vehicle> find(@NonNull @Nonnull ParamHolderBuilder builder) {
+    public synchronized Page<Vehicle> find(@NonNull @Nonnull ParamsHolderBuilder builder) {
         log.info("find. Parameters: {}");
         return vehicleRepository.find(builder.build());
     }

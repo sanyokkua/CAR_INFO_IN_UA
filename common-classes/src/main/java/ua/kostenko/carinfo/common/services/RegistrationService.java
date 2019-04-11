@@ -6,11 +6,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import ua.kostenko.carinfo.common.ParamHolderBuilder;
-import ua.kostenko.carinfo.common.database.Constants;
-import ua.kostenko.carinfo.common.database.repositories.PageableRepository;
+import ua.kostenko.carinfo.common.api.Constants;
+import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
+import ua.kostenko.carinfo.common.api.records.*;
+import ua.kostenko.carinfo.common.database.repositories.jdbc.crud.PageableRepository;
 import ua.kostenko.carinfo.common.database.repositories.jdbc.crud.RegistrationVehicleRepository;
-import ua.kostenko.carinfo.common.records.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -19,7 +19,7 @@ import java.util.Objects;
 
 @Slf4j
 @Service
-public class RegistrationService implements CrudService<Registration> {
+public class RegistrationService implements CrudService<Registration> { //TODO: rewrite logic
     private final PageableRepository<AdministrativeObject> adminRepository;
     private final PageableRepository<BodyType> bodyTypeRepository;
     private final PageableRepository<Brand> brandRepository;
@@ -68,22 +68,15 @@ public class RegistrationService implements CrudService<Registration> {
             BodyType bodyType = bodyTypeRepository.findByField(entity.getBodyType());
             Brand brand = brandRepository.findByField(entity.getBrand());
             Color color = colorRepository.findByField(entity.getColor());
-            Department department = departmentRepository.findByField(entity.getDepartmentName());
+            Department department = departmentRepository.findByField(entity.getDepartmentCode());
             FuelType fuelType = fuelTypeRepository.findByField(entity.getFuelType());
             Kind kind = kindRepository.findByField(entity.getKind());
             Model model = modelRepository.findByField(entity.getModel());
-            Operation operation = operationRepository.findByField(entity.getOperation());
+            Operation operation = operationRepository.findByField(entity.getOperationName());
             Purpose purpose = purposeRepository.findByField(entity.getPurpose());
             if (isNotNull(administrativeObject, bodyType, brand, color, department, fuelType, kind, model, operation, purpose)) {
                 Vehicle vehicle = vehicleRepository.findByFields(brand.getBrandId(), model.getModelId());
                 if (Objects.nonNull(vehicle)) {
-                    entity.setColorId(color.getColorId());
-                    entity.setKindId(kind.getKindId());
-                    entity.setPurposeId(purpose.getPurposeId());
-                    entity.setAdminObjectId(administrativeObject.getAdminObjId());
-                    entity.setBodyTypeId(bodyType.getBodyTypeId());
-                    entity.setFuelTypeId(fuelType.getFuelTypeId());
-                    entity.setVehicleId(vehicle.getVehicleId());
                     Registration result = registrationRepository.create(entity);
                     return result;
                 } else {
@@ -109,8 +102,8 @@ public class RegistrationService implements CrudService<Registration> {
 
 //        String adminObjName = entity.getAdminObjName();
 //        String adminObjType = entity.getAdminObjType();
-        String operation = entity.getOperation();
-        String departmentName = entity.getDepartmentName();
+        String operation = entity.getOperationName();
+        String departmentName = entity.getDepartmentCode();
 //        String departmentAddress = entity.getDepartmentAddress();
 //        String departmentEmail = entity.getDepartmentEmail();
 //        String kind = entity.getKind();
@@ -127,13 +120,13 @@ public class RegistrationService implements CrudService<Registration> {
         String registrationNumber = entity.getRegistrationNumber();
 //        Date registrationDate = entity.getRegistrationDate();
 
-        boolean operationExists = operationRepository.isExistsId(entity.getOpCode());
-        boolean departmentExists = departmentRepository.isExistsId(entity.getDepCode());
+//        boolean operationExists = operationRepository.isExistsId(entity.getOpCode());
+//        boolean departmentExists = departmentRepository.isExistsId(entity.getDepCode());
         boolean colorExists = colorRepository.isExists(Color.builder().colorName(color).build());
         boolean bodyTypeExists = bodyTypeRepository.isExists(BodyType.builder().bodyTypeName(bodyType).build());
         boolean fuelTypeExists = fuelTypeRepository.isExists(FuelType.builder().fuelTypeName(fuelType).build());
         boolean isRegistrationNumberValid = StringUtils.isNotBlank(registrationNumber);
-        return operationExists && departmentExists && colorExists && bodyTypeExists && fuelTypeExists && isRegistrationNumberValid;
+        return colorExists && bodyTypeExists && fuelTypeExists && isRegistrationNumberValid;
     }
 
     @Nullable
@@ -144,25 +137,18 @@ public class RegistrationService implements CrudService<Registration> {
             BodyType bodyType = bodyTypeRepository.findByField(entity.getBodyType());
             Brand brand = brandRepository.findByField(entity.getBrand());
             Color color = colorRepository.findByField(entity.getColor());
-            Department department = departmentRepository.findByField(entity.getDepartmentName());
+            Department department = departmentRepository.findByField(entity.getDepartmentCode());
             FuelType fuelType = fuelTypeRepository.findByField(entity.getFuelType());
             Kind kind = kindRepository.findByField(entity.getKind());
             Model model = modelRepository.findByField(entity.getModel());
-            Operation operation = operationRepository.findByField(entity.getOperation());
+            Operation operation = operationRepository.findByField(entity.getOperationName());
             Purpose purpose = purposeRepository.findByField(entity.getPurpose());
             if (isNotNull(administrativeObject, bodyType, brand, color, department, fuelType, kind, model, operation, purpose)) {
-                Page<Vehicle> vehicles = vehicleRepository.find(new ParamHolderBuilder()
+                Page<Vehicle> vehicles = vehicleRepository.find(new ParamsHolderBuilder()
                                                                         .param(Constants.RegistrationBrand.NAME, brand.getBrandName())
                                                                         .param(Constants.RegistrationModel.NAME, model.getModelName())
                                                                         .build());
                 Vehicle vehicle = vehicles.get().findFirst().orElseGet(null);
-                entity.setColorId(color.getColorId());
-                entity.setKindId(kind.getKindId());
-                entity.setPurposeId(purpose.getPurposeId());
-                entity.setAdminObjectId(administrativeObject.getAdminObjId());
-                entity.setBodyTypeId(bodyType.getBodyTypeId());
-                entity.setFuelTypeId(fuelType.getFuelTypeId());
-                entity.setVehicleId(vehicle.getVehicleId());
                 Registration result = registrationRepository.update(entity);
                 return result;
             } else {
@@ -195,7 +181,7 @@ public class RegistrationService implements CrudService<Registration> {
     }
 
     @Override
-    public synchronized Page<Registration> find(@NonNull @Nonnull ParamHolderBuilder builder) {
+    public synchronized Page<Registration> find(@NonNull @Nonnull ParamsHolderBuilder builder) {
         log.info("find. Parameters: {}");
         return registrationRepository.find(builder.build());
     }

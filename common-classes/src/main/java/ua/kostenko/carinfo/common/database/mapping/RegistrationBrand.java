@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ua.kostenko.carinfo.common.database.Constants;
+import ua.kostenko.carinfo.common.api.Constants;
 
 import javax.persistence.*;
 import java.io.Serializable;

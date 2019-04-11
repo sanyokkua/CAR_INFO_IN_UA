@@ -3,8 +3,8 @@ package ua.kostenko.carinfo.common.services;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import ua.kostenko.carinfo.common.ParamHolderBuilder;
-import ua.kostenko.carinfo.common.database.repositories.PageableRepository;
+import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
+import ua.kostenko.carinfo.common.database.repositories.jdbc.crud.PageableRepository;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -79,7 +79,7 @@ abstract class DefaultCrudService<T> implements CrudService<T> {
     }
 
     @Override
-    public synchronized Page<T> find(@NonNull @Nonnull ParamHolderBuilder builder) {
+    public synchronized Page<T> find(@NonNull @Nonnull ParamsHolderBuilder builder) {
         log.info("find. Parameters: {}");
         return repository.find(builder.build());
     }

@@ -13,12 +13,9 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import ua.kostenko.carinfo.common.ParamsHolder;
-import ua.kostenko.carinfo.common.database.Constants;
-import ua.kostenko.carinfo.common.database.repositories.CrudRepository;
-import ua.kostenko.carinfo.common.database.repositories.FieldSearchable;
-import ua.kostenko.carinfo.common.database.repositories.PageableRepository;
-import ua.kostenko.carinfo.common.records.BodyType;
+import ua.kostenko.carinfo.common.api.Constants;
+import ua.kostenko.carinfo.common.api.ParamsHolder;
+import ua.kostenko.carinfo.common.api.records.BodyType;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

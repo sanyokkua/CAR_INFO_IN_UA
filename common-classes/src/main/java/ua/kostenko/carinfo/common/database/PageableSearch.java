@@ -6,14 +6,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import ua.kostenko.carinfo.common.ParamsHolder;
+import ua.kostenko.carinfo.common.api.ParamsHolder;
 
 import javax.annotation.Nonnull;
 import java.util.*;
 
 public interface PageableSearch<T> {
 
-    Page<T> find(@Nonnull @NonNull ParamsHolder searchParams);
+    Page<T> find(@Nonnull @NonNull final ParamsHolder searchParams);
 
     default Page<T> getPage(JdbcTemplate jdbcTemplate, RowMapper<T> rowMapper, Pageable pageable, String select, String from, String where, int total) {
         String querySql = select + from + where + " limit " + pageable.getPageSize() + " offset " + pageable.getOffset();
