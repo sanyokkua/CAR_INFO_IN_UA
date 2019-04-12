@@ -21,7 +21,7 @@ public class DepartmentService extends DefaultCrudService<Department> {
 
     @Override
     boolean isValid(Department entity) {
-        return StringUtils.isNotBlank(entity.getDepartmentName()) && StringUtils.isNotBlank(entity.getDepartmentAddress());
+        return StringUtils.isNotBlank(entity.getDepartmentAddress());
     }
 
 }

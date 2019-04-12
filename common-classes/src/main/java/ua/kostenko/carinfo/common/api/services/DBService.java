@@ -16,6 +16,7 @@ public interface DBService<T> {
     boolean isValid(@Nonnull @NonNull final T entity);
     Optional<T> get(final long id);
     Optional<T> get(@Nonnull @NonNull ParamsHolderBuilder builder);
+    Optional<T> get(@Nonnull @NonNull T entity);
     List<T> getAll();
     Page<T> getAll(@Nonnull @NonNull ParamsHolderBuilder builder);
 
