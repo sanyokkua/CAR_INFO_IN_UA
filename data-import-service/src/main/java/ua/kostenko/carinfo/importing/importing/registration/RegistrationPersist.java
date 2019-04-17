@@ -4,7 +4,6 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import ua.kostenko.carinfo.common.api.records.*;
-import ua.kostenko.carinfo.common.records.*;
 import ua.kostenko.carinfo.common.services.CrudService;
 import ua.kostenko.carinfo.importing.csv.pojo.RegistrationPojo;
 import ua.kostenko.carinfo.importing.importing.Persist;
@@ -134,8 +133,6 @@ public class RegistrationPersist implements Persist<RegistrationPojo> {
 
     private Vehicle getVehicle(Model createdModel, Brand createdBrand ){
         Vehicle vehicle = Vehicle.builder()
-                                 .brandId(createdBrand.getBrandId())
-                                 .modelId(createdModel.getModelId())
                                  .brandName(createdBrand.getBrandName())
                                  .modelName(createdModel.getModelName())
                                  .build();
@@ -215,35 +212,34 @@ public class RegistrationPersist implements Persist<RegistrationPojo> {
             Long vehicleTotalWeight = record.getVehicleTotalWeight();
             String vehicleRegistrationNumber = record.getVehicleRegistrationNumber().toUpperCase();
             Registration registration = Registration.builder()
-                                                    .adminObjectId(administrativeObject.getAdminObjId())
-                                                    .opCode(operation.getOperationCode())
-                                                    .depCode(department.getDepartmentCode())
-                                                    .kindId(kind.getKindId())
-                                                    .colorId(color.getColorId())
-                                                    .bodyTypeId(bodyType.getBodyTypeId())
-                                                    .purposeId(Objects.nonNull(purpose) ? purpose.getPurposeId() : null)
-                                                    .fuelTypeId(Objects.nonNull(fuelType) ? fuelType.getFuelTypeId() : null)
-                                                    .vehicleId(createdVehicle.getVehicleId())
-                                                    .adminObjName(administrativeObject.getAdminObjName())
-                                                    .adminObjType(administrativeObject.getAdminObjType())
-                                                    .operation(operation.getOperationName())
-                                                    .departmentName(department.getDepartmentName())
-                                                    .departmentAddress(department.getDepartmentAddress())
-                                                    .departmentEmail(department.getDepartmentEmail())
-                                                    .kind(kind.getKindName())
-                                                    .brand(brand.getBrandName())
-                                                    .model(model.getModelName())
-                                                    .color(color.getColorName())
-                                                    .bodyType(bodyType.getBodyTypeName())
-                                                    .purpose(Objects.nonNull(purpose) ? purpose.getPurposeName() : null)
-                                                    .fuelType(Objects.nonNull(fuelType) ? fuelType.getFuelTypeName() : null)
-                                                    .engineCapacity(vehicleEngineCapacity)
-                                                    .ownWeight(vehicleOwnWeight)
-                                                    .totalWeight(vehicleTotalWeight)
-                                                    .makeYear(vehicleMakeYear)
-                                                    .personType(personType)
-                                                    .registrationNumber(vehicleRegistrationNumber)
-                                                    .registrationDate(resultDate)
+//                                                    .opCode(operation.getOperationCode())
+//                                                    .depCode(department.getDepartmentCode())
+//                                                    .kindId(kind.getKindId())
+//                                                    .colorId(color.getColorId())
+//                                                    .bodyTypeId(bodyType.getBodyTypeId())
+//                                                    .purposeId(Objects.nonNull(purpose) ? purpose.getPurposeId() : null)
+//                                                    .fuelTypeId(Objects.nonNull(fuelType) ? fuelType.getFuelTypeId() : null)
+//                                                    .vehicleId(createdVehicle.getVehicleId())
+//                                                    .adminObjName(administrativeObject.getAdminObjName())
+//                                                    .adminObjType(administrativeObject.getAdminObjType())
+//                                                    .operation(operation.getOperationName())
+//                                                    .departmentName(department.getDepartmentName())
+//                                                    .departmentAddress(department.getDepartmentAddress())
+//                                                    .departmentEmail(department.getDepartmentEmail())
+//                                                    .kind(kind.getKindName())
+//                                                    .brand(brand.getBrandName())
+//                                                    .model(model.getModelName())
+//                                                    .color(color.getColorName())
+//                                                    .bodyType(bodyType.getBodyTypeName())
+//                                                    .purpose(Objects.nonNull(purpose) ? purpose.getPurposeName() : null)
+//                                                    .fuelType(Objects.nonNull(fuelType) ? fuelType.getFuelTypeName() : null)
+//                                                    .engineCapacity(vehicleEngineCapacity)
+//                                                    .ownWeight(vehicleOwnWeight)
+//                                                    .totalWeight(vehicleTotalWeight)
+//                                                    .makeYear(vehicleMakeYear)
+//                                                    .personType(personType)
+//                                                    .registrationNumber(vehicleRegistrationNumber)
+//                                                    .registrationDate(resultDate)
                                                     .build();
             registrationCrudService.create(registration);
         } catch (Exception ex) {

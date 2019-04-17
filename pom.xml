@@ -6,6 +6,13 @@
     <groupId>ua.kostenko.carinfo</groupId>
     <artifactId>car-info</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <versions-maven-plugin.version>2.5</versions-maven-plugin.version>
+    </properties>
+
     <packaging>pom</packaging>
 
     <name>car-info-parent</name>
@@ -18,5 +25,18 @@
         <module>rest-service</module>
         <module>data-import-service</module>
     </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>${versions-maven-plugin.version}</version>
+                <configuration>
+                    <generateBackupPoms>false</generateBackupPoms>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

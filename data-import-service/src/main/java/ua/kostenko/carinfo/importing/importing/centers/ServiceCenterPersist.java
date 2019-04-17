@@ -25,7 +25,6 @@ public class ServiceCenterPersist implements Persist<ServiceCenter> {
         log.info(record.toString());
         Department dep = Department.builder()
                                    .departmentCode(record.getDepId())
-                                   .departmentName(record.getDepId().toString())
                                    .departmentAddress(record.getAddress())
                                    .departmentEmail(record.getEmail())
                                    .build();
