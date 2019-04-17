@@ -12,24 +12,17 @@
     <description>Rest service which searches data from DB and returns it as Jsons using rest api</description>
 
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.0.5.RELEASE</version>
+        <groupId>ua.kostenko.carinfo</groupId>
+        <artifactId>car-info</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
         <relativePath/>
     </parent>
-
-    <properties>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <commons-text.version>1.6</commons-text.version>
-        <carinfo-common-classes.version>0.0.1-SNAPSHOT</carinfo-common-classes.version>
-    </properties>
 
     <dependencies>
         <dependency>
             <groupId>ua.kostenko.carinfo.common</groupId>
             <artifactId>carinfo-common-classes</artifactId>
-            <version>${carinfo-common-classes.version}</version>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -67,21 +60,4 @@
 <!--            </dependency>-->
 <!--        </dependencies>-->
 <!--    </dependencyManagement>-->
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>versions-maven-plugin</artifactId>
-                <version>${versions-maven-plugin.version}</version>
-                <configuration>
-                    <generateBackupPoms>false</generateBackupPoms>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>
