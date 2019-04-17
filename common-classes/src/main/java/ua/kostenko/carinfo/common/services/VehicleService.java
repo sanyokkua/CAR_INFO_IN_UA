@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Slf4j
-@Service
+
 public class VehicleService implements CrudService<Vehicle> {
     private final PageableRepository<Vehicle> vehicleRepository;
     private final PageableRepository<Brand> brandRepository;

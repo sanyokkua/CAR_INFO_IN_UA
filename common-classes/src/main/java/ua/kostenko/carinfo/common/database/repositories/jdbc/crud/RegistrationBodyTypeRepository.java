@@ -25,7 +25,7 @@ import java.util.List;
 
 import static java.util.Objects.nonNull;
 
-@Repository
+
 @Slf4j
 public class RegistrationBodyTypeRepository extends CachingJdbcRepository<BodyType> implements PageableRepository<BodyType>, FieldSearchable<BodyType> {
     private static final RowMapper<BodyType> ROW_MAPPER = (resultSet, i) -> BodyType.builder()

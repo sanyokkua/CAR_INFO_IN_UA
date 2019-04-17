@@ -24,7 +24,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-@Repository
+
 @Slf4j
 public class RegistrationVehicleRepository extends JdbcRepository<Vehicle> implements PageableRepository<Vehicle> {
     private static final String BRAND = "brand";

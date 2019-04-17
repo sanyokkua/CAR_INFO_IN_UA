@@ -23,7 +23,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-@Repository
+
 @Slf4j
 public class RegistrationRecordRepository extends JdbcRepository<Registration> implements PageableRepository<Registration> {
     private static final RowMapper<Registration> ROW_MAPPER = (resultSet, i) -> Registration.builder()

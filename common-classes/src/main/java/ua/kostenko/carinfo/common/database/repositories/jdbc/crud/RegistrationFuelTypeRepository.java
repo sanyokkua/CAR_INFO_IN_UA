@@ -25,7 +25,7 @@ import java.util.List;
 
 import static java.util.Objects.nonNull;
 
-@Repository
+
 @Slf4j
 public class RegistrationFuelTypeRepository extends CachingJdbcRepository<FuelType> implements PageableRepository<FuelType>, FieldSearchable<FuelType> {
     private static final RowMapper<FuelType> ROW_MAPPER = (resultSet, i) -> FuelType.builder()

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ua.kostenko.carinfo.common.api.records.Department;
+import ua.kostenko.carinfo.common.api.services.DBService;
 import ua.kostenko.carinfo.common.services.CrudService;
 import ua.kostenko.carinfo.importing.importing.Persist;
 
@@ -13,10 +14,10 @@ import javax.annotation.Nonnull;
 @Slf4j
 @Component
 public class ServiceCenterPersist implements Persist<ServiceCenter> {
-    private final CrudService<Department> service;
+    private final DBService<Department> service;
 
     @Autowired
-    public ServiceCenterPersist(@NonNull @Nonnull CrudService<Department> service) {
+    public ServiceCenterPersist(@NonNull @Nonnull DBService<Department> service) {
         this.service = service;
     }
 
@@ -28,7 +29,7 @@ public class ServiceCenterPersist implements Persist<ServiceCenter> {
                                    .departmentAddress(record.getAddress())
                                    .departmentEmail(record.getEmail())
                                    .build();
-        boolean exists = service.isExists(dep);
+        boolean exists = service.exists(dep);
         if (!exists){
             service.create(dep);
         }

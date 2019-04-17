@@ -11,7 +11,7 @@ import ua.kostenko.carinfo.common.database.repositories.jdbc.crud.PageableReposi
 import javax.annotation.Nonnull;
 
 @Slf4j
-@Service
+
 public class AdministrativeObjectService extends DefaultCrudService<AdministrativeObject> {
 
     @Autowired

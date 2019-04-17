@@ -28,9 +28,13 @@ abstract class CommonDbService <T> implements DBService<T> {
                 log.info("create: entity {} already exists");
                 return get(entity);
             } else {
-                T created = repository.create(entity);
-                log.info("create: created entity: {}", created);
-                return Optional.ofNullable(created);
+                try {
+                    T created = repository.create(entity);
+                    log.info("create: created entity: {}", created);
+                    return Optional.ofNullable(created);
+                } catch (Exception ex){
+                    log.warn("Exception occurred in creating of entity", ex);
+                }
             }
         }
         log.warn("create: entity {} is not valid", entity);

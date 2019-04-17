@@ -25,7 +25,7 @@ import java.util.List;
 
 import static java.util.Objects.nonNull;
 
-@Repository
+
 @Slf4j
 public class RegistrationColorRepository extends CachingJdbcRepository<Color> implements PageableRepository<Color>, FieldSearchable<Color> {
     private static final RowMapper<Color> ROW_MAPPER = (resultSet, i) -> Color.builder()

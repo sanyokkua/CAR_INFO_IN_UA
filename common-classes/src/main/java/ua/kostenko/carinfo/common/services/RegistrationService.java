@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Slf4j
-@Service
+
 public class RegistrationService implements CrudService<Registration> { //TODO: rewrite logic
     private final PageableRepository<AdministrativeObject> adminRepository;
     private final PageableRepository<BodyType> bodyTypeRepository;

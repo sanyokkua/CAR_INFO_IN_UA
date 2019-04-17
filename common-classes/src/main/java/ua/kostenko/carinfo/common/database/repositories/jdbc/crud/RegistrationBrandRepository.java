@@ -25,7 +25,7 @@ import java.util.List;
 
 import static java.util.Objects.nonNull;
 
-@Repository
+
 @Slf4j
 public class RegistrationBrandRepository extends CachingJdbcRepository<Brand> implements PageableRepository<Brand>, FieldSearchable<Brand> {
     private static final RowMapper<Brand> ROW_MAPPER = (resultSet, i) -> Brand.builder()

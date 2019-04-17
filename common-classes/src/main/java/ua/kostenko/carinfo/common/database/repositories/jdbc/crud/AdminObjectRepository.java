@@ -25,7 +25,6 @@ import java.util.List;
 
 import static java.util.Objects.nonNull;
 
-@Repository
 @Slf4j
 public class AdminObjectRepository extends CachingJdbcRepository<AdministrativeObject> implements PageableRepository<AdministrativeObject>, FieldSearchable<AdministrativeObject> {
     private static final RowMapper<AdministrativeObject> ROW_MAPPER = (resultSet, i) -> AdministrativeObject.builder()
