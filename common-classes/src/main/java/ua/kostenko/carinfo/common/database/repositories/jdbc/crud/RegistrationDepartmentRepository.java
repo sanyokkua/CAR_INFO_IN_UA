@@ -41,11 +41,11 @@ public class RegistrationDepartmentRepository extends CachingJdbcRepository<Depa
 
     @Override
     CacheLoader<String, Department> getCacheLoader() {
-        return new CacheLoader<String, Department>() {
-            @Override
-            public Department load(@NonNull @Nonnull String key) {
-                return findByField(key);
-            }
+        return new CacheLoader<>() {
+          @Override
+          public Department load(@NonNull @Nonnull String key) {
+            return findByField(key);
+          }
         };
     }
 

@@ -40,11 +40,11 @@ public class RegistrationBrandRepository extends CachingJdbcRepository<Brand> im
 
     @Override
     CacheLoader<String, Brand> getCacheLoader() {
-        return new CacheLoader<String, Brand>() {
-            @Override
-            public Brand load(@NonNull @Nonnull String key) {
-                return findByField(key);
-            }
+        return new CacheLoader<>() {
+          @Override
+          public Brand load(@NonNull @Nonnull String key) {
+            return findByField(key);
+          }
         };
     }
 

@@ -40,11 +40,11 @@ public class RegistrationModelRepository extends CachingJdbcRepository<Model> im
 
     @Override
     CacheLoader<String, Model> getCacheLoader() {
-        return new CacheLoader<String, Model>() {
-            @Override
-            public Model load(@NonNull @Nonnull String key) {
-                return findByField(key);
-            }
+        return new CacheLoader<>() {
+          @Override
+          public Model load(@NonNull @Nonnull String key) {
+            return findByField(key);
+          }
         };
     }
 

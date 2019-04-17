@@ -40,11 +40,11 @@ public class RegistrationPurposeRepository extends CachingJdbcRepository<Purpose
 
     @Override
     CacheLoader<String, Purpose> getCacheLoader() {
-        return new CacheLoader<String, Purpose>() {
-            @Override
-            public Purpose load(@NonNull @Nonnull String key) {
-                return findByField(key);
-            }
+        return new CacheLoader<>() {
+          @Override
+          public Purpose load(@NonNull @Nonnull String key) {
+            return findByField(key);
+          }
         };
     }
 

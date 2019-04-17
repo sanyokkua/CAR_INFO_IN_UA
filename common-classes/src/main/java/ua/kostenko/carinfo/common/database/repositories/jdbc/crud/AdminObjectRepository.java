@@ -40,7 +40,7 @@ public class AdminObjectRepository extends CachingJdbcRepository<AdministrativeO
 
     @Override
     public CacheLoader<String, AdministrativeObject> getCacheLoader() {
-        return new CacheLoader<String, AdministrativeObject>() {
+        return new CacheLoader<>() {
             @Override
             public AdministrativeObject load(@NonNull @Nonnull String key) {
                 return findByField(key);

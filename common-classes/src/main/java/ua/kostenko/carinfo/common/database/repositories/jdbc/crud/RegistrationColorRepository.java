@@ -40,11 +40,11 @@ public class RegistrationColorRepository extends CachingJdbcRepository<Color> im
 
     @Override
     CacheLoader<String, Color> getCacheLoader() {
-        return new CacheLoader<String, Color>() {
-            @Override
-            public Color load(@NonNull @Nonnull String key) {
-                return findByField(key);
-            }
+        return new CacheLoader<>() {
+          @Override
+          public Color load(@NonNull @Nonnull String key) {
+            return findByField(key);
+          }
         };
     }
 

@@ -3,7 +3,6 @@ package ua.kostenko.carinfo.common.database.repositories;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Repository;
 import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
 
 import javax.annotation.Nonnull;

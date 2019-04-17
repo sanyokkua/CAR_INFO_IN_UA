@@ -40,11 +40,11 @@ public class RegistrationBodyTypeRepository extends CachingJdbcRepository<BodyTy
 
     @Override
     CacheLoader<String, BodyType> getCacheLoader() {
-        return new CacheLoader<String, BodyType>() {
-            @Override
-            public BodyType load(@NonNull @Nonnull String key) {
-                return findByField(key);
-            }
+        return new CacheLoader<>() {
+          @Override
+          public BodyType load(@NonNull @Nonnull String key) {
+            return findByField(key);
+          }
         };
     }
 

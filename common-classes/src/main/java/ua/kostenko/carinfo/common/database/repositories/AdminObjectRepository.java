@@ -11,7 +11,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ua.kostenko.carinfo.common.api.Constants;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
-import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
 import ua.kostenko.carinfo.common.api.records.AdministrativeObject;
 import ua.kostenko.carinfo.common.database.repositories.jdbc.crud.CrudRepository;
 

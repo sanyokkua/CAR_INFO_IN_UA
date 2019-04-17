@@ -40,11 +40,11 @@ public class RegistrationKindRepository extends CachingJdbcRepository<Kind> impl
 
     @Override
     CacheLoader<String, Kind> getCacheLoader() {
-        return new CacheLoader<String, Kind>() {
-            @Override
-            public Kind load(@NonNull @Nonnull String key) {
-                return findByField(key);
-            }
+        return new CacheLoader<>() {
+          @Override
+          public Kind load(@NonNull @Nonnull String key) {
+            return findByField(key);
+          }
         };
     }
 

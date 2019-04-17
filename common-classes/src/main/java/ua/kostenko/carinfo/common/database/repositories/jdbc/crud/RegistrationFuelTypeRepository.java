@@ -40,11 +40,11 @@ public class RegistrationFuelTypeRepository extends CachingJdbcRepository<FuelTy
 
     @Override
     CacheLoader<String, FuelType> getCacheLoader() {
-        return new CacheLoader<String, FuelType>() {
-            @Override
-            public FuelType load(@NonNull @Nonnull String key) {
-                return findByField(key);
-            }
+        return new CacheLoader<>() {
+          @Override
+          public FuelType load(@NonNull @Nonnull String key) {
+            return findByField(key);
+          }
         };
     }
 

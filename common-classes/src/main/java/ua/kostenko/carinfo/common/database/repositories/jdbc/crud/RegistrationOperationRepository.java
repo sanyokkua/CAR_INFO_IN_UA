@@ -40,11 +40,11 @@ public class RegistrationOperationRepository extends CachingJdbcRepository<Opera
 
     @Override
     CacheLoader<String, Operation> getCacheLoader() {
-        return new CacheLoader<String, Operation>() {
-            @Override
-            public Operation load(@NonNull @Nonnull String key) {
-                return findByField(key);
-            }
+        return new CacheLoader<>() {
+          @Override
+          public Operation load(@NonNull @Nonnull String key) {
+            return findByField(key);
+          }
         };
     }
 

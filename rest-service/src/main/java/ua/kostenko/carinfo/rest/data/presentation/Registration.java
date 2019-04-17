@@ -47,8 +47,6 @@ public class Registration {
 
         static PersonKind getPersonKind(String person) {
             switch (person) {
-                case "P":
-                    return PERSON;
                 case "J":
                     return JURIDICAL;
                 default:
