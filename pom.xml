@@ -144,9 +144,7 @@
                 <version>${versions-maven-plugin.version}</version>
                 <configuration>
                     <generateBackupPoms>false</generateBackupPoms>
-                    <configuration>
-
-                    </configuration>
+                    <rulesUri>file://${project.basedir}/version_rules.xml</rulesUri>
                 </configuration>
             </plugin>
             <plugin>
