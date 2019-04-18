@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import ua.kostenko.carinfo.common.api.records.*;
 import ua.kostenko.carinfo.common.api.services.DBService;
 import ua.kostenko.carinfo.importing.csv.mappers.registration.RegistrationCsvMapper;
-import ua.kostenko.carinfo.importing.csv.pojo.RegistrationPojo;
+import ua.kostenko.carinfo.importing.csv.pojo.RegistrationCsvRecord;
 import ua.kostenko.carinfo.importing.csv.reader.CsvReader;
 import ua.kostenko.carinfo.importing.csv.reader.options.Options;
 import ua.kostenko.carinfo.importing.csv.structure.headers.registration.RegistrationHeaders;
@@ -26,47 +26,47 @@ import java.util.stream.Stream;
 public class FileProcessingTask implements Runnable {
     private final String link;
     private final File tempDirectory;
-    private final DBService<Registration> registrationCrudService;
-    private final DBService<AdministrativeObject> administrativeObjectCrudService;
-    private final DBService<BodyType> bodyTypeCrudService;
-    private final DBService<Brand> brandCrudService;
-    private final DBService<Color> colorCrudService;
-    private final DBService<Department> departmentCrudService;
-    private final DBService<FuelType> fuelTypeCrudService;
-    private final DBService<Kind> kindCrudService;
-    private final DBService<Model> modelCrudService;
-    private final DBService<Operation> operationCrudService;
-    private final DBService<Purpose> purposeCrudService;
-    private final DBService<Vehicle> vehicleCrudService;
+    private final DBService<Registration> registrationDBService;
+    private final DBService<AdministrativeObject> administrativeObjectDBService;
+    private final DBService<BodyType> bodyTypeDBService;
+    private final DBService<Brand> brandDBService;
+    private final DBService<Color> colorDBService;
+    private final DBService<Department> departmentDBService;
+    private final DBService<FuelType> fuelTypeDBService;
+    private final DBService<Kind> kindDBService;
+    private final DBService<Model> modelDBService;
+    private final DBService<Operation> operationDBService;
+    private final DBService<Purpose> purposeDBService;
+    private final DBService<Vehicle> vehicleDBService;
 
     public FileProcessingTask(@NonNull @Nonnull String link,
                               @NonNull @Nonnull File tempDirectory,
-                              @NonNull @Nonnull DBService<Registration> registrationCrudService,
-                              @NonNull @Nonnull DBService<AdministrativeObject> administrativeObjectCrudService,
-                              @NonNull @Nonnull DBService<BodyType> bodyTypeCrudService,
-                              @NonNull @Nonnull DBService<Brand> brandCrudService,
-                              @NonNull @Nonnull DBService<Color> colorCrudService,
-                              @NonNull @Nonnull DBService<Department> departmentCrudService,
-                              @NonNull @Nonnull DBService<FuelType> fuelTypeCrudService,
-                              @NonNull @Nonnull DBService<Kind> kindCrudService,
-                              @NonNull @Nonnull DBService<Model> modelCrudService,
-                              @NonNull @Nonnull DBService<Operation> operationCrudService,
-                              @NonNull @Nonnull DBService<Purpose> purposeCrudService,
-                              @NonNull @Nonnull DBService<Vehicle> vehicleCrudService) {
+                              @NonNull @Nonnull DBService<Registration> registrationDBService,
+                              @NonNull @Nonnull DBService<AdministrativeObject> administrativeObjectDBService,
+                              @NonNull @Nonnull DBService<BodyType> bodyTypeDBService,
+                              @NonNull @Nonnull DBService<Brand> brandDBService,
+                              @NonNull @Nonnull DBService<Color> colorDBService,
+                              @NonNull @Nonnull DBService<Department> departmentDBService,
+                              @NonNull @Nonnull DBService<FuelType> fuelTypeDBService,
+                              @NonNull @Nonnull DBService<Kind> kindDBService,
+                              @NonNull @Nonnull DBService<Model> modelDBService,
+                              @NonNull @Nonnull DBService<Operation> operationDBService,
+                              @NonNull @Nonnull DBService<Purpose> purposeDBService,
+                              @NonNull @Nonnull DBService<Vehicle> vehicleDBService) {
         this.link = link;
         this.tempDirectory = tempDirectory;
-        this.registrationCrudService = registrationCrudService;
-        this.administrativeObjectCrudService = administrativeObjectCrudService;
-        this.bodyTypeCrudService = bodyTypeCrudService;
-        this.brandCrudService = brandCrudService;
-        this.colorCrudService = colorCrudService;
-        this.departmentCrudService = departmentCrudService;
-        this.fuelTypeCrudService = fuelTypeCrudService;
-        this.kindCrudService = kindCrudService;
-        this.modelCrudService = modelCrudService;
-        this.operationCrudService = operationCrudService;
-        this.purposeCrudService = purposeCrudService;
-        this.vehicleCrudService = vehicleCrudService;
+        this.registrationDBService = registrationDBService;
+        this.administrativeObjectDBService = administrativeObjectDBService;
+        this.bodyTypeDBService = bodyTypeDBService;
+        this.brandDBService = brandDBService;
+        this.colorDBService = colorDBService;
+        this.departmentDBService = departmentDBService;
+        this.fuelTypeDBService = fuelTypeDBService;
+        this.kindDBService = kindDBService;
+        this.modelDBService = modelDBService;
+        this.operationDBService = operationDBService;
+        this.purposeDBService = purposeDBService;
+        this.vehicleDBService = vehicleDBService;
     }
 
     @Override
@@ -106,18 +106,18 @@ public class FileProcessingTask implements Runnable {
             Options<RegistrationHeaders> options = csvUtils.getOptions();
             if (Objects.nonNull(options)) {
                 RegistrationCsvMapper mapper = new RegistrationCsvMapper(options.getHeaders());
-                Persist<RegistrationPojo> persist = new RegistrationPersist(registrationCrudService,
-                                                                            administrativeObjectCrudService,
-                                                                            bodyTypeCrudService,
-                                                                            brandCrudService,
-                                                                            colorCrudService,
-                                                                            departmentCrudService,
-                                                                            fuelTypeCrudService,
-                                                                            kindCrudService,
-                                                                            modelCrudService,
-                                                                            operationCrudService,
-                                                                            purposeCrudService,
-                                                                            vehicleCrudService);
+                Persist<RegistrationCsvRecord> persist = new RegistrationPersist(registrationDBService,
+                                                                                 administrativeObjectDBService,
+                                                                                 bodyTypeDBService,
+                                                                                 brandDBService,
+                                                                                 colorDBService,
+                                                                                 departmentDBService,
+                                                                                 fuelTypeDBService,
+                                                                                 kindDBService,
+                                                                                 modelDBService,
+                                                                                 operationDBService,
+                                                                                 purposeDBService,
+                                                                                 vehicleDBService);
                 CsvReader.readCsvFile(options.getReaderOptions(), mapper, persist);
             } else {
                 log.error("processExtractedFiles: Options is null");

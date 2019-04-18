@@ -66,6 +66,7 @@ public final class ParamsHolderBuilder {
                            .longValues(longValues)
                            .integerValues(integerValues)
                            .stringValues(stringValues)
+                           .dateValues(dateValues)
                            .build();
     }
 

@@ -9,6 +9,7 @@ import ua.kostenko.carinfo.common.api.services.DBService;
 import ua.kostenko.carinfo.importing.importing.Persist;
 
 import javax.annotation.Nonnull;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -28,9 +29,15 @@ public class ServiceCenterPersist implements Persist<ServiceCenter> {
                                    .departmentAddress(record.getAddress())
                                    .departmentEmail(record.getEmail())
                                    .build();
-        boolean exists = service.exists(dep);
-        if (!exists){
-            service.create(dep);
+        if (!service.exists(dep)) {
+            Optional<Department> department = service.create(dep);
+            if (department.isPresent()) {
+                log.info("Created department: {}", department.get());
+            } else {
+                log.warn("Department is not created. {}", record);
+            }
+        } else {
+            log.info("Department {} already exists", dep);
         }
     }
 }

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegistrationPojo {
+public class RegistrationCsvRecord {
     private String personType;
     private Long administrativeObject;
     private Long operationCode;

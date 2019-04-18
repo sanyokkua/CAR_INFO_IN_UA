@@ -33,45 +33,45 @@ public class RegistrationImportInitializer implements Initializer {
     private final ExecutorService executorService;
     private final ApplicationProperties properties;
     private final DBService<Registration> service;
-    private final DBService<AdministrativeObject> adminRepository;
-    private final DBService<BodyType> bodyTypeRepository;
-    private final DBService<Brand> brandRepository;
-    private final DBService<Color> colorRepository;
-    private final DBService<Department> departmentRepository;
-    private final DBService<FuelType> fuelTypeRepository;
-    private final DBService<Kind> kindRepository;
-    private final DBService<Model> modelRepository;
-    private final DBService<Operation> operationRepository;
-    private final DBService<Purpose> purposeRepository;
-    private final DBService<Vehicle> vehicleRepository;
+    private final DBService<AdministrativeObject> administrativeObjectDBService;
+    private final DBService<BodyType> bodyTypeDBService;
+    private final DBService<Brand> brandDBService;
+    private final DBService<Color> colorDBService;
+    private final DBService<Department> departmentDBService;
+    private final DBService<FuelType> fuelTypeDBService;
+    private final DBService<Kind> kindDBService;
+    private final DBService<Model> modelDBService;
+    private final DBService<Operation> operationDBService;
+    private final DBService<Purpose> purposeDBService;
+    private final DBService<Vehicle> vehicleDBService;
 
     @Autowired
     public RegistrationImportInitializer(@NonNull @Nonnull ApplicationProperties properties,
                                          @NonNull @Nonnull DBService<Registration> service,
-                                         @NonNull @Nonnull DBService<AdministrativeObject> adminRepository,
-                                         @NonNull @Nonnull DBService<BodyType> bodyTypeRepository,
-                                         @NonNull @Nonnull DBService<Brand> brandRepository,
-                                         @NonNull @Nonnull DBService<Color> colorRepository,
-                                         @NonNull @Nonnull DBService<Department> departmentRepository,
-                                         @NonNull @Nonnull DBService<FuelType> fuelTypeRepository,
-                                         @NonNull @Nonnull DBService<Kind> kindRepository,
-                                         @NonNull @Nonnull DBService<Model> modelRepository,
-                                         @NonNull @Nonnull DBService<Operation> operationRepository,
-                                         @NonNull @Nonnull DBService<Purpose> purposeRepository,
-                                         @NonNull @Nonnull DBService<Vehicle> vehicleRepository) {
+                                         @NonNull @Nonnull DBService<AdministrativeObject> administrativeObjectDBService,
+                                         @NonNull @Nonnull DBService<BodyType> bodyTypeDBService,
+                                         @NonNull @Nonnull DBService<Brand> brandDBService,
+                                         @NonNull @Nonnull DBService<Color> colorDBService,
+                                         @NonNull @Nonnull DBService<Department> departmentDBService,
+                                         @NonNull @Nonnull DBService<FuelType> fuelTypeDBService,
+                                         @NonNull @Nonnull DBService<Kind> kindDBService,
+                                         @NonNull @Nonnull DBService<Model> modelDBService,
+                                         @NonNull @Nonnull DBService<Operation> operationDBService,
+                                         @NonNull @Nonnull DBService<Purpose> purposeDBService,
+                                         @NonNull @Nonnull DBService<Vehicle> vehicleDBService) {
         this.properties = properties;
         this.service = service;
-        this.adminRepository = adminRepository;
-        this.bodyTypeRepository = bodyTypeRepository;
-        this.brandRepository = brandRepository;
-        this.colorRepository = colorRepository;
-        this.departmentRepository = departmentRepository;
-        this.fuelTypeRepository = fuelTypeRepository;
-        this.kindRepository = kindRepository;
-        this.modelRepository = modelRepository;
-        this.operationRepository = operationRepository;
-        this.purposeRepository = purposeRepository;
-        this.vehicleRepository = vehicleRepository;
+        this.administrativeObjectDBService = administrativeObjectDBService;
+        this.bodyTypeDBService = bodyTypeDBService;
+        this.brandDBService = brandDBService;
+        this.colorDBService = colorDBService;
+        this.departmentDBService = departmentDBService;
+        this.fuelTypeDBService = fuelTypeDBService;
+        this.kindDBService = kindDBService;
+        this.modelDBService = modelDBService;
+        this.operationDBService = operationDBService;
+        this.purposeDBService = purposeDBService;
+        this.vehicleDBService = vehicleDBService;
         int coresNumber = Runtime.getRuntime().availableProcessors();
         executorService = Executors.newFixedThreadPool(coresNumber);
     }
@@ -84,17 +84,17 @@ public class RegistrationImportInitializer implements Initializer {
         File tempDirectory = FileUtil.getTempDirectory();
         if (Objects.nonNull(tempDirectory)) {
             downloadLinks.forEach(link -> executorService.execute(new FileProcessingTask(link, tempDirectory, service,
-                                                                                         adminRepository,
-                                                                                         bodyTypeRepository,
-                                                                                         brandRepository,
-                                                                                         colorRepository,
-                                                                                         departmentRepository,
-                                                                                         fuelTypeRepository,
-                                                                                         kindRepository,
-                                                                                         modelRepository,
-                                                                                         operationRepository,
-                                                                                         purposeRepository,
-                                                                                         vehicleRepository)));
+                                                                                         administrativeObjectDBService,
+                                                                                         bodyTypeDBService,
+                                                                                         brandDBService,
+                                                                                         colorDBService,
+                                                                                         departmentDBService,
+                                                                                         fuelTypeDBService,
+                                                                                         kindDBService,
+                                                                                         modelDBService,
+                                                                                         operationDBService,
+                                                                                         purposeDBService,
+                                                                                         vehicleDBService)));
         } else {
             throw new RuntimeException("importRegistrations: Temp directory is null. Download can't be performed");
         }

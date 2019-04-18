@@ -36,4 +36,10 @@ public interface CsvMapper<T> {
     default Long getLong(CSVRecord csvRecord, String key) {
         return getLong(csvRecord.get(key));
     }
+
+    @Nullable
+    default String getStringValueInUpperCase(CSVRecord csvRecord, String header){
+        String value = getString(csvRecord, header);
+        return StringUtils.isNotBlank(value)? value.toUpperCase() : null;
+    }
 }

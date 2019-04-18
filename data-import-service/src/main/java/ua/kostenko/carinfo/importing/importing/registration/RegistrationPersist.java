@@ -5,143 +5,147 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import ua.kostenko.carinfo.common.api.records.*;
 import ua.kostenko.carinfo.common.api.services.DBService;
-import ua.kostenko.carinfo.importing.csv.pojo.RegistrationPojo;
+import ua.kostenko.carinfo.importing.csv.pojo.RegistrationCsvRecord;
 import ua.kostenko.carinfo.importing.importing.Persist;
 
 import javax.annotation.Nonnull;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
-public class RegistrationPersist implements Persist<RegistrationPojo> {
+public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
     private static final SimpleDateFormat FORMAT_FIRST = new SimpleDateFormat("yyyy-MM-dd");//2013-02-02
     private static final SimpleDateFormat FORMAT_SECOND = new SimpleDateFormat("dd-MM-yyyy");//19.02.2019
-    private final DBService<Registration> registrationCrudService;
-    private final DBService<AdministrativeObject> adminService;
-    private final DBService<BodyType> bodyTypeCrudService;
-    private final DBService<Brand> brandCrudService;
-    private final DBService<Color> colorCrudService;
-    private final DBService<Department> departmentCrudService;
-    private final DBService<FuelType> fuelTypeCrudService;
-    private final DBService<Kind> kindCrudService;
-    private final DBService<Model> modelCrudService;
-    private final DBService<Operation> operationCrudService;
-    private final DBService<Purpose> purposeCrudService;
-    private final DBService<Vehicle> vehicleCrudService;
+    private final DBService<Registration> registrationDBService;
+    private final DBService<AdministrativeObject> administrativeObjectDBService;
+    private final DBService<BodyType> bodyTypeDBService;
+    private final DBService<Brand> brandDBService;
+    private final DBService<Color> colorDBService;
+    private final DBService<Department> departmentDBService;
+    private final DBService<FuelType> fuelTypeDBService;
+    private final DBService<Kind> kindDBService;
+    private final DBService<Model> modelDBService;
+    private final DBService<Operation> operationDBService;
+    private final DBService<Purpose> purposeDBService;
+    private final DBService<Vehicle> vehicleDBService;
 
-    public RegistrationPersist(@NonNull @Nonnull DBService<Registration> registrationCrudService,
-                               @NonNull @Nonnull DBService<AdministrativeObject> adminService,
-                               @NonNull @Nonnull DBService<BodyType> bodyTypeCrudService,
-                               @NonNull @Nonnull DBService<Brand> brandCrudService,
-                               @NonNull @Nonnull DBService<Color> colorCrudService,
-                               @NonNull @Nonnull DBService<Department> departmentCrudService,
-                               @NonNull @Nonnull DBService<FuelType> fuelTypeCrudService,
-                               @NonNull @Nonnull DBService<Kind> kindCrudService,
-                               @NonNull @Nonnull DBService<Model> modelCrudService,
-                               @NonNull @Nonnull DBService<Operation> operationCrudService,
-                               @NonNull @Nonnull DBService<Purpose> purposeCrudService,
-                               @NonNull @Nonnull DBService<Vehicle> vehicleCrudService) {
-        this.registrationCrudService = registrationCrudService;
-        this.adminService = adminService;
-        this.bodyTypeCrudService = bodyTypeCrudService;
-        this.brandCrudService = brandCrudService;
-        this.colorCrudService = colorCrudService;
-        this.departmentCrudService = departmentCrudService;
-        this.fuelTypeCrudService = fuelTypeCrudService;
-        this.kindCrudService = kindCrudService;
-        this.modelCrudService = modelCrudService;
-        this.operationCrudService = operationCrudService;
-        this.purposeCrudService = purposeCrudService;
-        this.vehicleCrudService = vehicleCrudService;
+    public RegistrationPersist(@NonNull @Nonnull DBService<Registration> registrationDBService,
+                               @NonNull @Nonnull DBService<AdministrativeObject> administrativeObjectDBService,
+                               @NonNull @Nonnull DBService<BodyType> bodyTypeDBService,
+                               @NonNull @Nonnull DBService<Brand> brandDBService,
+                               @NonNull @Nonnull DBService<Color> colorDBService,
+                               @NonNull @Nonnull DBService<Department> departmentDBService,
+                               @NonNull @Nonnull DBService<FuelType> fuelTypeDBService,
+                               @NonNull @Nonnull DBService<Kind> kindDBService,
+                               @NonNull @Nonnull DBService<Model> modelDBService,
+                               @NonNull @Nonnull DBService<Operation> operationDBService,
+                               @NonNull @Nonnull DBService<Purpose> purposeDBService,
+                               @NonNull @Nonnull DBService<Vehicle> vehicleDBService) {
+        this.registrationDBService = registrationDBService;
+        this.administrativeObjectDBService = administrativeObjectDBService;
+        this.bodyTypeDBService = bodyTypeDBService;
+        this.brandDBService = brandDBService;
+        this.colorDBService = colorDBService;
+        this.departmentDBService = departmentDBService;
+        this.fuelTypeDBService = fuelTypeDBService;
+        this.kindDBService = kindDBService;
+        this.modelDBService = modelDBService;
+        this.operationDBService = operationDBService;
+        this.purposeDBService = purposeDBService;
+        this.vehicleDBService = vehicleDBService;
     }
 
-    private Operation getOperation(@NonNull @Nonnull RegistrationPojo record) {
+    private Optional<Operation> getOperation(@NonNull @Nonnull RegistrationCsvRecord record) {
         Long operationCode = record.getOperationCode();
-        Operation foundOperation = operationCrudService.get(operationCode).orElse(null);
-        if (Objects.nonNull(foundOperation)){
+        Optional<Operation> foundOperation = operationDBService.get(operationCode);
+        if (foundOperation.isPresent()) {
             return foundOperation;
         }
-        String operationName = record.getOperationName().toUpperCase();
+        String operationName = record.getOperationName();
         Operation operation = Operation.builder().operationCode(operationCode).operationName(operationName).build();
-        return operationCrudService.create(operation).orElse(null);
+        return operationDBService.create(operation);
     }
 
-    private Model getModel(@NonNull @Nonnull RegistrationPojo record) {
-        String vehicleModel = StringUtils.trim(record.getVehicleModel()).toUpperCase();
+    private Optional<Model> getModel(@NonNull @Nonnull RegistrationCsvRecord record) {
+        String vehicleModel = StringUtils.trim(record.getVehicleModel());
         Model model = Model.builder().modelName(vehicleModel).build();
-        Model foundModel = modelCrudService.get(model).orElse(null);
-        return Objects.nonNull(foundModel) ? foundModel : modelCrudService.create(model).orElse(null);
+        Optional<Model> foundModel = modelDBService.get(model);
+        return Objects.nonNull(foundModel) ? foundModel : modelDBService.create(model);
     }
 
-    private Brand getBrand(@NonNull @Nonnull RegistrationPojo record) {
-        String vehicleModel = StringUtils.trim(record.getVehicleModel()).toUpperCase();
-        String vehicleBrand = StringUtils.trim(record.getVehicleBrand()).toUpperCase();
+    private Optional<Brand> getBrand(@NonNull @Nonnull RegistrationCsvRecord record) {
+        String vehicleModel = StringUtils.trim(record.getVehicleModel());
+        String vehicleBrand = StringUtils.trim(record.getVehicleBrand());
         if (vehicleBrand.contains(vehicleModel)) {
             vehicleBrand = StringUtils.remove(vehicleBrand, vehicleModel);
             vehicleBrand = StringUtils.trim(vehicleBrand);
         }
         Brand brand = Brand.builder().brandName(vehicleBrand).build();
-        Brand foundBrand = brandCrudService.get(brand).orElse(null);
-        return Objects.nonNull(foundBrand) ? foundBrand : brandCrudService.create(brand).orElse(null);
+        Optional<Brand> foundBrand = brandDBService.get(brand);
+        return Objects.nonNull(foundBrand) ? foundBrand : brandDBService.create(brand);
     }
 
-    private Color getColor(@NonNull @Nonnull RegistrationPojo record) {
-        String vehicleColor = record.getVehicleColor().toUpperCase();
+    private Optional<Color> getColor(@NonNull @Nonnull RegistrationCsvRecord record) {
+        String vehicleColor = record.getVehicleColor();
         Color color = Color.builder().colorName(vehicleColor).build();
-        Color foundColor = colorCrudService.get(color).orElse(null);
-        return Objects.nonNull(foundColor) ? foundColor : colorCrudService.create(color).orElse(null);
+        Optional<Color> foundColor = colorDBService.get(color);
+        return Objects.nonNull(foundColor) ? foundColor : colorDBService.create(color);
     }
 
-    private Kind getKind(@NonNull @Nonnull RegistrationPojo record) {
-        String vehicleKind = record.getVehicleKind().toUpperCase();
+    private Optional<Kind> getKind(@NonNull @Nonnull RegistrationCsvRecord record) {
+        String vehicleKind = record.getVehicleKind();
         Kind kind = Kind.builder().kindName(vehicleKind).build();
-        Kind foundKind = kindCrudService.get(kind).orElse(null);
-        return Objects.nonNull(foundKind) ? foundKind : kindCrudService.create(kind).orElse(null);
+        Optional<Kind> foundKind = kindDBService.get(kind);
+        return Objects.nonNull(foundKind) ? foundKind : kindDBService.create(kind);
     }
 
-    private BodyType getBodyType(@NonNull @Nonnull RegistrationPojo record) {
-        String vehicleBodyType = record.getVehicleBodyType().toUpperCase();
+    private Optional<BodyType> getBodyType(@NonNull @Nonnull RegistrationCsvRecord record) {
+        String vehicleBodyType = record.getVehicleBodyType();
         BodyType bodyType = BodyType.builder().bodyTypeName(vehicleBodyType).build();
-        BodyType foundBodyType = bodyTypeCrudService.get(bodyType).orElse(null);
-        return Objects.nonNull(foundBodyType) ? foundBodyType : bodyTypeCrudService.create(bodyType).orElse(null);
+        Optional<BodyType> foundBodyType = bodyTypeDBService.get(bodyType);
+        return Objects.nonNull(foundBodyType) ? foundBodyType : bodyTypeDBService.create(bodyType);
     }
 
-    private Purpose getPurpose(@NonNull @Nonnull RegistrationPojo record) {
-        String vehiclePurpose = record.getVehiclePurpose().toUpperCase();
+    private Optional<Purpose> getPurpose(@NonNull @Nonnull RegistrationCsvRecord record) {
+        String vehiclePurpose = record.getVehiclePurpose();
         Purpose purpose = Purpose.builder().purposeName(vehiclePurpose).build();
-        Purpose foundPurpose = purposeCrudService.get(purpose).orElse(null);
-        return Objects.nonNull(foundPurpose) ? foundPurpose : purposeCrudService.create(purpose).orElse(null);
+        Optional<Purpose> foundPurpose = purposeDBService.get(purpose);
+        return Objects.nonNull(foundPurpose) ? foundPurpose : purposeDBService.create(purpose);
     }
 
-    private FuelType getFuelType(@NonNull @Nonnull RegistrationPojo record) {
-        String vehicleFuelType = record.getVehicleFuelType().toUpperCase();
+    private Optional<FuelType> getFuelType(@NonNull @Nonnull RegistrationCsvRecord record) {
+        String vehicleFuelType = record.getVehicleFuelType();
         FuelType fuelType = FuelType.builder().fuelTypeName(vehicleFuelType).build();
-        FuelType foundFuelType = fuelTypeCrudService.get(fuelType).orElse(null);
-        return Objects.nonNull(foundFuelType) ? foundFuelType : fuelTypeCrudService.create(fuelType).orElse(null);
+        Optional<FuelType> foundFuelType = fuelTypeDBService.get(fuelType);
+        return Objects.nonNull(foundFuelType) ? foundFuelType : fuelTypeDBService.create(fuelType);
     }
 
-    private AdministrativeObject getAdministrativeObject(@NonNull @Nonnull RegistrationPojo record) {
+    private Optional<AdministrativeObject> getAdministrativeObject(@NonNull @Nonnull RegistrationCsvRecord record) {
         Long administrativeObjectId = record.getAdministrativeObject();
-        return adminService.get(administrativeObjectId).orElse(null);
+        return administrativeObjectDBService.get(administrativeObjectId);
     }
 
-    private Department getDepartment(@NonNull @Nonnull RegistrationPojo record) {
+    private Optional<Department> getDepartment(@NonNull @Nonnull RegistrationCsvRecord record) {
         Long departmentCode = record.getDepartmentCode();
-        return departmentCrudService.get(departmentCode).orElse(null);
+        return departmentDBService.get(departmentCode);
     }
 
-    private Vehicle getVehicle(Model createdModel, Brand createdBrand ){
-        Vehicle vehicle = Vehicle.builder()
-                                 .brandName(createdBrand.getBrandName())
-                                 .modelName(createdModel.getModelName())
-                                 .build();
-        Vehicle foundVehicle = vehicleCrudService.get(vehicle).orElse(null);
-        return Objects.nonNull(foundVehicle) ? foundVehicle : vehicleCrudService.create(vehicle).orElse(null);
+    private Optional<Vehicle> getVehicle(Model createdModel, Brand createdBrand) {
+        if (Objects.nonNull(createdBrand) && Objects.nonNull(createdModel)) {
+            Vehicle vehicle = Vehicle.builder()
+                                     .brandName(createdBrand.getBrandName())
+                                     .modelName(createdModel.getModelName())
+                                     .build();
+            Optional<Vehicle> foundVehicle = vehicleDBService.get(vehicle);
+            return Objects.nonNull(foundVehicle) ? foundVehicle : vehicleDBService.create(vehicle);
+        }
+        return Optional.empty();
     }
 
-    private Date getDate(@Nonnull @NonNull RegistrationPojo record) {
-        String registrationDate = record.getRegistrationDate().toUpperCase();
+    private Date getDate(@Nonnull @NonNull RegistrationCsvRecord record) {
+        String registrationDate = record.getRegistrationDate();
         Date resultDate = null;
         try {
             java.util.Date date = FORMAT_FIRST.parse(registrationDate);
@@ -161,88 +165,67 @@ public class RegistrationPersist implements Persist<RegistrationPojo> {
     }
 
     @Override
-    public void persist(@NonNull @Nonnull RegistrationPojo record) {
+    public void persist(@NonNull @Nonnull RegistrationCsvRecord record) {
         log.info("persist: Thread N: {}", Thread.currentThread().getId());
         log.info("persist: Record: {}", record.toString());
         try {
-            Operation operation = getOperation(record);
-            Model model = getModel(record);
-            Brand brand = getBrand(record);
-            Color color = getColor(record);
-            Kind kind = getKind(record);
-            BodyType bodyType = getBodyType(record);
-            Purpose purpose = getPurpose(record);
-            FuelType fuelType = getFuelType(record);
-            AdministrativeObject administrativeObject = getAdministrativeObject(record);
-            Department department = getDepartment(record);
-
-            if (Objects.isNull(administrativeObject)) {
-                log.warn("AdminObject is null");
-                return;
-            }
-            if (Objects.isNull(department)) {
-                log.warn("Department is null");
-                return;
-            }
-            if (Objects.isNull(brand)) {
-                log.warn("Brand is null");
-                return;
-            }
-            if (Objects.isNull(model)) {
-                log.warn("Model is null");
-                return;
-            }
-            if (Objects.isNull(operation)) {
-                log.warn("Operation is null");
-                return;
-            }
-
-            Vehicle createdVehicle = getVehicle(model, brand);
-
-            if (Objects.isNull(createdVehicle)) {
-                log.warn("createdVehicle is null");
-                return;
-            }
-
-            java.sql.Date resultDate = getDate(record);
-            String personType = record.getPersonType().toUpperCase();
+            Optional<Operation> operation = getOperation(record);
+            Optional<Model> model = getModel(record);
+            Optional<Brand> brand = getBrand(record);
+            Optional<Color> color = getColor(record);
+            Optional<Kind> kind = getKind(record);
+            Optional<BodyType> bodyType = getBodyType(record);
+            Optional<Purpose> purpose = getPurpose(record);
+            Optional<FuelType> fuelType = getFuelType(record);
+            Optional<AdministrativeObject> administrativeObject = getAdministrativeObject(record);
+            Optional<Department> department = getDepartment(record);
+            Optional<Vehicle> createdVehicle = getVehicle(model.orElseGet(null), brand.orElseGet(null));
+            java.sql.Date registrationDate = getDate(record);
+            String personType = record.getPersonType();
             Long vehicleMakeYear = record.getVehicleMakeYear();
             Long vehicleEngineCapacity = record.getVehicleEngineCapacity();
             Long vehicleOwnWeight = record.getVehicleOwnWeight();
             Long vehicleTotalWeight = record.getVehicleTotalWeight();
-            String vehicleRegistrationNumber = record.getVehicleRegistrationNumber().toUpperCase();
-            Registration registration = Registration.builder()
-//                                                    .adminObjectId(administrativeObject.getAdminObjId())
-//                                                    .opCode(operation.getOperationCode())
-//                                                    .depCode(department.getDepartmentCode())
-//                                                    .kindId(kind.getKindId())
-//                                                    .colorId(color.getColorId())
-//                                                    .bodyTypeId(bodyType.getBodyTypeId())
-//                                                    .purposeId(Objects.nonNull(purpose) ? purpose.getPurposeId() : null)
-//                                                    .fuelTypeId(Objects.nonNull(fuelType) ? fuelType.getFuelTypeId() : null)
-//                                                    .vehicleId(createdVehicle.getVehicleId())
-//                                                    .adminObjName(administrativeObject.getAdminObjName())
-//                                                    .adminObjType(administrativeObject.getAdminObjType())
-//                                                    .operation(operation.getOperationName())
-//                                                    .departmentName(department.getDepartmentName())
-//                                                    .departmentAddress(department.getDepartmentAddress())
-//                                                    .departmentEmail(department.getDepartmentEmail())
-//                                                    .kind(kind.getKindName())
-//                                                    .brand(brand.getBrandName())
-//                                                    .model(model.getModelName())
-//                                                    .color(color.getColorName())
-//                                                    .bodyType(bodyType.getBodyTypeName())
-//                                                    .purpose(Objects.nonNull(purpose) ? purpose.getPurposeName() : null)
-//                                                    .fuelType(Objects.nonNull(fuelType) ? fuelType.getFuelTypeName() : null)
-//                                                    .engineCapacity(vehicleEngineCapacity)
-//                                                    .ownWeight(vehicleOwnWeight)
-//                                                    .totalWeight(vehicleTotalWeight)
-//                                                    .makeYear(vehicleMakeYear)
-//                                                    .personType(personType)
-//                                                    .registrationNumber(vehicleRegistrationNumber)
-//                                                    .registrationDate(resultDate)
-                                                    .build();
-            registrationCrudService.create(registration);
+            String vehicleRegistrationNumber = record.getVehicleRegistrationNumber();
+
+            if (operation.isPresent() && department.isPresent() && kind.isPresent() && color.isPresent() &&
+                    purpose.isPresent() && brand.isPresent() && model.isPresent() &&
+                    createdVehicle.isPresent() && StringUtils.isNotBlank(personType) &&
+                    Objects.nonNull(vehicleMakeYear) && Objects.nonNull(registrationDate)) {
+                AdministrativeObject nullableAdminObj = administrativeObject.orElseGet(null);
+                BodyType nullableBodyType = bodyType.orElseGet(null);
+                FuelType nullableFuelType = fuelType.orElseGet(null);
+
+                Registration registration = Registration.builder()
+                                                        .adminObjName(Objects.nonNull(nullableAdminObj) ? nullableAdminObj.getAdminObjName() : null)//NULLABLE
+                                                        .adminObjType(Objects.nonNull(nullableAdminObj) ? nullableAdminObj.getAdminObjType() : null)//NULLABLE
+                                                        .operationCode(operation.get().getOperationCode())//non NULLABLE opName
+                                                        .operationName(operation.get().getOperationName())//non NULLABLE opName
+                                                        .departmentCode(department.get().getDepartmentCode())//non NULLABLE
+                                                        .departmentAddress(department.get().getDepartmentAddress())//non NULLABLE
+                                                        .departmentEmail(department.get().getDepartmentEmail())//non NULLABLE
+                                                        .kind(kind.get().getKindName())//non NULLABLE
+                                                        .color(color.get().getColorName())//non NULLABLE
+                                                        .bodyType(Objects.nonNull(nullableAdminObj) ? nullableBodyType.getBodyTypeName() : null)//NULLABLE
+                                                        .purpose(purpose.get().getPurposeName())//non NULLABLE
+                                                        .brand(brand.get().getBrandName())//non NULLABLE
+                                                        .model(model.get().getModelName())//non NULLABLE
+                                                        .fuelType(Objects.nonNull(nullableFuelType) ? nullableFuelType.getFuelTypeName() : null)//NULLABLE
+                                                        .engineCapacity(vehicleEngineCapacity)//NULLABLE
+                                                        .makeYear(vehicleMakeYear)//non NULLABLE
+                                                        .ownWeight(vehicleOwnWeight)//NULLABLE
+                                                        .totalWeight(vehicleTotalWeight)//NULLABLE
+                                                        .personType(personType)//non NULLABLE
+                                                        .registrationNumber(vehicleRegistrationNumber)//NULLABLE
+                                                        .registrationDate(registrationDate)//non NULLABLE
+                                                        .build();
+                Optional<Registration> result = registrationDBService.create(registration);
+                if (!result.isPresent()) {
+                    log.warn("Record {} is not created!", record);
+                }
+            } else {
+                log.warn("Registration record is not valid");
+            }
         } catch (Exception ex) {
             log.warn("Problem with saving record: {}", record.toString());
             log.error("ERROR OCCURRED IN PERSISTING CURRENT RECORD", ex);

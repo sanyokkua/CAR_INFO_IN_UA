@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdministrativeObjectPojo {
+public class AdministrativeObjectCsvRecord {
     private Long id;
     private String type;
     private String name;

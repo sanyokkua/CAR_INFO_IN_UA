@@ -31,7 +31,7 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration> {
                                                                                             .adminObjType(resultSet.getString(Constants.AdminObject.TYPE))
                                                                                             .operationCode(resultSet.getLong(Constants.RegistrationOperation.CODE))
                                                                                             .operationName(resultSet.getString(Constants.RegistrationOperation.NAME))
-                                                                                            .departmentCode(resultSet.getString(Constants.RegistrationDepartment.NAME))
+                                                                                            .departmentCode(resultSet.getLong(Constants.RegistrationDepartment.NAME))
                                                                                             .departmentAddress(resultSet.getString(Constants.RegistrationDepartment.ADDRESS))
                                                                                             .departmentEmail(resultSet.getString(Constants.RegistrationDepartment.EMAIL))
                                                                                             .kind(resultSet.getString(Constants.RegistrationKind.NAME))

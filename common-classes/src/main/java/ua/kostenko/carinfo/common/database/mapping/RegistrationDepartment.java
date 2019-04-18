@@ -17,16 +17,12 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = Constants.SCHEMA, name = Constants.RegistrationDepartment.TABLE, uniqueConstraints = {@UniqueConstraint(columnNames = Constants.RegistrationDepartment.NAME)})
+@Table(schema = Constants.SCHEMA, name = Constants.RegistrationDepartment.TABLE)
 class RegistrationDepartment implements Serializable {
 
     @Id
     @Column(name = Constants.RegistrationDepartment.CODE, nullable = false)//non NULLABLE
     private Long departmentCode;
-
-    @NaturalId
-    @Column(name = Constants.RegistrationDepartment.NAME)//NULLABLE
-    private String departmentName;
 
     @Column(name = Constants.RegistrationDepartment.ADDRESS)//NULLABLE
     private String departmentAddress;
