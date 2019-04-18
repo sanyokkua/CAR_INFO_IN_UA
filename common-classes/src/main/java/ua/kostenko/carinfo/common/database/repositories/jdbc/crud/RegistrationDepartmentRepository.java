@@ -30,7 +30,6 @@ import static java.util.Objects.nonNull;
 public class RegistrationDepartmentRepository extends CachingJdbcRepository<Department> implements PageableRepository<Department>, FieldSearchable<Department> {
     private static final RowMapper<Department> ROW_MAPPER = (resultSet, i) -> Department.builder()
                                                                                         .departmentCode(resultSet.getLong(Constants.RegistrationDepartment.CODE))
-                                                                                        .departmentName(resultSet.getString(Constants.RegistrationDepartment.NAME))
                                                                                         .departmentAddress(resultSet.getString(Constants.RegistrationDepartment.ADDRESS))
                                                                                         .departmentEmail(resultSet.getString(Constants.RegistrationDepartment.EMAIL))
                                                                                         .build();
@@ -62,31 +61,31 @@ public class RegistrationDepartmentRepository extends CachingJdbcRepository<Depa
     @Nullable
     @Override
     public Department find(@Nonnull Department entity) {
-        return getFromCache(entity.getDepartmentName());
+        return getFromCache(null);
     }
 
     @Nullable
     @Override
     public Department create(@NonNull @Nonnull Department entity) {
         String jdbcTemplateInsert = "insert into carinfo.department (dep_code, dep_name, dep_addr, dep_email) values (?, ?, ?, ?);";
-        jdbcTemplate.update(jdbcTemplateInsert, entity.getDepartmentCode(), entity.getDepartmentName(), entity.getDepartmentAddress(), entity.getDepartmentEmail());
-        return getFromCache(entity.getDepartmentName());
+        jdbcTemplate.update(jdbcTemplateInsert, entity.getDepartmentCode(), null, entity.getDepartmentAddress(), entity.getDepartmentEmail());
+        return getFromCache(null);
     }
 
     @Nullable
     @Override
     public Department update(@NonNull @Nonnull Department entity) {
-        getCache().invalidate(entity.getDepartmentName());
+        getCache().invalidate(null);
         String jdbcTemplateUpdate = "update carinfo.department set dep_name = ?, dep_addr = ?, dep_email = ? where dep_code = ?;";
-        jdbcTemplate.update(jdbcTemplateUpdate, entity.getDepartmentName(), entity.getDepartmentAddress(), entity.getDepartmentEmail(), entity.getDepartmentCode());
-        return findByField(entity.getDepartmentName());
+        jdbcTemplate.update(jdbcTemplateUpdate, null, entity.getDepartmentAddress(), entity.getDepartmentEmail(), entity.getDepartmentCode());
+        return findByField(null);
     }
 
     @Override
     public boolean delete(@NonNull @Nonnull Long id) {
         Department department = find(id);
         if (nonNull(department)) {
-            getCache().invalidate(department.getDepartmentName());
+            getCache().invalidate(department.getDepartmentCode());
         }
         String jdbcTemplateDelete = "delete from carinfo.department where dep_code = ?;";
         int updated = jdbcTemplate.update(jdbcTemplateDelete, id);
@@ -115,7 +114,7 @@ public class RegistrationDepartmentRepository extends CachingJdbcRepository<Depa
 
     @Override
     public boolean isExists(@NonNull @Nonnull Department entity) {
-        return nonNull(getFromCache(entity.getDepartmentName()));
+        return nonNull(getFromCache(null));
     }
 
     @Override
@@ -129,7 +128,7 @@ public class RegistrationDepartmentRepository extends CachingJdbcRepository<Depa
                 public void setValues(@Nonnull PreparedStatement ps, int i) throws SQLException {
                     Department object = batch.get(i);
                     ps.setLong(1, object.getDepartmentCode());
-                    ps.setString(2, object.getDepartmentName());
+//                    ps.setString(2, object.getDepartmentName());
                     ps.setString(3, object.getDepartmentAddress());
                     ps.setString(4, object.getDepartmentEmail());
                 }
