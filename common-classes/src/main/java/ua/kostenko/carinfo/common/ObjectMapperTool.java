@@ -8,9 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 
 @Slf4j
+@Deprecated
 public final class ObjectMapperTool {
     private final static ObjectMapper objectMapper = new ObjectMapper();
 
+    @Deprecated
     public static String writeValueAsString(Object object) {
         Preconditions.checkNotNull(object, "Argument can't be null");
         try {
@@ -21,6 +23,7 @@ public final class ObjectMapperTool {
         return null;
     }
 
+    @Deprecated
     public static <T> T readValue(String content, Class<T> valueType) {
         try {
             return objectMapper.readValue(content, valueType);

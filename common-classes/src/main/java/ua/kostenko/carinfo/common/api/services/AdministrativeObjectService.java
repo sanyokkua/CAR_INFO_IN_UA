@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
 import ua.kostenko.carinfo.common.api.records.AdministrativeObject;
 import ua.kostenko.carinfo.common.database.repositories.DBRepository;
 
@@ -13,7 +14,7 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-public class AdministrativeObjectService extends CommonDbService<AdministrativeObject> {
+class AdministrativeObjectService extends CommonDbService<AdministrativeObject> {
 
     @Autowired
     protected AdministrativeObjectService(@NonNull @Nonnull DBRepository<AdministrativeObject> repository) {
@@ -27,6 +28,9 @@ public class AdministrativeObjectService extends CommonDbService<AdministrativeO
 
     @Override
     public Optional<AdministrativeObject> get(@Nonnull AdministrativeObject entity) {
-        return Optional.empty();
+        ParamsHolderBuilder builder = new ParamsHolderBuilder();
+        builder.param(AdministrativeObject.ADMIN_OBJ_NAME, entity.getAdminObjName());
+        AdministrativeObject foundEntity = this.repository.findOne(builder.build());
+        return Optional.ofNullable(foundEntity);
     }
 }

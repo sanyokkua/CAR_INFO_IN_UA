@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
 import ua.kostenko.carinfo.common.api.records.BodyType;
 import ua.kostenko.carinfo.common.database.repositories.DBRepository;
 
@@ -13,7 +14,7 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-public class BodyTypeService extends CommonDbService <BodyType>{
+class BodyTypeService extends CommonDbService<BodyType> {
 
     @Autowired
     protected BodyTypeService(@NonNull @Nonnull DBRepository<BodyType> repository) {
@@ -27,6 +28,9 @@ public class BodyTypeService extends CommonDbService <BodyType>{
 
     @Override
     public Optional<BodyType> get(@NonNull @Nonnull BodyType entity) {
-        return Optional.empty();
+        ParamsHolderBuilder builder = new ParamsHolderBuilder();
+        builder.param(BodyType.BODY_TYPE_NAME, entity.getBodyTypeName());
+        BodyType foundEntity = this.repository.findOne(builder.build());
+        return Optional.ofNullable(foundEntity);
     }
 }

@@ -11,7 +11,6 @@ import java.io.File;
 @AllArgsConstructor
 @ToString
 public class ReaderOptions {
-    @NonNull
     private char delimiter;
     @NonNull
     private String encoding;

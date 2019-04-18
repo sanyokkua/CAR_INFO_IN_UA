@@ -9,10 +9,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import ua.kostenko.carinfo.common.api.Constants;
+import ua.kostenko.carinfo.common.Utils;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.records.BodyType;
-import ua.kostenko.carinfo.common.database.repositories.jdbc.crud.CrudRepository;
+import ua.kostenko.carinfo.common.database.Constants;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -23,7 +23,7 @@ import static java.util.Objects.nonNull;
 
 @Repository
 @Slf4j
-public class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType> {
+class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType> {
     private static final RowMapper<BodyType> ROW_MAPPER = (resultSet, i) -> BodyType.builder()
                                                                                     .bodyTypeId(resultSet.getLong(Constants.RegistrationBodyType.ID))
                                                                                     .bodyTypeName(resultSet.getString(Constants.RegistrationBodyType.NAME))
@@ -33,7 +33,6 @@ public class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType>
     public RegistrationBodyTypeRepository(@NonNull @Nonnull JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
     }
-
 
     @Nullable
     @Override
@@ -77,14 +76,14 @@ public class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType>
     @Override
     public BodyType findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.body_type where body_type_id = ?;";
-        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
+        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
     }
 
     @Nullable
     @Override
     public BodyType findOne(@Nonnull ParamsHolder searchParams) {
         String jdbcTemplateSelect = "select * from carinfo.body_type where body_type_name = ?;";
-        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, searchParams.getString(BodyType.BODY_TYPE_NAME)));
+        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, searchParams.getString(BodyType.BODY_TYPE_NAME)));
     }
 
     @Override

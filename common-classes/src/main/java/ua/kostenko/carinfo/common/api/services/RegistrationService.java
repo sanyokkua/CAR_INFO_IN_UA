@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
 import ua.kostenko.carinfo.common.api.records.Registration;
 import ua.kostenko.carinfo.common.database.repositories.DBRepository;
 
@@ -14,7 +15,7 @@ import static java.util.Objects.nonNull;
 
 @Slf4j
 @Service
-public class RegistrationService extends CommonDbService<Registration> {
+class RegistrationService extends CommonDbService<Registration> {
 
     @Autowired
     protected RegistrationService(@NonNull @Nonnull DBRepository<Registration> repository) {
@@ -40,6 +41,12 @@ public class RegistrationService extends CommonDbService<Registration> {
 
     @Override
     public Optional<Registration> get(@NonNull @Nonnull Registration entity) {
-        return Optional.empty();
+        ParamsHolderBuilder builder = new ParamsHolderBuilder();
+        builder.param(Registration.BRAND, entity.getBrand());
+        builder.param(Registration.MODEL, entity.getModel());
+        builder.param(Registration.REGISTRATION_NUMBER, entity.getRegistrationNumber());
+        builder.param(Registration.REGISTRATION_DATE, entity.getRegistrationDate());
+        Registration foundEntity = this.repository.findOne(builder.build());
+        return Optional.ofNullable(foundEntity);
     }
 }

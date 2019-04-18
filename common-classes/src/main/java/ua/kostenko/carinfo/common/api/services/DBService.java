@@ -20,5 +20,4 @@ public interface DBService<T> {
     List<T> getAll();
     Page<T> getAll(@Nonnull @NonNull ParamsHolderBuilder builder);
 
-
 }

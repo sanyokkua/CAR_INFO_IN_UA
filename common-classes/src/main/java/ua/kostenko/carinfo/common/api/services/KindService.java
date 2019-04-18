@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
 import ua.kostenko.carinfo.common.api.records.Kind;
 import ua.kostenko.carinfo.common.database.repositories.DBRepository;
 
@@ -13,7 +14,7 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-public class KindService extends CommonDbService <Kind>{
+class KindService extends CommonDbService<Kind> {
 
     @Autowired
     protected KindService(@NonNull @Nonnull DBRepository<Kind> repository) {
@@ -27,6 +28,9 @@ public class KindService extends CommonDbService <Kind>{
 
     @Override
     public Optional<Kind> get(@NonNull @Nonnull Kind entity) {
-        return Optional.empty();
+        ParamsHolderBuilder builder = new ParamsHolderBuilder();
+        builder.param(Kind.KIND_NAME, entity.getKindName());
+        Kind foundEntity = this.repository.findOne(builder.build());
+        return Optional.ofNullable(foundEntity);
     }
 }

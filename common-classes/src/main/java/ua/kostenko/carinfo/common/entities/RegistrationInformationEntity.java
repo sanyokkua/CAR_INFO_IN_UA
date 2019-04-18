@@ -12,6 +12,7 @@ import java.util.UUID;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+@Deprecated
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -79,16 +80,16 @@ public class RegistrationInformationEntity {
             entity = new RegistrationInformationEntity();
         }
 
+        public RegistrationInformationEntityBuilder setId(String id) {
+            entity.setId(getValueOrEmptyString(id));
+            return this;
+        }
+
         private String getValueOrEmptyString(String value) {
             if (isBlank(value)) {
                 return "";
             }
             return value;
-        }
-
-        public RegistrationInformationEntityBuilder setId(String id) {
-            entity.setId(getValueOrEmptyString(id));
-            return this;
         }
 
         public RegistrationInformationEntityBuilder setPerson(String person) {
@@ -191,15 +192,15 @@ public class RegistrationInformationEntity {
             return this;
         }
 
-        private boolean hasNullMainFields() {
-            return isBlank(entity.getRegistrationDate()) || isBlank(entity.getCarBrand()) || isBlank(entity.getCarKind());
-        }
-
         public RegistrationInformationEntity build() {
             if (hasNullMainFields()) {
                 return null;
             }
             return entity;
+        }
+
+        private boolean hasNullMainFields() {
+            return isBlank(entity.getRegistrationDate()) || isBlank(entity.getCarBrand()) || isBlank(entity.getCarKind());
         }
     }
 }

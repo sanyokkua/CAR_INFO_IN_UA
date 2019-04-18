@@ -9,10 +9,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import ua.kostenko.carinfo.common.api.Constants;
+import ua.kostenko.carinfo.common.Utils;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.records.Color;
-import ua.kostenko.carinfo.common.database.repositories.jdbc.crud.CrudRepository;
+import ua.kostenko.carinfo.common.database.Constants;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -23,7 +23,7 @@ import static java.util.Objects.nonNull;
 
 @Repository
 @Slf4j
-public class RegistrationColorRepository extends CommonDBRepository<Color> {
+class RegistrationColorRepository extends CommonDBRepository<Color> {
     private static final RowMapper<Color> ROW_MAPPER = (resultSet, i) -> Color.builder()
                                                                               .colorId(resultSet.getLong(Constants.RegistrationColor.ID))
                                                                               .colorName(resultSet.getString(Constants.RegistrationColor.NAME))
@@ -33,7 +33,6 @@ public class RegistrationColorRepository extends CommonDBRepository<Color> {
     public RegistrationColorRepository(@NonNull @Nonnull JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
     }
-
 
     @Nullable
     @Override
@@ -77,7 +76,7 @@ public class RegistrationColorRepository extends CommonDBRepository<Color> {
     @Override
     public Color findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.color where color_id = ?;";
-        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
+        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
     }
 
     @Nullable
@@ -85,7 +84,7 @@ public class RegistrationColorRepository extends CommonDBRepository<Color> {
     public Color findOne(@Nonnull ParamsHolder searchParams) {
         String colorName = searchParams.getString(Color.COLOR_NAME);
         String jdbcTemplateSelect = "select * from carinfo.color where color_name = ?;";
-        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, colorName));
+        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, colorName));
     }
 
     @Override
@@ -93,7 +92,6 @@ public class RegistrationColorRepository extends CommonDBRepository<Color> {
         String jdbcTemplateSelect = "select * from carinfo.color;";
         return jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER);
     }
-
 
     @Override
     public Page<Color> find(@NonNull @Nonnull ParamsHolder searchParams) {

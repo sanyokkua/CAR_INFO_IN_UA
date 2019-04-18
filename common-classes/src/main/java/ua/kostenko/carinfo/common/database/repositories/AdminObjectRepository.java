@@ -9,11 +9,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import ua.kostenko.carinfo.common.api.Constants;
+import ua.kostenko.carinfo.common.Utils;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
-import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
 import ua.kostenko.carinfo.common.api.records.AdministrativeObject;
-import ua.kostenko.carinfo.common.database.repositories.jdbc.crud.CrudRepository;
+import ua.kostenko.carinfo.common.database.Constants;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -21,15 +20,17 @@ import java.util.List;
 import java.util.Objects;
 
 import static java.util.Objects.nonNull;
+import static ua.kostenko.carinfo.common.Utils.getResultOrWrapExceptionToNull;
 
 @Repository
 @Slf4j
-public class AdminObjectRepository extends CommonDBRepository<AdministrativeObject> {
+class AdminObjectRepository extends CommonDBRepository<AdministrativeObject> {
     private static final RowMapper<AdministrativeObject> ROW_MAPPER = (resultSet, i) -> AdministrativeObject.builder()
                                                                                                             .adminObjId(resultSet.getLong(Constants.AdminObject.ID))
                                                                                                             .adminObjType(resultSet.getString(Constants.AdminObject.TYPE))
                                                                                                             .adminObjName(resultSet.getString(Constants.AdminObject.NAME))
                                                                                                             .build();
+
     @Autowired
     public AdminObjectRepository(@NonNull @Nonnull JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
@@ -77,7 +78,7 @@ public class AdminObjectRepository extends CommonDBRepository<AdministrativeObje
     @Override
     public AdministrativeObject findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.admin_object where admin_obj_id = ?;";
-        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
+        return getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
     }
 
     @Nullable
@@ -85,7 +86,7 @@ public class AdminObjectRepository extends CommonDBRepository<AdministrativeObje
     public AdministrativeObject findOne(@Nonnull ParamsHolder searchParams) {
         String name = searchParams.getString(AdministrativeObject.ADMIN_OBJ_NAME);
         String jdbcTemplateSelect = "select * from carinfo.admin_object where admin_obj_name = ?;";
-        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, name));
+        return getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, name));
     }
 
     @Override

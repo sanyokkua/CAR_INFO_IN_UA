@@ -8,8 +8,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Slf4j
+@Deprecated
 public final class PathUtils {
 
+    @Deprecated
     public synchronized static Path getPath(String path) {
         Path destination = null;
         try {

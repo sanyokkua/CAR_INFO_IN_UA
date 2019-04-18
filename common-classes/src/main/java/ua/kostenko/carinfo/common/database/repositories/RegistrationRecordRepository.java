@@ -10,10 +10,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
-import ua.kostenko.carinfo.common.api.Constants;
+import ua.kostenko.carinfo.common.Utils;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.records.*;
-import ua.kostenko.carinfo.common.database.repositories.jdbc.crud.CrudRepository;
+import ua.kostenko.carinfo.common.database.Constants;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,7 +25,7 @@ import static java.util.Objects.nonNull;
 
 @Repository
 @Slf4j
-public class RegistrationRecordRepository extends CommonDBRepository<Registration> {
+class RegistrationRecordRepository extends CommonDBRepository<Registration> {
     private static final RowMapper<Registration> ROW_MAPPER = (resultSet, i) -> Registration.builder()
                                                                                             .adminObjName(resultSet.getString(Constants.AdminObject.NAME))
                                                                                             .adminObjType(resultSet.getString(Constants.AdminObject.TYPE))
@@ -135,37 +135,29 @@ public class RegistrationRecordRepository extends CommonDBRepository<Registratio
         Long purposeId = Objects.nonNull(purpose) ? purpose.getPurposeId() : null;
         Long fuelTypeId = Objects.nonNull(fuelType) ? fuelType.getFuelTypeId() : null;
 
-        setNullableToStatement(statement,1, adminObjId);
-        setNullableToStatement(statement,2, operationCode);
-        setNullableToStatement(statement,3, departmentCode);
-        setNullableToStatement(statement,4, kindId);
-        setNullableToStatement(statement,5, vehicleId);
-        setNullableToStatement(statement,6, colorId);
-        setNullableToStatement(statement,7, bodyTypeId);
-        setNullableToStatement(statement,8, purposeId);
-        setNullableToStatement(statement,9, fuelTypeId);
-        setNullableToStatement(statement,10, entity.getOwnWeight());
-        setNullableToStatement(statement,11, entity.getTotalWeight());
-        setNullableToStatement(statement,12, entity.getEngineCapacity());
-        setNullableToStatement(statement,13, entity.getMakeYear());
+        setNullableToStatement(statement, 1, adminObjId);
+        setNullableToStatement(statement, 2, operationCode);
+        setNullableToStatement(statement, 3, departmentCode);
+        setNullableToStatement(statement, 4, kindId);
+        setNullableToStatement(statement, 5, vehicleId);
+        setNullableToStatement(statement, 6, colorId);
+        setNullableToStatement(statement, 7, bodyTypeId);
+        setNullableToStatement(statement, 8, purposeId);
+        setNullableToStatement(statement, 9, fuelTypeId);
+        setNullableToStatement(statement, 10, entity.getOwnWeight());
+        setNullableToStatement(statement, 11, entity.getTotalWeight());
+        setNullableToStatement(statement, 12, entity.getEngineCapacity());
+        setNullableToStatement(statement, 13, entity.getMakeYear());
         setNullableToStatement(statement, 14, entity.getRegistrationDate());
         setNullableToStatement(statement, 15, entity.getRegistrationNumber());
         setNullableToStatement(statement, 16, entity.getPersonType());
     }
 
     private void setNullableToStatement(@NonNull PreparedStatement statement, int index, @Nullable Long value) throws SQLException {
-        if (Objects.isNull(value)){
+        if (Objects.isNull(value)) {
             statement.setNull(index, Types.BIGINT);
         } else {
             statement.setLong(index, value);
-        }
-    }
-
-    private void setNullableToStatement(@NonNull PreparedStatement statement, int index, @Nullable String value) throws SQLException {
-        if (Objects.isNull(value)){
-            statement.setNull(index, Types.VARCHAR);
-        } else {
-            statement.setString(index, value);
         }
     }
 
@@ -174,6 +166,14 @@ public class RegistrationRecordRepository extends CommonDBRepository<Registratio
             statement.setNull(index, Types.DATE);
         } else {
             statement.setDate(index, value);
+        }
+    }
+
+    private void setNullableToStatement(@NonNull PreparedStatement statement, int index, @Nullable String value) throws SQLException {
+        if (Objects.isNull(value)) {
+            statement.setNull(index, Types.VARCHAR);
+        } else {
+            statement.setString(index, value);
         }
     }
 
@@ -269,7 +269,7 @@ public class RegistrationRecordRepository extends CommonDBRepository<Registratio
                 "and c.color_id = r.color_id and bt.body_type_id = r.body_type_id and p.purpose_id = r.purpose_id and ft.fuel_type_id = r.fuel_type_id and b.brand_id = v.brand_id " +
                 "and m.model_id = v.model_id " +
                 "and r.id = ?;";
-        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
+        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
     }
 
     @Nullable
@@ -279,7 +279,7 @@ public class RegistrationRecordRepository extends CommonDBRepository<Registratio
                 "from carinfo.record r, carinfo.admin_object ao, carinfo.operation o, carinfo.department d, carinfo.kind k, carinfo.vehicle v, carinfo.color c, carinfo.body_type bt," +
                 " carinfo.purpose p, carinfo.fuel_type ft, carinfo.brand b, carinfo.model m ";
         String where = buildWhereForFind(searchParams);
-        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect + where, ROW_MAPPER));
+        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect + where, ROW_MAPPER));
     }
 
     @Override
@@ -291,24 +291,6 @@ public class RegistrationRecordRepository extends CommonDBRepository<Registratio
                 "and c.color_id = r.color_id and bt.body_type_id = r.body_type_id and p.purpose_id = r.purpose_id and ft.fuel_type_id = r.fuel_type_id and b.brand_id = v.brand_id " +
                 "and m.model_id = v.model_id;";
         return jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER);
-    }
-
-    @Override
-    public Page<Registration> find(@NonNull @Nonnull ParamsHolder searchParams) {
-        Pageable pageable = searchParams.getPage();
-        String select = "select * ";
-        String from = "from carinfo.record r, carinfo.admin_object ao, carinfo.operation o, carinfo.department d," +
-                " carinfo.kind k, carinfo.vehicle v, carinfo.color c, carinfo.body_type bt," +
-                " carinfo.purpose p, carinfo.fuel_type ft, carinfo.brand b, carinfo.model m ";
-        String where = buildWhereForFind(searchParams);
-        String countQuery = "select count(1) as row_count " + from + where;
-        int total = jdbcTemplate.queryForObject(countQuery, (rs, rowNum) -> rs.getInt(1));
-
-        int limit = pageable.getPageSize();
-        long offset = pageable.getOffset();
-        String querySql = select + where + " limit ? offset ?";
-        List<Registration> result = jdbcTemplate.query(querySql, ROW_MAPPER, limit, offset);
-        return new PageImpl<>(result, pageable, total);
     }
 
     private String buildWhereForFind(@Nonnull @NonNull ParamsHolder searchParams) {
@@ -367,5 +349,23 @@ public class RegistrationRecordRepository extends CommonDBRepository<Registratio
                 .add("r.total_weight", totalWeight)
                 .add("r.registration_number", regNumber)
                 .build();
+    }
+
+    @Override
+    public Page<Registration> find(@NonNull @Nonnull ParamsHolder searchParams) {
+        Pageable pageable = searchParams.getPage();
+        String select = "select * ";
+        String from = "from carinfo.record r, carinfo.admin_object ao, carinfo.operation o, carinfo.department d," +
+                " carinfo.kind k, carinfo.vehicle v, carinfo.color c, carinfo.body_type bt," +
+                " carinfo.purpose p, carinfo.fuel_type ft, carinfo.brand b, carinfo.model m ";
+        String where = buildWhereForFind(searchParams);
+        String countQuery = "select count(1) as row_count " + from + where;
+        int total = jdbcTemplate.queryForObject(countQuery, (rs, rowNum) -> rs.getInt(1));
+
+        int limit = pageable.getPageSize();
+        long offset = pageable.getOffset();
+        String querySql = select + where + " limit ? offset ?";
+        List<Registration> result = jdbcTemplate.query(querySql, ROW_MAPPER, limit, offset);
+        return new PageImpl<>(result, pageable, total);
     }
 }

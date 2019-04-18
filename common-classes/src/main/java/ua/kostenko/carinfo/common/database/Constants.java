@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.common.api;
+package ua.kostenko.carinfo.common.database;
 
 public interface Constants {
     String SCHEMA = "carinfo";

@@ -2,7 +2,6 @@ package ua.kostenko.carinfo.common.database.repositories;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -10,10 +9,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import ua.kostenko.carinfo.common.api.Constants;
+import ua.kostenko.carinfo.common.Utils;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.records.Brand;
-import ua.kostenko.carinfo.common.database.repositories.jdbc.crud.CrudRepository;
+import ua.kostenko.carinfo.common.database.Constants;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -24,7 +23,7 @@ import static java.util.Objects.nonNull;
 
 @Repository
 @Slf4j
-public class RegistrationBrandRepository extends CommonDBRepository<Brand> {
+class RegistrationBrandRepository extends CommonDBRepository<Brand> {
     private static final RowMapper<Brand> ROW_MAPPER = (resultSet, i) -> Brand.builder()
                                                                               .brandId(resultSet.getLong(Constants.RegistrationBrand.ID))
                                                                               .brandName(resultSet.getString(Constants.RegistrationBrand.NAME))
@@ -77,7 +76,7 @@ public class RegistrationBrandRepository extends CommonDBRepository<Brand> {
     @Override
     public Brand findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.brand where brand_id = ?;";
-        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
+        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
     }
 
     @Nullable
@@ -85,7 +84,7 @@ public class RegistrationBrandRepository extends CommonDBRepository<Brand> {
     public Brand findOne(@Nonnull ParamsHolder searchParams) {
         String jdbcTemplateSelect = "select * from carinfo.brand where brand_name = ?;";
         String brandName = searchParams.getString(Brand.BRAND_NAME);
-        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, brandName));
+        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, brandName));
     }
 
     @Override

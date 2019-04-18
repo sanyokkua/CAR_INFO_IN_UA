@@ -9,10 +9,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import ua.kostenko.carinfo.common.api.Constants;
+import ua.kostenko.carinfo.common.Utils;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.records.Purpose;
-import ua.kostenko.carinfo.common.database.repositories.jdbc.crud.CrudRepository;
+import ua.kostenko.carinfo.common.database.Constants;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -23,7 +23,7 @@ import static java.util.Objects.nonNull;
 
 @Repository
 @Slf4j
-public class RegistrationPurposeRepository extends CommonDBRepository<Purpose> {
+class RegistrationPurposeRepository extends CommonDBRepository<Purpose> {
     private static final RowMapper<Purpose> ROW_MAPPER = (resultSet, i) -> Purpose.builder()
                                                                                   .purposeId(resultSet.getLong(Constants.RegistrationPurpose.ID))
                                                                                   .purposeName(resultSet.getString(Constants.RegistrationPurpose.NAME))
@@ -76,7 +76,7 @@ public class RegistrationPurposeRepository extends CommonDBRepository<Purpose> {
     @Override
     public Purpose findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.purpose where purpose_id = ?;";
-        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
+        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
     }
 
     @Nullable
@@ -84,7 +84,7 @@ public class RegistrationPurposeRepository extends CommonDBRepository<Purpose> {
     public Purpose findOne(@Nonnull ParamsHolder searchParams) {
         String purposeName = searchParams.getString(Purpose.PURPOSE_NAME);
         String jdbcTemplateSelect = "select * from carinfo.purpose where purpose_name = ?;";
-        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, purposeName));
+        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, purposeName));
     }
 
     @Override

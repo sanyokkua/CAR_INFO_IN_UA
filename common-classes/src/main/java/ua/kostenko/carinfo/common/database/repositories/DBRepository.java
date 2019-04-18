@@ -10,12 +10,16 @@ import java.util.List;
 
 public interface DBRepository<T> extends PageableSearch<T> {
 
-    @Nullable T create(@NonNull @Nonnull final T entity);
-    @Nullable T update(@NonNull @Nonnull final T entity);
+    @Nullable
+    T create(@NonNull @Nonnull final T entity);
+    @Nullable
+    T update(@NonNull @Nonnull final T entity);
     boolean delete(final long id);
     boolean existId(final long id);
     boolean exist(@NonNull @Nonnull final T entity);
-    @Nullable T findOne(final long id);
-    @Nullable T findOne(@Nonnull @NonNull final ParamsHolder searchParams);
+    @Nullable
+    T findOne(final long id);
+    @Nullable
+    T findOne(@Nonnull @NonNull final ParamsHolder searchParams);
     List<T> find();
 }

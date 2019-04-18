@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
 import ua.kostenko.carinfo.common.api.records.Operation;
 import ua.kostenko.carinfo.common.database.repositories.DBRepository;
 
@@ -13,7 +14,7 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-public class OperationService extends CommonDbService <Operation>{
+class OperationService extends CommonDbService<Operation> {
 
     @Autowired
     protected OperationService(@NonNull @Nonnull DBRepository<Operation> repository) {
@@ -27,6 +28,9 @@ public class OperationService extends CommonDbService <Operation>{
 
     @Override
     public Optional<Operation> get(@NonNull @Nonnull Operation entity) {
-        return Optional.empty();
+        ParamsHolderBuilder builder = new ParamsHolderBuilder();
+        builder.param(Operation.OPERATION_NAME, entity.getOperationName());
+        Operation foundEntity = this.repository.findOne(builder.build());
+        return Optional.ofNullable(foundEntity);
     }
 }

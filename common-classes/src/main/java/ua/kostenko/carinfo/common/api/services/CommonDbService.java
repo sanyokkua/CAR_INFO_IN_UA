@@ -13,8 +13,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static ua.kostenko.carinfo.common.Utils.processIgnoreException;
+
 @Slf4j
-abstract class CommonDbService <T> implements DBService<T> {
+abstract class CommonDbService<T> implements DBService<T> {
     protected final DBRepository<T> repository;
 
     protected CommonDbService(@NonNull @Nonnull DBRepository<T> repository) {
@@ -24,14 +26,16 @@ abstract class CommonDbService <T> implements DBService<T> {
     @Override
     public Optional<T> create(@Nonnull @NonNull T entity) {
         if (isValid(entity)) {
-            if (exists(entity)) {
-                log.info("create: entity {} already exists");
-                return get(entity);
-            } else {
-                T created = repository.create(entity);
-                log.info("create: created entity: {}", created);
-                return Optional.ofNullable(created);
-            }
+            return processIgnoreException(() -> {
+                if (exists(entity)) {
+                    log.info("create: entity {} already exists", entity);
+                    return get(entity);
+                } else {
+                    T created = repository.create(entity);
+                    log.info("create: created entity: {}", created);
+                    return Optional.ofNullable(created);
+                }
+            });
         }
         log.warn("create: entity {} is not valid", entity);
         return Optional.empty();
@@ -40,14 +44,16 @@ abstract class CommonDbService <T> implements DBService<T> {
     @Override
     public Optional<T> update(@Nonnull T entity) {
         if (isValid(entity)) {
-            if (exists(entity)) {
-                log.info("update: entity {} exists, will be updated");
-                T updated = repository.update(entity);
-                return Optional.ofNullable(updated);
-            } else {
-                log.warn("update: entity: {} is not exists, nothing to update", entity);
-                return Optional.empty();
-            }
+            return processIgnoreException(() -> {
+                if (exists(entity)) {
+                    log.info("update: entity {} exists, will be updated", entity);
+                    T updated = repository.update(entity);
+                    return Optional.ofNullable(updated);
+                } else {
+                    log.warn("update: entity: {} is not exists, nothing to update", entity);
+                    return Optional.empty();
+                }
+            });
         }
         log.warn("update: entity {} is not valid", entity);
         return Optional.empty();

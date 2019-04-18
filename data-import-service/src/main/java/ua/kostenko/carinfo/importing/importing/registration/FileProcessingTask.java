@@ -3,7 +3,7 @@ package ua.kostenko.carinfo.importing.importing.registration;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import ua.kostenko.carinfo.common.api.records.*;
-import ua.kostenko.carinfo.common.services.CrudService;
+import ua.kostenko.carinfo.common.api.services.DBService;
 import ua.kostenko.carinfo.importing.csv.mappers.registration.RegistrationCsvMapper;
 import ua.kostenko.carinfo.importing.csv.pojo.RegistrationPojo;
 import ua.kostenko.carinfo.importing.csv.reader.CsvReader;
@@ -26,33 +26,33 @@ import java.util.stream.Stream;
 public class FileProcessingTask implements Runnable {
     private final String link;
     private final File tempDirectory;
-    private final CrudService<Registration> registrationCrudService;
-    private final CrudService<AdministrativeObject> administrativeObjectCrudService;
-    private final CrudService<BodyType> bodyTypeCrudService;
-    private final CrudService<Brand> brandCrudService;
-    private final CrudService<Color> colorCrudService;
-    private final CrudService<Department> departmentCrudService;
-    private final CrudService<FuelType> fuelTypeCrudService;
-    private final CrudService<Kind> kindCrudService;
-    private final CrudService<Model> modelCrudService;
-    private final CrudService<Operation> operationCrudService;
-    private final CrudService<Purpose> purposeCrudService;
-    private final CrudService<Vehicle> vehicleCrudService;
+    private final DBService<Registration> registrationCrudService;
+    private final DBService<AdministrativeObject> administrativeObjectCrudService;
+    private final DBService<BodyType> bodyTypeCrudService;
+    private final DBService<Brand> brandCrudService;
+    private final DBService<Color> colorCrudService;
+    private final DBService<Department> departmentCrudService;
+    private final DBService<FuelType> fuelTypeCrudService;
+    private final DBService<Kind> kindCrudService;
+    private final DBService<Model> modelCrudService;
+    private final DBService<Operation> operationCrudService;
+    private final DBService<Purpose> purposeCrudService;
+    private final DBService<Vehicle> vehicleCrudService;
 
     public FileProcessingTask(@NonNull @Nonnull String link,
                               @NonNull @Nonnull File tempDirectory,
-                              @NonNull @Nonnull CrudService<Registration> registrationCrudService,
-                              @NonNull @Nonnull CrudService<AdministrativeObject> administrativeObjectCrudService,
-                              @NonNull @Nonnull CrudService<BodyType> bodyTypeCrudService,
-                              @NonNull @Nonnull CrudService<Brand> brandCrudService,
-                              @NonNull @Nonnull CrudService<Color> colorCrudService,
-                              @NonNull @Nonnull CrudService<Department> departmentCrudService,
-                              @NonNull @Nonnull CrudService<FuelType> fuelTypeCrudService,
-                              @NonNull @Nonnull CrudService<Kind> kindCrudService,
-                              @NonNull @Nonnull CrudService<Model> modelCrudService,
-                              @NonNull @Nonnull CrudService<Operation> operationCrudService,
-                              @NonNull @Nonnull CrudService<Purpose> purposeCrudService,
-                              @NonNull @Nonnull CrudService<Vehicle> vehicleCrudService) {
+                              @NonNull @Nonnull DBService<Registration> registrationCrudService,
+                              @NonNull @Nonnull DBService<AdministrativeObject> administrativeObjectCrudService,
+                              @NonNull @Nonnull DBService<BodyType> bodyTypeCrudService,
+                              @NonNull @Nonnull DBService<Brand> brandCrudService,
+                              @NonNull @Nonnull DBService<Color> colorCrudService,
+                              @NonNull @Nonnull DBService<Department> departmentCrudService,
+                              @NonNull @Nonnull DBService<FuelType> fuelTypeCrudService,
+                              @NonNull @Nonnull DBService<Kind> kindCrudService,
+                              @NonNull @Nonnull DBService<Model> modelCrudService,
+                              @NonNull @Nonnull DBService<Operation> operationCrudService,
+                              @NonNull @Nonnull DBService<Purpose> purposeCrudService,
+                              @NonNull @Nonnull DBService<Vehicle> vehicleCrudService) {
         this.link = link;
         this.tempDirectory = tempDirectory;
         this.registrationCrudService = registrationCrudService;

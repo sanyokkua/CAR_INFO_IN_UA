@@ -1,7 +1,7 @@
 package ua.kostenko.carinfo.common.database.mapping;
 
 import lombok.*;
-import ua.kostenko.carinfo.common.api.Constants;
+import ua.kostenko.carinfo.common.database.Constants;
 
 import javax.persistence.*;
 import java.io.Serializable;

@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.NaturalId;
-import ua.kostenko.carinfo.common.api.Constants;
+import ua.kostenko.carinfo.common.database.Constants;
 
 import javax.persistence.*;
 import java.io.Serializable;

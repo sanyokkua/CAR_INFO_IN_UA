@@ -3,7 +3,6 @@ package ua.kostenko.carinfo.common.database.repositories;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -11,12 +10,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
-import ua.kostenko.carinfo.common.api.Constants;
+import ua.kostenko.carinfo.common.Utils;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.records.Brand;
 import ua.kostenko.carinfo.common.api.records.Model;
 import ua.kostenko.carinfo.common.api.records.Vehicle;
-import ua.kostenko.carinfo.common.database.repositories.jdbc.crud.CrudRepository;
+import ua.kostenko.carinfo.common.database.Constants;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,7 +28,7 @@ import static java.util.Objects.nonNull;
 
 @Repository
 @Slf4j
-public class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
+class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
     private static final String BRAND = "brand";
     private static final String MODEL = "model";
     private static final RowMapper<Vehicle> ROW_MAPPER = (resultSet, i) -> Vehicle.builder()
@@ -127,7 +126,7 @@ public class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
         String jdbcTemplateSelect = "select v.vehicle_id, v.model_id, v.brand_id, b.brand_name as brand, m.model_name as model " +
                 "from carinfo.vehicle v, carinfo.brand b, carinfo.model m " +
                 "where vehicle_id = ? and v.brand_id = b.brand_id and m.model_id = v.model_id;";
-        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
+        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
     }
 
     @Nullable
@@ -152,7 +151,7 @@ public class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
         String jdbcTemplateSelect = "select v.vehicle_id, v.model_id, v.brand_id, b.brand_name as brand, m.model_name as model " +
                 "from carinfo.vehicle v, carinfo.brand b, carinfo.model m " +
                 "where v.brand_id = b.brand_id and m.model_id = v.model_id and v.brand_id = ? and v.model_id = ?;";
-        return CrudRepository.getNullableResultIfException(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, brand.getBrandId(), model.getModelId()));
+        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, brand.getBrandId(), model.getModelId()));
     }
 
     @Override

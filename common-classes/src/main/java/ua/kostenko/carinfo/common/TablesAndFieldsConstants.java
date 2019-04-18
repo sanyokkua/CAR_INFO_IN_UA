@@ -1,7 +1,9 @@
 package ua.kostenko.carinfo.common;
 
+@Deprecated
 public interface TablesAndFieldsConstants {
 
+    @Deprecated
     interface RegistrationInformationTable {
         String TABLE = "registration_information";
         String FIELD_ID = "id";
@@ -28,6 +30,7 @@ public interface TablesAndFieldsConstants {
         String FIELD_REGISTRATION_DATE = "registration_date";
     }
 
+    @Deprecated
     interface AdministrativeObjectTable {
         String TABLE = "administrative_object";
         String FIELD_ID = "id";
@@ -35,6 +38,7 @@ public interface TablesAndFieldsConstants {
         String FIELD_TYPE_NAME = "type_name";
     }
 
+    @Deprecated
     interface ServiceCenterTable {
         String TABLE = "service_center";
         String FIELD_DEPARTMENT_CODE = "dep_code";
@@ -42,6 +46,7 @@ public interface TablesAndFieldsConstants {
         String FIELD_EMAIL = "email";
     }
 
+    @Deprecated
     interface RegionCodeTable {
         String TABLE = "region_code";
         String FIELD_CODE = "code";
