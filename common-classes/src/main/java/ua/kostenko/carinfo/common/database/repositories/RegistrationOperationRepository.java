@@ -3,6 +3,7 @@ package ua.kostenko.carinfo.common.database.repositories;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -17,9 +18,6 @@ import ua.kostenko.carinfo.common.database.Constants;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Objects;
-
-import static java.util.Objects.nonNull;
 
 @Repository
 @Slf4j
@@ -39,7 +37,7 @@ class RegistrationOperationRepository extends CommonDBRepository<Operation> {
     public Operation create(@NonNull @Nonnull Operation entity) {
         String jdbcTemplateInsert = "insert into carinfo.operation (op_code, op_name) values (?, ?);";
         jdbcTemplate.update(jdbcTemplateInsert, entity.getOperationCode(), entity.getOperationName());
-        ParamsHolder searchParams = getBuilder().param(Operation.OPERATION_NAME, entity.getOperationName()).build();
+        ParamsHolder searchParams = getBuilder().param(Operation.OPERATION_CODE, entity.getOperationCode()).build();
         return findOne(searchParams);
     }
 
@@ -48,7 +46,7 @@ class RegistrationOperationRepository extends CommonDBRepository<Operation> {
     public Operation update(@NonNull @Nonnull Operation entity) {
         String jdbcTemplateUpdate = "update carinfo.operation set op_name = ? where op_code = ?;";
         jdbcTemplate.update(jdbcTemplateUpdate, entity.getOperationName(), entity.getOperationCode());
-        ParamsHolder searchParams = getBuilder().param(Operation.OPERATION_NAME, entity.getOperationName()).build();
+        ParamsHolder searchParams = getBuilder().param(Operation.OPERATION_CODE, entity.getOperationCode()).build();
         return findOne(searchParams);
     }
 
@@ -62,29 +60,35 @@ class RegistrationOperationRepository extends CommonDBRepository<Operation> {
     @Override
     public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(op_code) from carinfo.operation where op_code = ?;";
-        Long numberOfRows = jdbcTemplate.queryForObject(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), id);
-        return Objects.nonNull(numberOfRows) && numberOfRows > 0;
+        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), id).stream().findFirst().orElse(0L);
+        return numberOfRows > 0;
     }
 
     @Override
     public boolean exist(@Nonnull Operation entity) {
-        ParamsHolder searchParams = getBuilder().param(Operation.OPERATION_NAME, entity.getOperationName()).build();
-        return nonNull(findOne(searchParams));
+        String jdbcTemplateSelectCount = "select count(op_code) from carinfo.operation where op_code = ?;";
+        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), entity.getOperationCode())
+                                        .stream().findFirst().orElse(0L);
+        return numberOfRows > 0;
     }
 
     @Nullable
     @Override
     public Operation findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.operation where op_code = ?;";
-        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
+        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER, id).stream().findFirst().orElse(null));
     }
 
+    @Cacheable(cacheNames = "operation", unless = "#result != null")
     @Nullable
     @Override
     public Operation findOne(@Nonnull ParamsHolder searchParams) {
-        String operationName = searchParams.getString(Operation.OPERATION_NAME);
-        String jdbcTemplateSelect = "select * from carinfo.operation where op_name = ?;";
-        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, operationName));
+        Long param = searchParams.getLong(Operation.OPERATION_CODE);
+        String jdbcTemplateSelect = "select * from carinfo.operation where op_code = ?;";
+        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER, param)
+                                                                      .stream()
+                                                                      .findFirst()
+                                                                      .orElse(null));
     }
 
     @Override
@@ -97,9 +101,9 @@ class RegistrationOperationRepository extends CommonDBRepository<Operation> {
     public Page<Operation> find(@NonNull @Nonnull ParamsHolder searchParams) {
         Pageable pageable = searchParams.getPage();
         String select = "select * from carinfo.operation o ";
-        String name = searchParams.getString(Operation.OPERATION_NAME);
+        Long code = searchParams.getLong(Operation.OPERATION_CODE);
 
-        String where = buildWhere().add("o.op_name", name).build();
+        String where = buildWhere().add("o.op_code", code, true).build();
 
         String countQuery = "select count(1) as row_count " + "from carinfo.operation o " + where;
         int total = jdbcTemplate.queryForObject(countQuery, (rs, rowNum) -> rs.getInt(1));

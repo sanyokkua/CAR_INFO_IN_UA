@@ -3,6 +3,7 @@ package ua.kostenko.carinfo.common.database.repositories;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -23,8 +24,6 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Objects;
-
-import static java.util.Objects.nonNull;
 
 @Repository
 @Slf4j
@@ -107,17 +106,17 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
     @Override
     public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(vehicle_id) from carinfo.vehicle where vehicle_id = ?;";
-        Long numberOfRows = jdbcTemplate.queryForObject(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), id);
-        return Objects.nonNull(numberOfRows) && numberOfRows > 0;
+        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), id).stream().findFirst().orElse(0L);
+        return numberOfRows > 0;
     }
 
     @Override
     public boolean exist(@Nonnull Vehicle entity) {
-        ParamsHolder searchParams = getBuilder()
-                .param(Vehicle.BRAND_NAME, entity.getBrandName())
-                .param(Vehicle.MODEL_NAME, entity.getModelName())
-                .build();
-        return nonNull(findOne(searchParams));
+        String jdbcTemplateSelectCount = "select count(v.vehicle_id) from carinfo.vehicle v, carinfo.brand b, carinfo.model m " +
+                "where v.brand_id = b.brand_id and m.model_id = v.model_id and m.model_name = ? and b.brand_name = ?;";
+        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), entity.getModelName(), entity.getBrandName())
+                                        .stream().findFirst().orElse(0L);
+        return numberOfRows > 0;
     }
 
     @Nullable
@@ -126,9 +125,10 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
         String jdbcTemplateSelect = "select v.vehicle_id, v.model_id, v.brand_id, b.brand_name as brand, m.model_name as model " +
                 "from carinfo.vehicle v, carinfo.brand b, carinfo.model m " +
                 "where vehicle_id = ? and v.brand_id = b.brand_id and m.model_id = v.model_id;";
-        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
+        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER, id).stream().findFirst().orElse(null));
     }
 
+    @Cacheable(cacheNames = "vehicle", unless = "#result != null")
     @Nullable
     @Override
     public Vehicle findOne(@Nonnull ParamsHolder searchParams) {
@@ -151,7 +151,10 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
         String jdbcTemplateSelect = "select v.vehicle_id, v.model_id, v.brand_id, b.brand_name as brand, m.model_name as model " +
                 "from carinfo.vehicle v, carinfo.brand b, carinfo.model m " +
                 "where v.brand_id = b.brand_id and m.model_id = v.model_id and v.brand_id = ? and v.model_id = ?;";
-        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, brand.getBrandId(), model.getModelId()));
+        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER, brand.getBrandId(), model.getModelId())
+                                                                      .stream()
+                                                                      .findFirst()
+                                                                      .orElse(null));
     }
 
     @Override
@@ -170,10 +173,10 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
         String brandName = searchParams.getString(Vehicle.BRAND_NAME);
 
         String where = buildWhere()
-                .add("v.model_id", "m.model_id")
-                .add("v.brand_id", "b.brand_id")
-                .add("m.model_name", modelName)
-                .add("b.brand_name", brandName)
+                .add("v.model_id", "m.model_id", false)
+                .add("v.brand_id", "b.brand_id", false)
+                .add("m.model_name", modelName, true)
+                .add("b.brand_name", brandName, true)
                 .build();
 
         String countQuery = "select count(1) as row_count " + " from carinfo.vehicle v, carinfo.brand b, carinfo.model m  " + where;

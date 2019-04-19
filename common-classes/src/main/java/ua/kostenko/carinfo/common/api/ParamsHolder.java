@@ -12,6 +12,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode
 public class ParamsHolder {
     private Pageable page;
     private Map<String, Long> longValues;
@@ -26,7 +27,7 @@ public class ParamsHolder {
     @Nullable
     public Long getLong(@NonNull @Nonnull String key) {
         if (Objects.nonNull(longValues)) {
-            longValues.getOrDefault(key, null);
+            return longValues.getOrDefault(key, null);
         }
         return null;
     }
@@ -34,7 +35,7 @@ public class ParamsHolder {
     @Nullable
     public Integer getInt(@NonNull @Nonnull String key) {
         if (Objects.nonNull(integerValues)) {
-            integerValues.getOrDefault(key, null);
+            return integerValues.getOrDefault(key, null);
         }
         return null;
     }
@@ -42,7 +43,7 @@ public class ParamsHolder {
     @Nullable
     public String getString(@NonNull @Nonnull String key) {
         if (Objects.nonNull(stringValues)) {
-            stringValues.getOrDefault(key, null);
+            return stringValues.getOrDefault(key, null);
         }
         return null;
     }
@@ -50,7 +51,7 @@ public class ParamsHolder {
     @Nullable
     public Date getDate(@NonNull @Nonnull String key) {
         if (Objects.nonNull(dateValues)) {
-            dateValues.getOrDefault(key, null);
+            return dateValues.getOrDefault(key, null);
         }
         return null;
     }

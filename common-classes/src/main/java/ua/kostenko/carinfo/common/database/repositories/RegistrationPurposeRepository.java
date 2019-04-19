@@ -3,6 +3,7 @@ package ua.kostenko.carinfo.common.database.repositories;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -18,8 +19,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
-
-import static java.util.Objects.nonNull;
 
 @Repository
 @Slf4j
@@ -62,29 +61,35 @@ class RegistrationPurposeRepository extends CommonDBRepository<Purpose> {
     @Override
     public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(purpose_id) from carinfo.purpose where purpose_id = ?;";
-        Long numberOfRows = jdbcTemplate.queryForObject(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), id);
-        return Objects.nonNull(numberOfRows) && numberOfRows > 0;
+        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), id).stream().findFirst().orElse(0L);
+        return numberOfRows > 0;
     }
 
     @Override
     public boolean exist(@Nonnull Purpose entity) {
-        ParamsHolder searchParams = getBuilder().param(Purpose.PURPOSE_NAME, entity.getPurposeName()).build();
-        return nonNull(findOne(searchParams));
+        String jdbcTemplateSelectCount = "select count(purpose_id) from carinfo.purpose where purpose_name = ?;";
+        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), entity.getPurposeName())
+                                        .stream().findFirst().orElse(0L);
+        return numberOfRows > 0;
     }
 
     @Nullable
     @Override
     public Purpose findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.purpose where purpose_id = ?;";
-        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
+        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER, id).stream().findFirst().orElse(null));
     }
 
+    @Cacheable(cacheNames = "purpose", unless = "#result != null")
     @Nullable
     @Override
     public Purpose findOne(@Nonnull ParamsHolder searchParams) {
-        String purposeName = searchParams.getString(Purpose.PURPOSE_NAME);
+        String param = searchParams.getString(Purpose.PURPOSE_NAME);
         String jdbcTemplateSelect = "select * from carinfo.purpose where purpose_name = ?;";
-        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, purposeName));
+        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER, param)
+                                                                      .stream()
+                                                                      .findFirst()
+                                                                      .orElse(null));
     }
 
     @Override
@@ -99,7 +104,7 @@ class RegistrationPurposeRepository extends CommonDBRepository<Purpose> {
         String select = "select * from carinfo.purpose p ";
         String name = searchParams.getString(Purpose.PURPOSE_NAME);
 
-        String where = buildWhere().add("p.purpose_name", name).build();
+        String where = buildWhere().add("p.purpose_name", name, true).build();
 
         String countQuery = "select count(1) as row_count " + "from carinfo.purpose p " + where;
         int total = jdbcTemplate.queryForObject(countQuery, (rs, rowNum) -> rs.getInt(1));

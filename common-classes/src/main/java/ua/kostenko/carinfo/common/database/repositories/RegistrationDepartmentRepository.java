@@ -3,6 +3,7 @@ package ua.kostenko.carinfo.common.database.repositories;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -18,8 +19,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
-
-import static java.util.Objects.nonNull;
 
 @Repository
 @Slf4j
@@ -63,23 +62,26 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department> {
     @Override
     public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(dep_code) from carinfo.department where dep_code = ?;";
-        Long numberOfRows = jdbcTemplate.queryForObject(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), id);
-        return Objects.nonNull(numberOfRows) && numberOfRows > 0;
+        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), id).stream().findFirst().orElse(0L);
+        return numberOfRows > 0;
     }
 
     @Override
     public boolean exist(@Nonnull Department entity) {
-        ParamsHolder searchParams = getBuilder().param(Department.DEPARTMENT_CODE, entity.getDepartmentCode()).build();
-        return nonNull(findOne(searchParams));
+        String jdbcTemplateSelectCount = "select count(dep_code) from carinfo.department where dep_code = ?;";
+        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), entity.getDepartmentCode())
+                                        .stream().findFirst().orElse(0L);
+        return numberOfRows > 0;
     }
 
     @Nullable
     @Override
     public Department findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.department where dep_code = ?;";
-        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
+        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER, id).stream().findFirst().orElse(null));
     }
 
+    @Cacheable(cacheNames = "department", unless = "#result != null")
     @Nullable
     @Override
     public Department findOne(@Nonnull ParamsHolder searchParams) {
@@ -87,8 +89,7 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department> {
         if (Objects.isNull(depCode)) {
             return null;
         }
-        String jdbcTemplateSelect = "select * from carinfo.department where dep_code = ?;";
-        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, depCode));
+        return findOne(depCode);
     }
 
     @Override
@@ -107,9 +108,9 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department> {
         String address = searchParams.getString(Department.DEPARTMENT_ADDRESS);
 
         String where = buildWhere()
-                .add("d.dep_code", code)
-                .add("d.dep_email", email)
-                .add("d.dep_addr", address)
+                .add("d.dep_code", code, true)
+                .add("d.dep_email", email, true)
+                .add("d.dep_addr", address, true)
                 .build();
 
         String countQuery = "select count(1) as row_count " + " from carinfo.department d " + where;

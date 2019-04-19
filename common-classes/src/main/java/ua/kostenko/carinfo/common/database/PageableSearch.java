@@ -32,8 +32,12 @@ public interface PageableSearch<T> {
             values = new HashMap<>();
         }
 
-        public WhereBuilder add(@NonNull @Nonnull String key, Object value) {
-            values.put(key, value);
+        public WhereBuilder add(@NonNull @Nonnull String key, Object value, boolean isValue) {
+            if (isValue && Objects.nonNull(value)) {
+                values.put(key, String.format("'%s'", value.toString()));
+            } else {
+                values.put(key, value);
+            }
             return this;
         }
 

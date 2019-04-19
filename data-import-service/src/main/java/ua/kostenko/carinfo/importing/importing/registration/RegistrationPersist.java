@@ -9,15 +9,13 @@ import ua.kostenko.carinfo.importing.csv.pojo.RegistrationCsvRecord;
 import ua.kostenko.carinfo.importing.importing.Persist;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
 public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
-    private static final SimpleDateFormat FORMAT_FIRST = new SimpleDateFormat("yyyy-MM-dd");//2013-02-02
-    private static final SimpleDateFormat FORMAT_SECOND = new SimpleDateFormat("dd-MM-yyyy");//19.02.2019
     private final DBService<Registration> registrationDBService;
     private final DBService<AdministrativeObject> administrativeObjectDBService;
     private final DBService<BodyType> bodyTypeDBService;
@@ -58,147 +56,101 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
     }
 
     private Optional<Operation> getOperation(@NonNull @Nonnull RegistrationCsvRecord record) {
-        Long operationCode = record.getOperationCode();
-        Optional<Operation> foundOperation = operationDBService.get(operationCode);
-        if (foundOperation.isPresent()) {
-            return foundOperation;
-        }
-        String operationName = record.getOperationName();
-        Operation operation = Operation.builder().operationCode(operationCode).operationName(operationName).build();
-        return operationDBService.create(operation);
+        Operation operation = record.getOperation();
+        return operationDBService.exists(operation) ? operationDBService.get(operation) : operationDBService.create(operation);
     }
 
     private Optional<Model> getModel(@NonNull @Nonnull RegistrationCsvRecord record) {
-        String vehicleModel = StringUtils.trim(record.getVehicleModel());
-        Model model = Model.builder().modelName(vehicleModel).build();
-        Optional<Model> foundModel = modelDBService.get(model);
-        return Objects.nonNull(foundModel) ? foundModel : modelDBService.create(model);
+        Model model = record.getModel();
+        return modelDBService.exists(model) ? modelDBService.get(model) : modelDBService.create(model);
     }
 
     private Optional<Brand> getBrand(@NonNull @Nonnull RegistrationCsvRecord record) {
-        String vehicleModel = StringUtils.trim(record.getVehicleModel());
-        String vehicleBrand = StringUtils.trim(record.getVehicleBrand());
-        if (vehicleBrand.contains(vehicleModel)) {
-            vehicleBrand = StringUtils.remove(vehicleBrand, vehicleModel);
-            vehicleBrand = StringUtils.trim(vehicleBrand);
-        }
-        Brand brand = Brand.builder().brandName(vehicleBrand).build();
-        Optional<Brand> foundBrand = brandDBService.get(brand);
-        return Objects.nonNull(foundBrand) ? foundBrand : brandDBService.create(brand);
+        Brand brand = record.getBrand();
+        return brandDBService.exists(brand) ? brandDBService.get(brand) : brandDBService.create(brand);
     }
 
     private Optional<Color> getColor(@NonNull @Nonnull RegistrationCsvRecord record) {
-        String vehicleColor = record.getVehicleColor();
-        Color color = Color.builder().colorName(vehicleColor).build();
-        Optional<Color> foundColor = colorDBService.get(color);
-        return Objects.nonNull(foundColor) ? foundColor : colorDBService.create(color);
+        Color color = record.getColor();
+        return colorDBService.exists(color) ? colorDBService.get(color) : colorDBService.create(color);
     }
 
     private Optional<Kind> getKind(@NonNull @Nonnull RegistrationCsvRecord record) {
-        String vehicleKind = record.getVehicleKind();
-        Kind kind = Kind.builder().kindName(vehicleKind).build();
-        Optional<Kind> foundKind = kindDBService.get(kind);
-        return Objects.nonNull(foundKind) ? foundKind : kindDBService.create(kind);
+        Kind kind = record.getKind();
+        return kindDBService.exists(kind) ? kindDBService.get(kind) : kindDBService.create(kind);
     }
 
     private Optional<BodyType> getBodyType(@NonNull @Nonnull RegistrationCsvRecord record) {
-        String vehicleBodyType = record.getVehicleBodyType();
-        BodyType bodyType = BodyType.builder().bodyTypeName(vehicleBodyType).build();
-        Optional<BodyType> foundBodyType = bodyTypeDBService.get(bodyType);
-        return Objects.nonNull(foundBodyType) ? foundBodyType : bodyTypeDBService.create(bodyType);
+        BodyType bodyType = record.getBodyType();
+        return bodyTypeDBService.exists(bodyType) ? bodyTypeDBService.get(bodyType) : bodyTypeDBService.create(bodyType);
     }
 
     private Optional<Purpose> getPurpose(@NonNull @Nonnull RegistrationCsvRecord record) {
-        String vehiclePurpose = record.getVehiclePurpose();
-        Purpose purpose = Purpose.builder().purposeName(vehiclePurpose).build();
-        Optional<Purpose> foundPurpose = purposeDBService.get(purpose);
-        return Objects.nonNull(foundPurpose) ? foundPurpose : purposeDBService.create(purpose);
+        Purpose purpose = record.getPurpose();
+        return purposeDBService.exists(purpose) ? purposeDBService.get(purpose) : purposeDBService.create(purpose);
     }
 
     private Optional<FuelType> getFuelType(@NonNull @Nonnull RegistrationCsvRecord record) {
-        String vehicleFuelType = record.getVehicleFuelType();
-        FuelType fuelType = FuelType.builder().fuelTypeName(vehicleFuelType).build();
-        Optional<FuelType> foundFuelType = fuelTypeDBService.get(fuelType);
-        return Objects.nonNull(foundFuelType) ? foundFuelType : fuelTypeDBService.create(fuelType);
+        FuelType fuelType = record.getFuelType();
+        return fuelTypeDBService.exists(fuelType) ? fuelTypeDBService.get(fuelType) : fuelTypeDBService.create(fuelType);
     }
 
     private Optional<AdministrativeObject> getAdministrativeObject(@NonNull @Nonnull RegistrationCsvRecord record) {
-        Long administrativeObjectId = record.getAdministrativeObject();
-        return administrativeObjectDBService.get(administrativeObjectId);
+        AdministrativeObject adminObject = record.getAdminObject();
+        Optional<Long> adminObjId = Optional.ofNullable(adminObject.getAdminObjId());
+        return adminObjId.isPresent() ? administrativeObjectDBService.get(adminObjId.get()) : Optional.empty();
     }
 
     private Optional<Department> getDepartment(@NonNull @Nonnull RegistrationCsvRecord record) {
-        Long departmentCode = record.getDepartmentCode();
-        return departmentDBService.get(departmentCode);
+        Department department = record.getDepartment();
+        return departmentDBService.exists(department) ? departmentDBService.get(department) : departmentDBService.create(department);
     }
 
-    private Optional<Vehicle> getVehicle(Model createdModel, Brand createdBrand) {
+    private Optional<Vehicle> getVehicle(@Nullable Model createdModel, @Nullable Brand createdBrand) {
         if (Objects.nonNull(createdBrand) && Objects.nonNull(createdModel)) {
             Vehicle vehicle = Vehicle.builder()
                                      .brandName(createdBrand.getBrandName())
                                      .modelName(createdModel.getModelName())
                                      .build();
-            Optional<Vehicle> foundVehicle = vehicleDBService.get(vehicle);
-            return Objects.nonNull(foundVehicle) ? foundVehicle : vehicleDBService.create(vehicle);
+            return vehicleDBService.exists(vehicle) ? vehicleDBService.get(vehicle) : vehicleDBService.create(vehicle);
         }
         return Optional.empty();
     }
 
-    private Date getDate(@Nonnull @NonNull RegistrationCsvRecord record) {
-        String registrationDate = record.getRegistrationDate();
-        Date resultDate = null;
-        try {
-            java.util.Date date = FORMAT_FIRST.parse(registrationDate);
-            resultDate = new Date(date.getTime());
-        } catch (Exception ex) {
-            log.warn("Problem with parsing date with first formatter: {}", registrationDate);
-        }
-        if (Objects.isNull(resultDate)) {
-            try {
-                java.util.Date date = FORMAT_SECOND.parse(registrationDate);
-                resultDate = new Date(date.getTime());
-            } catch (Exception ex) {
-                log.warn("Problem with parsing date with second formatter: {}", registrationDate);
-            }
-        }
-        return resultDate;
-    }
-
     @Override
     public void persist(@NonNull @Nonnull RegistrationCsvRecord record) {
-        log.info("persist: Thread N: {}", Thread.currentThread().getId());
-        log.info("persist: Record: {}", record.toString());
+        log.info("persist: Thread N: {}, record: {}", Thread.currentThread().getId(), record);
         try {
-            Optional<Operation> operation = getOperation(record);
-            Optional<Model> model = getModel(record);
-            Optional<Brand> brand = getBrand(record);
-            Optional<Color> color = getColor(record);
-            Optional<Kind> kind = getKind(record);
-            Optional<BodyType> bodyType = getBodyType(record);
-            Optional<Purpose> purpose = getPurpose(record);
-            Optional<FuelType> fuelType = getFuelType(record);
-            Optional<AdministrativeObject> administrativeObject = getAdministrativeObject(record);
-            Optional<Department> department = getDepartment(record);
-            Optional<Vehicle> createdVehicle = getVehicle(model.orElseGet(null), brand.orElseGet(null));
-            java.sql.Date registrationDate = getDate(record);
-            String personType = record.getPersonType();
-            Long vehicleMakeYear = record.getVehicleMakeYear();
-            Long vehicleEngineCapacity = record.getVehicleEngineCapacity();
-            Long vehicleOwnWeight = record.getVehicleOwnWeight();
-            Long vehicleTotalWeight = record.getVehicleTotalWeight();
-            String vehicleRegistrationNumber = record.getVehicleRegistrationNumber();
+            final Optional<AdministrativeObject> administrativeObject = getAdministrativeObject(record);
+            final Optional<Operation> operation = getOperation(record);
+            final Optional<Model> model = getModel(record);
+            final Optional<Brand> brand = getBrand(record);
+            final Optional<Color> color = getColor(record);
+            final Optional<Kind> kind = getKind(record);
+            final Optional<BodyType> bodyType = getBodyType(record);
+            final Optional<Purpose> purpose = getPurpose(record);
+            final Optional<FuelType> fuelType = getFuelType(record);
+            final Optional<Department> department = getDepartment(record);
+            final Optional<Vehicle> createdVehicle = getVehicle(model.orElseGet(null), brand.orElseGet(null));
 
-            if (operation.isPresent() && department.isPresent() && kind.isPresent() && color.isPresent() &&
-                    purpose.isPresent() && brand.isPresent() && model.isPresent() &&
-                    createdVehicle.isPresent() && StringUtils.isNotBlank(personType) &&
-                    Objects.nonNull(vehicleMakeYear) && Objects.nonNull(registrationDate)) {
-                AdministrativeObject nullableAdminObj = administrativeObject.orElseGet(null);
-                BodyType nullableBodyType = bodyType.orElseGet(null);
-                FuelType nullableFuelType = fuelType.orElseGet(null);
+            final Date registrationDate = record.getDate();
 
+            final String personType = record.getPersonType();
+            final Long vehicleMakeYear = record.getVehicleMakeYear();
+            final Long vehicleEngineCapacity = record.getVehicleEngineCapacity();
+            final Long vehicleOwnWeight = record.getVehicleOwnWeight();
+            final Long vehicleTotalWeight = record.getVehicleTotalWeight();
+            final String vehicleRegistrationNumber = record.getVehicleRegistrationNumber();
+
+            if (isPresent(operation, "operation") && isPresent(model, "model") &&
+                    isPresent(brand, "brand") && isPresent(color, "color") &&
+                    isPresent(kind, "kind") && isPresent(purpose, "purpose") &&
+                    isPresent(department, "department") && isPresent(createdVehicle, "createdVehicle") &&
+                    isNotNull(vehicleMakeYear, "vehicleMakeYear") && isNotNull(registrationDate, "registrationDate") &&
+                    isNotBlank(personType, "personType")) {
                 Registration registration = Registration.builder()
-                                                        .adminObjName(Objects.nonNull(nullableAdminObj) ? nullableAdminObj.getAdminObjName() : null)//NULLABLE
-                                                        .adminObjType(Objects.nonNull(nullableAdminObj) ? nullableAdminObj.getAdminObjType() : null)//NULLABLE
+                                                        .adminObjName(administrativeObject.map(AdministrativeObject::getAdminObjName).orElse(null))//NULLABLE
+                                                        .adminObjType(administrativeObject.map(AdministrativeObject::getAdminObjType).orElse(null))//NULLABLE
                                                         .operationCode(operation.get().getOperationCode())//non NULLABLE opName
                                                         .operationName(operation.get().getOperationName())//non NULLABLE opName
                                                         .departmentCode(department.get().getDepartmentCode())//non NULLABLE
@@ -206,29 +158,50 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
                                                         .departmentEmail(department.get().getDepartmentEmail())//non NULLABLE
                                                         .kind(kind.get().getKindName())//non NULLABLE
                                                         .color(color.get().getColorName())//non NULLABLE
-                                                        .bodyType(Objects.nonNull(nullableAdminObj) ? nullableBodyType.getBodyTypeName() : null)//NULLABLE
+                                                        .bodyType(bodyType.map(BodyType::getBodyTypeName).orElse(null))//NULLABLE
                                                         .purpose(purpose.get().getPurposeName())//non NULLABLE
                                                         .brand(brand.get().getBrandName())//non NULLABLE
                                                         .model(model.get().getModelName())//non NULLABLE
-                                                        .fuelType(Objects.nonNull(nullableFuelType) ? nullableFuelType.getFuelTypeName() : null)//NULLABLE
+                                                        .fuelType(fuelType.map(FuelType::getFuelTypeName).orElse(null))//NULLABLE
                                                         .engineCapacity(vehicleEngineCapacity)//NULLABLE
                                                         .makeYear(vehicleMakeYear)//non NULLABLE
                                                         .ownWeight(vehicleOwnWeight)//NULLABLE
                                                         .totalWeight(vehicleTotalWeight)//NULLABLE
                                                         .personType(personType)//non NULLABLE
                                                         .registrationNumber(vehicleRegistrationNumber)//NULLABLE
-                                                        .registrationDate(registrationDate)//non NULLABLE
+                                                        .registrationDate(record.getDate())//non NULLABLE
                                                         .build();
                 Optional<Registration> result = registrationDBService.create(registration);
                 if (!result.isPresent()) {
                     log.warn("Record {} is not created!", record);
                 }
             } else {
-                log.warn("Registration record is not valid");
+                log.warn("Registration record is not valid. Record = {}", record);
             }
         } catch (Exception ex) {
-            log.warn("Problem with saving record: {}", record.toString());
+            log.warn("Problem with saving record: {}", record);
             log.error("ERROR OCCURRED IN PERSISTING CURRENT RECORD", ex);
         }
+    }
+
+    private static <T> boolean isPresent(Optional<T> optional, String objectName) {
+        if (!optional.isPresent()) {
+            log.warn("{} is not present", objectName);
+        }
+        return optional.isPresent();
+    }
+
+    private static boolean isNotNull(Object object, String objectName) {
+        if (Objects.isNull(object)) {
+            log.warn("{} is null", objectName);
+        }
+        return Objects.nonNull(object);
+    }
+
+    private static boolean isNotBlank(String object, String objectName) {
+        if (StringUtils.isBlank(object)) {
+            log.warn("{} is blank", objectName);
+        }
+        return StringUtils.isNotBlank(object);
     }
 }

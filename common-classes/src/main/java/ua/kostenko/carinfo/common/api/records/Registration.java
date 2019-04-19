@@ -42,9 +42,7 @@ public class Registration implements Serializable {
     private String operationName;//non NULLABLE opName
     @NonNull
     private Long departmentCode;//non NULLABLE
-    @NonNull
     private String departmentAddress;//non NULLABLE
-    @NonNull
     private String departmentEmail;//non NULLABLE
     @NonNull
     private String kind;//non NULLABLE

@@ -29,12 +29,12 @@ public class Registration {
     public static Registration map(ResultSet resultSet, RegionCodeEntity registrationNumberRegionName) {
         try {
             return new Registration(PersonKind.getPersonKind(resultSet.getString(FIELD_PERSON)),
-                    resultSet.getString(FIELD_TYPE_NAME),
-                    resultSet.getString(FIELD_NAME),
-                    resultSet.getString(FIELD_OPERATION_NAME),
-                    resultSet.getString(FIELD_REGISTRATION_DATE),
-                    resultSet.getString(FIELD_CAR_NEW_REG_NUMBER),
-                    registrationNumberRegionName);
+                                    resultSet.getString(FIELD_TYPE_NAME),
+                                    resultSet.getString(FIELD_NAME),
+                                    resultSet.getString(FIELD_OPERATION_NAME),
+                                    resultSet.getString(FIELD_REGISTRATION_DATE),
+                                    resultSet.getString(FIELD_CAR_NEW_REG_NUMBER),
+                                    registrationNumberRegionName);
         } catch (SQLException e) {
             log.error("Error with mapping resultSet row to Registration", e);
         }
@@ -47,8 +47,6 @@ public class Registration {
 
         static PersonKind getPersonKind(String person) {
             switch (person) {
-                case "P":
-                    return PERSON;
                 case "J":
                     return JURIDICAL;
                 default:

@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,9 +19,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
-
-import static java.util.Objects.nonNull;
-import static ua.kostenko.carinfo.common.Utils.getResultOrWrapExceptionToNull;
 
 @Repository
 @Slf4j
@@ -64,29 +62,39 @@ class AdminObjectRepository extends CommonDBRepository<AdministrativeObject> {
     @Override
     public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(admin_obj_id) from carinfo.admin_object where admin_obj_id = ?;";
-        Long numberOfRows = jdbcTemplate.queryForObject(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), id);
-        return Objects.nonNull(numberOfRows) && numberOfRows > 0;
+        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), id).stream().findFirst().orElse(0L);
+        return numberOfRows > 0;
     }
 
     @Override
     public boolean exist(@Nonnull AdministrativeObject entity) {
-        ParamsHolder searchParams = getBuilder().param(AdministrativeObject.ADMIN_OBJ_NAME, entity.getAdminObjName()).build();
-        return nonNull(findOne(searchParams));
+        String name = entity.getAdminObjName();
+        String jdbcTemplateSelectCount = "select count(admin_obj_id) from carinfo.admin_object where admin_obj_name = ?;";
+        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), name).stream().findFirst().orElse(0L);
+        return numberOfRows > 0;
     }
 
     @Nullable
     @Override
     public AdministrativeObject findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.admin_object where admin_obj_id = ?;";
-        return getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
+        return Utils.getResultOrWrapExceptionToNull(() -> {
+            List<AdministrativeObject> list = jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER, id);
+            return list.stream().findFirst().orElse(null);
+        });
     }
 
+
+    @Cacheable(cacheNames = "adminObj", unless = "#result != null")
     @Nullable
     @Override
     public AdministrativeObject findOne(@Nonnull ParamsHolder searchParams) {
-        String name = searchParams.getString(AdministrativeObject.ADMIN_OBJ_NAME);
+        String param = searchParams.getString(AdministrativeObject.ADMIN_OBJ_NAME);
         String jdbcTemplateSelect = "select * from carinfo.admin_object where admin_obj_name = ?;";
-        return getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, name));
+        return Utils.getResultOrWrapExceptionToNull(() -> {
+            List<AdministrativeObject> list = jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER, param);
+            return list.stream().findFirst().orElse(null);
+        });
     }
 
     @Override

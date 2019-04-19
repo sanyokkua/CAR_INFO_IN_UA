@@ -12,7 +12,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Builder
 public class Operation implements Serializable {
-    public static final String OPERATION_NAME = "operationName";
+    public static final String OPERATION_CODE = "operationCode";
     private Long operationCode;
     private String operationName;
 }

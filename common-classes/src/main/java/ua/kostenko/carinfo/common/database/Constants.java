@@ -31,7 +31,6 @@ public interface Constants {
     interface RegistrationDepartment {
         String TABLE = "department";
         String CODE = "dep_code";
-        String NAME = "dep_name";
         String ADDRESS = "dep_addr";
         String EMAIL = "dep_email";
     }

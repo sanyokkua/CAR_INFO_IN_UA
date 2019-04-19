@@ -3,6 +3,7 @@ package ua.kostenko.carinfo.common.database.repositories;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -19,9 +20,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.sql.*;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-
-import static java.util.Objects.nonNull;
 
 @Repository
 @Slf4j
@@ -31,7 +31,7 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration> {
                                                                                             .adminObjType(resultSet.getString(Constants.AdminObject.TYPE))
                                                                                             .operationCode(resultSet.getLong(Constants.RegistrationOperation.CODE))
                                                                                             .operationName(resultSet.getString(Constants.RegistrationOperation.NAME))
-                                                                                            .departmentCode(resultSet.getLong(Constants.RegistrationDepartment.NAME))
+                                                                                            .departmentCode(resultSet.getLong(Constants.RegistrationDepartment.CODE))
                                                                                             .departmentAddress(resultSet.getString(Constants.RegistrationDepartment.ADDRESS))
                                                                                             .departmentEmail(resultSet.getString(Constants.RegistrationDepartment.EMAIL))
                                                                                             .kind(resultSet.getString(Constants.RegistrationKind.NAME))
@@ -85,7 +85,7 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration> {
 
     @Nullable
     @Override
-    public Registration create(@NonNull @Nonnull Registration entity) {//TODO: finish
+    public Registration create(@NonNull @Nonnull Registration entity) {
         String jdbcTemplateInsert = "insert into carinfo.record (" +
                 "admin_obj_id, " +
                 "op_code, " +
@@ -110,8 +110,12 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration> {
             setParamsForStatement(entity, statement);
             return statement;
         }, keyHolder);
-        Object id = keyHolder.getKeys().get(Constants.RegistrationRecord.ID);
-        return findOne((long) id);
+        Map<String, Object> keys = keyHolder.getKeys();
+        if (Objects.nonNull(keys)) {
+            Object id = keys.get(Constants.RegistrationRecord.ID);
+            return findOne((long) id);
+        }
+        return null;
     }
 
     private void setParamsForStatement(@Nonnull @NonNull Registration entity, @NonNull PreparedStatement statement) throws SQLException {
@@ -121,7 +125,7 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration> {
         Department department = departmentDBRepository.findOne(getBuilder().param(Department.DEPARTMENT_CODE, entity.getDepartmentCode()).build());
         FuelType fuelType = fuelTypeDBRepository.findOne(getBuilder().param(FuelType.FUEL_NAME, entity.getFuelType()).build());
         Kind kind = kindDBRepository.findOne(getBuilder().param(Kind.KIND_NAME, entity.getKind()).build());
-        Operation operation = operationDBRepository.findOne(getBuilder().param(Operation.OPERATION_NAME, entity.getOperationCode()).build());
+        Operation operation = operationDBRepository.findOne(getBuilder().param(Operation.OPERATION_CODE, entity.getOperationCode()).build());
         Purpose purpose = purposeDBRepository.findOne(getBuilder().param(Purpose.PURPOSE_NAME, entity.getPurpose()).build());
         Vehicle vehicle = vehicleDBRepository.findOne(getBuilder().param(Vehicle.BRAND_NAME, entity.getBrand()).param(Vehicle.MODEL_NAME, entity.getModel()).build());
 
@@ -186,7 +190,7 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration> {
         Department department = departmentDBRepository.findOne(getBuilder().param(Department.DEPARTMENT_CODE, entity.getDepartmentCode()).build());
         FuelType fuelType = fuelTypeDBRepository.findOne(getBuilder().param(FuelType.FUEL_NAME, entity.getFuelType()).build());
         Kind kind = kindDBRepository.findOne(getBuilder().param(Kind.KIND_NAME, entity.getKind()).build());
-        Operation operation = operationDBRepository.findOne(getBuilder().param(Operation.OPERATION_NAME, entity.getOperationCode()).build());
+        Operation operation = operationDBRepository.findOne(getBuilder().param(Operation.OPERATION_CODE, entity.getOperationCode()).build());
         Purpose purpose = purposeDBRepository.findOne(getBuilder().param(Purpose.PURPOSE_NAME, entity.getPurpose()).build());
         Vehicle vehicle = vehicleDBRepository.findOne(getBuilder().param(Vehicle.BRAND_NAME, entity.getBrand()).param(Vehicle.MODEL_NAME, entity.getModel()).build());
 
@@ -237,26 +241,34 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration> {
     @Override
     public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(id) from carinfo.record where id = ?;";
-        Long numberOfRows = jdbcTemplate.queryForObject(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), id);
-        return Objects.nonNull(numberOfRows) && numberOfRows > 0;
+        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), id).stream().findFirst().orElse(0L);
+        return numberOfRows > 0;
     }
 
     @Override
     public boolean exist(@Nonnull Registration entity) {
-        ParamsHolder searchParams = getBuilder()
-                .param(Registration.OPERATION_CODE, entity.getOperationCode())
-                .param(Registration.OPERATION_NAME, entity.getOperationName())
-                .param(Registration.DEPARTMENT_CODE, entity.getDepartmentCode())
-                .param(Registration.KIND, entity.getKind())
-                .param(Registration.COLOR, entity.getColor())
-                .param(Registration.PURPOSE, entity.getPurpose())
-                .param(Registration.BRAND, entity.getBrand())
-                .param(Registration.MODEL, entity.getModel())
-                .param(Registration.MAKE_YEAR, entity.getMakeYear())
-                .param(Registration.PERSON_TYPE, entity.getPersonType())
-                .param(Registration.REGISTRATION_DATE, entity.getRegistrationDate())
-                .build();
-        return nonNull(findOne(searchParams));
+        String jdbcTemplateSelectCount = "select count(id) " +
+                "from carinfo.record r, carinfo.admin_object ao, carinfo.operation o, carinfo.department d, carinfo.kind k, carinfo.vehicle v, carinfo.color c, carinfo.body_type bt," +
+                " carinfo.purpose p, carinfo.fuel_type ft, carinfo.brand b, carinfo.model m " +
+                "where ao.admin_obj_id =  r.admin_obj_id and o.op_code = r.op_code and d.dep_code = r.dep_code and k.kind_id = r.kind_id and v.vehicle_id = r.vehicle_id " +
+                "and c.color_id = r.color_id and bt.body_type_id = r.body_type_id and p.purpose_id = r.purpose_id and ft.fuel_type_id = r.fuel_type_id and b.brand_id = v.brand_id " +
+                "and m.model_id = v.model_id " +
+                "and o.op_code = ? and o.op_name = ? and d.dep_code = ? and k.kind_name = ? and c.color_name = ? and p.purpose_name = ?" +
+                " and b.brand_name = ? and m.model_name = ? and r.make_year = ? and r.person_type = ? and r.registration_date = ?;";
+        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1),
+                                               entity.getOperationCode(),
+                                               entity.getOperationName(),
+                                               entity.getDepartmentCode(),
+                                               entity.getKind(),
+                                               entity.getColor(),
+                                               entity.getPurpose(),
+                                               entity.getBrand(),
+                                               entity.getModel(),
+                                               entity.getMakeYear(),
+                                               entity.getPersonType(),
+                                               entity.getRegistrationDate())
+                                        .stream().findFirst().orElse(0L);
+        return numberOfRows > 0;
     }
 
     @Nullable
@@ -269,9 +281,10 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration> {
                 "and c.color_id = r.color_id and bt.body_type_id = r.body_type_id and p.purpose_id = r.purpose_id and ft.fuel_type_id = r.fuel_type_id and b.brand_id = v.brand_id " +
                 "and m.model_id = v.model_id " +
                 "and r.id = ?;";
-        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect, ROW_MAPPER, id));
+        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER, id).stream().findFirst().orElse(null));
     }
 
+    @Cacheable(cacheNames = "registration", unless = "#result != null")
     @Nullable
     @Override
     public Registration findOne(@Nonnull ParamsHolder searchParams) {
@@ -279,7 +292,10 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration> {
                 "from carinfo.record r, carinfo.admin_object ao, carinfo.operation o, carinfo.department d, carinfo.kind k, carinfo.vehicle v, carinfo.color c, carinfo.body_type bt," +
                 " carinfo.purpose p, carinfo.fuel_type ft, carinfo.brand b, carinfo.model m ";
         String where = buildWhereForFind(searchParams);
-        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.queryForObject(jdbcTemplateSelect + where, ROW_MAPPER));
+        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.query(jdbcTemplateSelect + where, ROW_MAPPER)
+                                                                      .stream()
+                                                                      .findFirst()
+                                                                      .orElse(null));
     }
 
     @Override
@@ -316,38 +332,38 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration> {
         Long totalWeight = searchParams.getLong(Registration.TOTAL_WEIGHT);
         String regNumber = searchParams.getString(Registration.REGISTRATION_NUMBER);
         return buildWhere()
-                .add("ao.admin_obj_id", "r.admin_obj_id")
-                .add("o.op_code", "r.op_code")
-                .add("d.dep_code", "r.dep_code")
-                .add("k.kind_id", "r.kind_id")
-                .add("v.vehicle_id", "r.vehicle_id")
-                .add("c.color_id", "r.color_id")
-                .add("bt.body_type_id", "r.body_type_id")
-                .add("p.purpose_id", "r.purpose_id")
-                .add("ft.fuel_type_id", "r.fuel_type_id")
-                .add("b.brand_id", "v.brand_id")
-                .add("m.model_id", "v.model_id")
-                .add("o.op_code", opeCode)
-                .add("o.op_name", opName)
-                .add("d.dep_code", depCode)
-                .add("c.color_name", color)
-                .add("p.purpose_name", purpose)
-                .add("k.kind_name", kind)
-                .add("b.brand_name", brand)
-                .add("m.model_name", model)
-                .add("r.make_year", makeYear)
-                .add("r.person_type", personType)
-                .add("r.registration_date", regDate)
-                .add("ao.admin_obj_name", admObjName)
-                .add("ao.admin_obj_type", admObjType)
-                .add("d.dep_addr", depAddress)
-                .add("d.dep_email", depEmail)
-                .add("bt.body_type_name", bodyType)
-                .add("ft.fuel_type_name", fuelType)
-                .add("r.engine_capacity", engineCapacity)
-                .add("r.own_weight", ownWeight)
-                .add("r.total_weight", totalWeight)
-                .add("r.registration_number", regNumber)
+                .add("ao.admin_obj_id", "r.admin_obj_id", false)
+                .add("o.op_code", "r.op_code", false)
+                .add("d.dep_code", "r.dep_code", false)
+                .add("k.kind_id", "r.kind_id", false)
+                .add("v.vehicle_id", "r.vehicle_id", false)
+                .add("c.color_id", "r.color_id", false)
+                .add("bt.body_type_id", "r.body_type_id", false)
+                .add("p.purpose_id", "r.purpose_id", false)
+                .add("ft.fuel_type_id", "r.fuel_type_id", false)
+                .add("b.brand_id", "v.brand_id", false)
+                .add("m.model_id", "v.model_id", false)
+                .add("o.op_code", opeCode, true)
+                .add("o.op_name", opName, true)
+                .add("d.dep_code", depCode, true)
+                .add("c.color_name", color, true)
+                .add("p.purpose_name", purpose, true)
+                .add("k.kind_name", kind, true)
+                .add("b.brand_name", brand, true)
+                .add("m.model_name", model, true)
+                .add("r.make_year", makeYear, true)
+                .add("r.person_type", personType, true)
+                .add("r.registration_date", regDate, true)
+                .add("ao.admin_obj_name", admObjName, true)
+                .add("ao.admin_obj_type", admObjType, true)
+                .add("d.dep_addr", depAddress, true)
+                .add("d.dep_email", depEmail, true)
+                .add("bt.body_type_name", bodyType, true)
+                .add("ft.fuel_type_name", fuelType, true)
+                .add("r.engine_capacity", engineCapacity, true)
+                .add("r.own_weight", ownWeight, true)
+                .add("r.total_weight", totalWeight, true)
+                .add("r.registration_number", regNumber, true)
                 .build();
     }
 

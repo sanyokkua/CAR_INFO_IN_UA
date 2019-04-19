@@ -10,6 +10,7 @@ import ua.kostenko.carinfo.common.api.records.Operation;
 import ua.kostenko.carinfo.common.database.repositories.DBRepository;
 
 import javax.annotation.Nonnull;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -23,13 +24,13 @@ class OperationService extends CommonDbService<Operation> {
 
     @Override
     public boolean isValid(@NonNull @Nonnull Operation entity) {
-        return StringUtils.isNotBlank(entity.getOperationName());
+        return Objects.nonNull(entity.getOperationCode()) && StringUtils.isNotBlank(entity.getOperationName());
     }
 
     @Override
     public Optional<Operation> get(@NonNull @Nonnull Operation entity) {
         ParamsHolderBuilder builder = new ParamsHolderBuilder();
-        builder.param(Operation.OPERATION_NAME, entity.getOperationName());
+        builder.param(Operation.OPERATION_CODE, entity.getOperationCode());
         Operation foundEntity = this.repository.findOne(builder.build());
         return Optional.ofNullable(foundEntity);
     }
