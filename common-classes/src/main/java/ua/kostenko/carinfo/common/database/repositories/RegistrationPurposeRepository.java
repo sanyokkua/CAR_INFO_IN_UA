@@ -18,7 +18,6 @@ import ua.kostenko.carinfo.common.database.Constants;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Objects;
 
 @Repository
 @Slf4j

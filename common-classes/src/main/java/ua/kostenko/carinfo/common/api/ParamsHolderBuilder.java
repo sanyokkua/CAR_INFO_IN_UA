@@ -1,6 +1,8 @@
 package ua.kostenko.carinfo.common.api;
 
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 
@@ -11,6 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+@EqualsAndHashCode
+@ToString
 public final class ParamsHolderBuilder {
     private static final int DEFAULT_RECORDS_NUMBER = 10;
     private int records;
@@ -77,16 +81,5 @@ public final class ParamsHolderBuilder {
 
     private int getAmount(@Nullable Integer recordsPerPage) {
         return Objects.nonNull(recordsPerPage) && recordsPerPage > 0 ? recordsPerPage : DEFAULT_RECORDS_NUMBER;
-    }
-
-    @Override
-    public String toString() {
-        return "Params{" +
-                "records=" + records +
-                ", page=" + page +
-                ", longValues=" + longValues.toString() +
-                ", integerValues=" + integerValues.toString() +
-                ", stringValues=" + stringValues.toString() +
-                '}';
     }
 }

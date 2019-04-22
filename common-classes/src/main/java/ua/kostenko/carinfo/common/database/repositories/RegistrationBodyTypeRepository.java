@@ -18,7 +18,6 @@ import ua.kostenko.carinfo.common.database.Constants;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Objects;
 
 @Repository
 @Slf4j
@@ -69,7 +68,7 @@ class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType> {
     public boolean exist(@Nonnull BodyType entity) {
         String jdbcTemplateSelectCount = "select count(body_type_id) from carinfo.body_type where body_type_name = ?;";
         long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), entity.getBodyTypeName())
-                .stream().findFirst().orElse(0L);
+                                        .stream().findFirst().orElse(0L);
         return numberOfRows > 0;
     }
 

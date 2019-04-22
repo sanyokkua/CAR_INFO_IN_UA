@@ -27,7 +27,7 @@ class AdministrativeObjectService extends CommonDbService<AdministrativeObject> 
     }
 
     @Override
-    public Optional<AdministrativeObject> get(@Nonnull AdministrativeObject entity) {
+    public Optional<AdministrativeObject> get(@NonNull @Nonnull AdministrativeObject entity) {
         ParamsHolderBuilder builder = new ParamsHolderBuilder();
         builder.param(AdministrativeObject.ADMIN_OBJ_NAME, entity.getAdminObjName());
         AdministrativeObject foundEntity = this.repository.findOne(builder.build());

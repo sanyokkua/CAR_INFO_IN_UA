@@ -50,7 +50,7 @@ abstract class CommonDbService<T> implements DBService<T> {
                     T updated = repository.update(entity);
                     return Optional.ofNullable(updated);
                 } else {
-                    log.warn("update: entity: {} is not exists, nothing to update", entity);
+                    log.warn("update: entity: {} doesn't exist, nothing to update", entity);
                     return Optional.empty();
                 }
             });
@@ -67,7 +67,7 @@ abstract class CommonDbService<T> implements DBService<T> {
     }
 
     @Override
-    public boolean exists(@Nonnull T entity) {
+    public boolean exists(@NonNull @Nonnull T entity) {
         boolean exist = repository.exist(entity);
         log.info("exists: Entity {} exists: {}", entity, exist);
         return exist;
