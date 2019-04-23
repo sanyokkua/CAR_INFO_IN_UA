@@ -9,6 +9,9 @@ import ua.kostenko.carinfo.common.api.records.Registration;
 import ua.kostenko.carinfo.common.database.repositories.DBRepository;
 
 import javax.annotation.Nonnull;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
@@ -24,11 +27,9 @@ class RegistrationService extends CommonDbService<Registration> {
 
     @Override
     public boolean isValid(@NonNull @Nonnull Registration entity) {
-        return nonNull(entity.getOperationCode()) && //non NULLABLE
+        boolean isValid = nonNull(entity.getOperationCode()) && //non NULLABLE
                 nonNull(entity.getOperationName()) && //non NULLABLE
                 nonNull(entity.getDepartmentCode()) && //non NULLABLE
-                nonNull(entity.getDepartmentAddress()) && //non NULLABLE
-                nonNull(entity.getDepartmentEmail()) && //non NULLABLE
                 nonNull(entity.getKind()) && //non NULLABLE
                 nonNull(entity.getColor()) && //non NULLABLE
                 nonNull(entity.getPurpose()) && //non NULLABLE
@@ -36,7 +37,29 @@ class RegistrationService extends CommonDbService<Registration> {
                 nonNull(entity.getModel()) && //non NULLABLE
                 nonNull(entity.getMakeYear()) && //non NULLABLE
                 nonNull(entity.getPersonType()) && //non NULLABLE
-                nonNull(entity.getRegistrationDate());//non NULLABLE
+                nonNull(entity.getRegistrationDate()); //non NULLABLE
+        if (!isValid) {
+            Map<String, Object> fields = new HashMap<>();
+            fields.put("OperationCode", entity.getOperationCode());
+            fields.put("OperationName", entity.getOperationName());
+            fields.put("DepartmentCode", entity.getDepartmentCode());
+            fields.put("Kind", entity.getKind());
+            fields.put("Color", entity.getColor());
+            fields.put("Purpose", entity.getPurpose());
+            fields.put("Brand", entity.getBrand());
+            fields.put("Model", entity.getModel());
+            fields.put("MakeYear", entity.getMakeYear());
+            fields.put("PersonType", entity.getPersonType());
+            fields.put("RegistrationDate", entity.getRegistrationDate());
+            String result = "Entity: " + entity.toString() + " has next invalid fields: ";
+            StringBuilder builder = new StringBuilder();
+            fields.entrySet().stream()
+                  .filter(stringObjectEntry -> Objects.isNull(stringObjectEntry.getValue()))
+                  .forEach(stringObjectEntry -> builder.append(stringObjectEntry.getKey()).append("\n"));
+            result += builder.toString();
+            log.warn(result);
+        }
+        return isValid;
     }
 
     @Override
