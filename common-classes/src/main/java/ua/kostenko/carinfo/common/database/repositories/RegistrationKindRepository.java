@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import ua.kostenko.carinfo.common.Utils;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.records.Kind;
 import ua.kostenko.carinfo.common.database.Constants;
@@ -32,13 +31,16 @@ class RegistrationKindRepository extends CommonDBRepository<Kind> {
         super(jdbcTemplate);
     }
 
+    @Override
+    RowMapper<Kind> getRowMapper() {
+        return ROW_MAPPER;
+    }
+
     @Nullable
     @Override
     public Kind create(@NonNull @Nonnull Kind entity) {
         String jdbcTemplateInsert = "insert into carinfo.kind (kind_name) values (?);";
-        jdbcTemplate.update(jdbcTemplateInsert, entity.getKindName());
-        ParamsHolder searchParams = getBuilder().param(Kind.KIND_NAME, entity.getKindName()).build();
-        return findOne(searchParams);
+        return create(jdbcTemplateInsert, Constants.RegistrationKind.ID, entity.getKindName());
     }
 
     @Nullable
@@ -46,55 +48,48 @@ class RegistrationKindRepository extends CommonDBRepository<Kind> {
     public Kind update(@NonNull @Nonnull Kind entity) {
         String jdbcTemplateUpdate = "update carinfo.kind set kind_name = ? where kind_id = ?;";
         jdbcTemplate.update(jdbcTemplateUpdate, entity.getKindName(), entity.getKindId());
-        ParamsHolder searchParams = getBuilder().param(Kind.KIND_NAME, entity.getKindName()).build();
+        ParamsHolder searchParams = getParamsHolderBuilder().param(Kind.KIND_NAME, entity.getKindName()).build();
         return findOne(searchParams);
     }
 
     @Override
     public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.kind where kind_id = ?;";
-        int updated = jdbcTemplate.update(jdbcTemplateDelete, id);
-        return updated > 0;
+        return delete(jdbcTemplateDelete, id);
     }
 
     @Override
     public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(kind_id) from carinfo.kind where kind_id = ?;";
-        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), id).stream().findFirst().orElse(0L);
-        return numberOfRows > 0;
+        return exist(jdbcTemplateSelectCount, id);
     }
 
     @Override
-    public boolean exist(@Nonnull Kind entity) {
+    public boolean exist(@NonNull @Nonnull Kind entity) {
         String jdbcTemplateSelectCount = "select count(kind_id) from carinfo.kind where kind_name = ?;";
-        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), entity.getKindName())
-                                        .stream().findFirst().orElse(0L);
-        return numberOfRows > 0;
+        return exist(jdbcTemplateSelectCount, entity.getKindName());
     }
 
     @Nullable
     @Override
     public Kind findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.kind where kind_id = ?;";
-        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER, id).stream().findFirst().orElse(null));
+        return findOne(jdbcTemplateSelect, id);
     }
 
     @Cacheable(cacheNames = "kind", unless = "#result != null")
     @Nullable
     @Override
-    public Kind findOne(@Nonnull ParamsHolder searchParams) {
+    public Kind findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String param = searchParams.getString(Kind.KIND_NAME);
         String jdbcTemplateSelect = "select * from carinfo.kind where kind_name = ?;";
-        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER, param)
-                                                                      .stream()
-                                                                      .findFirst()
-                                                                      .orElse(null));
+        return findOne(jdbcTemplateSelect, param);
     }
 
     @Override
     public List<Kind> find() {
         String jdbcTemplateSelect = "select * from carinfo.kind;";
-        return jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER);
+        return find(jdbcTemplateSelect);
     }
 
     @Override
@@ -106,7 +101,7 @@ class RegistrationKindRepository extends CommonDBRepository<Kind> {
         String where = buildWhere().add("k.kind_name", name, true).build();
 
         String countQuery = "select count(1) as row_count " + "from carinfo.kind k " + where;
-        int total = jdbcTemplate.queryForObject(countQuery, (rs, rowNum) -> rs.getInt(1));
+        int total = jdbcTemplate.queryForObject(countQuery, FIND_TOTAL_MAPPER);
 
         String querySql = select + where + " limit " + pageable.getPageSize() + " offset " + pageable.getOffset();
         List<Kind> result = jdbcTemplate.query(querySql, ROW_MAPPER);

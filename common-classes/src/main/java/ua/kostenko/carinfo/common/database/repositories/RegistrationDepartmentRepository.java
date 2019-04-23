@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import ua.kostenko.carinfo.common.Utils;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.records.Department;
 import ua.kostenko.carinfo.common.database.Constants;
@@ -34,13 +33,16 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department> {
         super(jdbcTemplate);
     }
 
+    @Override
+    RowMapper<Department> getRowMapper() {
+        return ROW_MAPPER;
+    }
+
     @Nullable
     @Override
     public Department create(@NonNull @Nonnull Department entity) {
         String jdbcTemplateInsert = "insert into carinfo.department (dep_code, dep_addr, dep_email) values (?, ?, ?);";
-        jdbcTemplate.update(jdbcTemplateInsert, entity.getDepartmentCode(), entity.getDepartmentAddress(), entity.getDepartmentEmail());
-        ParamsHolder holder = getBuilder().param(Department.DEPARTMENT_CODE, entity.getDepartmentCode()).build();
-        return findOne(holder);
+        return create(jdbcTemplateInsert, Constants.RegistrationDepartment.CODE, entity.getDepartmentCode(), entity.getDepartmentAddress(), entity.getDepartmentEmail());
     }
 
     @Nullable
@@ -48,43 +50,39 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department> {
     public Department update(@NonNull @Nonnull Department entity) {
         String jdbcTemplateUpdate = "update carinfo.department set dep_addr = ?, dep_email = ? where dep_code = ?;";
         jdbcTemplate.update(jdbcTemplateUpdate, entity.getDepartmentAddress(), entity.getDepartmentEmail(), entity.getDepartmentCode());
-        ParamsHolder holder = getBuilder().param(Department.DEPARTMENT_CODE, entity.getDepartmentCode()).build();
+        ParamsHolder holder = getParamsHolderBuilder().param(Department.DEPARTMENT_CODE, entity.getDepartmentCode()).build();
         return findOne(holder);
     }
 
     @Override
     public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.department where dep_code = ?;";
-        int updated = jdbcTemplate.update(jdbcTemplateDelete, id);
-        return updated > 0;
+        return delete(jdbcTemplateDelete, id);
     }
 
     @Override
     public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(dep_code) from carinfo.department where dep_code = ?;";
-        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), id).stream().findFirst().orElse(0L);
-        return numberOfRows > 0;
+        return exist(jdbcTemplateSelectCount, id);
     }
 
     @Override
-    public boolean exist(@Nonnull Department entity) {
+    public boolean exist(@NonNull @Nonnull Department entity) {
         String jdbcTemplateSelectCount = "select count(dep_code) from carinfo.department where dep_code = ?;";
-        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), entity.getDepartmentCode())
-                                        .stream().findFirst().orElse(0L);
-        return numberOfRows > 0;
+        return exist(jdbcTemplateSelectCount, entity.getDepartmentCode());
     }
 
     @Nullable
     @Override
     public Department findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.department where dep_code = ?;";
-        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER, id).stream().findFirst().orElse(null));
+        return findOne(jdbcTemplateSelect, id);
     }
 
     @Cacheable(cacheNames = "department", unless = "#result != null")
     @Nullable
     @Override
-    public Department findOne(@Nonnull ParamsHolder searchParams) {
+    public Department findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         Long depCode = searchParams.getLong(Department.DEPARTMENT_CODE);
         if (Objects.isNull(depCode)) {
             return null;
@@ -95,7 +93,7 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department> {
     @Override
     public List<Department> find() {
         String jdbcTemplateSelect = "select * from carinfo.department;";
-        return jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER);
+        return find(jdbcTemplateSelect);
     }
 
     @Override
@@ -114,7 +112,7 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department> {
                 .build();
 
         String countQuery = "select count(1) as row_count " + " from carinfo.department d " + where;
-        int total = jdbcTemplate.queryForObject(countQuery, (rs, rowNum) -> rs.getInt(1));
+        int total = jdbcTemplate.queryForObject(countQuery, FIND_TOTAL_MAPPER);
 
         int limit = pageable.getPageSize();
         long offset = pageable.getOffset();

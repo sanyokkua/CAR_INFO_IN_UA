@@ -9,9 +9,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
-import ua.kostenko.carinfo.common.Utils;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.records.Brand;
 import ua.kostenko.carinfo.common.api.records.Model;
@@ -20,8 +18,6 @@ import ua.kostenko.carinfo.common.database.Constants;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.util.List;
 import java.util.Objects;
 
@@ -50,41 +46,32 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
     @Nullable
     @Override
     public Vehicle create(@NonNull @Nonnull Vehicle entity) {
-        ParamsHolder brandSearch = getBuilder().param(Brand.BRAND_NAME, entity.getBrandName()).build();
+        ParamsHolder brandSearch = getParamsHolderBuilder().param(Brand.BRAND_NAME, entity.getBrandName()).build();
         Brand brand = brandCommonDBRepository.findOne(brandSearch);
         if (Objects.isNull(brand)) {
             log.warn("create: brand is null. Return null instead of creating");
             return null;
         }
-        ParamsHolder modelSearch = getBuilder().param(Model.MODEL_NAME, entity.getModelName()).build();
+        ParamsHolder modelSearch = getParamsHolderBuilder().param(Model.MODEL_NAME, entity.getModelName()).build();
         Model model = modelCommonDBRepository.findOne(modelSearch);
         if (Objects.isNull(model)) {
             log.warn("create: model is null. Return null instead of creating");
             return null;
         }
-
         String jdbcTemplateInsert = "insert into carinfo.vehicle (brand_id, model_id) values (?, ?);";
-        GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> {
-            PreparedStatement statement = connection.prepareStatement(jdbcTemplateInsert, Statement.RETURN_GENERATED_KEYS);
-            statement.setLong(1, brand.getBrandId());
-            statement.setLong(2, model.getModelId());
-            return statement;
-        }, keyHolder);
-        Object id = keyHolder.getKeys().get(Constants.RegistrationVehicle.ID);
-        return findOne((long) id);
+        return create(jdbcTemplateInsert, Constants.RegistrationVehicle.ID, brand.getBrandId(), model.getModelId());
     }
 
     @Nullable
     @Override
     public Vehicle update(@NonNull @Nonnull Vehicle entity) {
-        ParamsHolder brandSearch = getBuilder().param(Brand.BRAND_NAME, entity.getBrandName()).build();
+        ParamsHolder brandSearch = getParamsHolderBuilder().param(Brand.BRAND_NAME, entity.getBrandName()).build();
         Brand brand = brandCommonDBRepository.findOne(brandSearch);
         if (Objects.isNull(brand)) {
             log.warn("update: brand is null. Return null instead of update");
             return null;
         }
-        ParamsHolder modelSearch = getBuilder().param(Model.MODEL_NAME, entity.getModelName()).build();
+        ParamsHolder modelSearch = getParamsHolderBuilder().param(Model.MODEL_NAME, entity.getModelName()).build();
         Model model = modelCommonDBRepository.findOne(modelSearch);
         if (Objects.isNull(model)) {
             log.warn("update: model is null. Return null instead of update");
@@ -99,24 +86,20 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
     @Override
     public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.vehicle where vehicle_id = ?;";
-        int updated = jdbcTemplate.update(jdbcTemplateDelete, id);
-        return updated > 0;
+        return delete(jdbcTemplateDelete, id);
     }
 
     @Override
     public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(vehicle_id) from carinfo.vehicle where vehicle_id = ?;";
-        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), id).stream().findFirst().orElse(0L);
-        return numberOfRows > 0;
+        return exist(jdbcTemplateSelectCount, id);
     }
 
     @Override
-    public boolean exist(@Nonnull Vehicle entity) {
+    public boolean exist(@NonNull @Nonnull Vehicle entity) {
         String jdbcTemplateSelectCount = "select count(v.vehicle_id) from carinfo.vehicle v, carinfo.brand b, carinfo.model m " +
                 "where v.brand_id = b.brand_id and m.model_id = v.model_id and m.model_name = ? and b.brand_name = ?;";
-        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), entity.getModelName(), entity.getBrandName())
-                                        .stream().findFirst().orElse(0L);
-        return numberOfRows > 0;
+        return exist(jdbcTemplateSelectCount, entity.getModelName(), entity.getBrandName());
     }
 
     @Nullable
@@ -125,23 +108,23 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
         String jdbcTemplateSelect = "select v.vehicle_id, v.model_id, v.brand_id, b.brand_name as brand, m.model_name as model " +
                 "from carinfo.vehicle v, carinfo.brand b, carinfo.model m " +
                 "where vehicle_id = ? and v.brand_id = b.brand_id and m.model_id = v.model_id;";
-        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER, id).stream().findFirst().orElse(null));
+        return findOne(jdbcTemplateSelect, id);
     }
 
     @Cacheable(cacheNames = "vehicle", unless = "#result != null")
     @Nullable
     @Override
-    public Vehicle findOne(@Nonnull ParamsHolder searchParams) {
+    public Vehicle findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String brandName = searchParams.getString(Vehicle.BRAND_NAME);
         String modelName = searchParams.getString(Vehicle.MODEL_NAME);
 
-        ParamsHolder brandSearch = getBuilder().param(Brand.BRAND_NAME, brandName).build();
+        ParamsHolder brandSearch = getParamsHolderBuilder().param(Brand.BRAND_NAME, brandName).build();
         Brand brand = brandCommonDBRepository.findOne(brandSearch);
         if (Objects.isNull(brand)) {
             log.warn("findOne: brand is null. Return null instead of findOne");
             return null;
         }
-        ParamsHolder modelSearch = getBuilder().param(Model.MODEL_NAME, modelName).build();
+        ParamsHolder modelSearch = getParamsHolderBuilder().param(Model.MODEL_NAME, modelName).build();
         Model model = modelCommonDBRepository.findOne(modelSearch);
         if (Objects.isNull(model)) {
             log.warn("findOne: model is null. Return null instead of findOne");
@@ -151,10 +134,7 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
         String jdbcTemplateSelect = "select v.vehicle_id, v.model_id, v.brand_id, b.brand_name as brand, m.model_name as model " +
                 "from carinfo.vehicle v, carinfo.brand b, carinfo.model m " +
                 "where v.brand_id = b.brand_id and m.model_id = v.model_id and v.brand_id = ? and v.model_id = ?;";
-        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER, brand.getBrandId(), model.getModelId())
-                                                                      .stream()
-                                                                      .findFirst()
-                                                                      .orElse(null));
+        return findOne(jdbcTemplateSelect, brand.getBrandId(), model.getModelId());
     }
 
     @Override
@@ -162,7 +142,7 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
         String jdbcTemplateSelect = "select v.vehicle_id, v.model_id, v.brand_id, b.brand_name as brand, m.model_name as model " +
                 "from carinfo.vehicle v, carinfo.brand b, carinfo.model m " +
                 "where v.brand_id = b.brand_id and m.model_id = v.model_id;";
-        return jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER);
+        return find(jdbcTemplateSelect);
     }
 
     @Override
@@ -180,12 +160,17 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
                 .build();
 
         String countQuery = "select count(1) as row_count " + " from carinfo.vehicle v, carinfo.brand b, carinfo.model m  " + where;
-        int total = jdbcTemplate.queryForObject(countQuery, (rs, rowNum) -> rs.getInt(1));
+        int total = jdbcTemplate.queryForObject(countQuery, FIND_TOTAL_MAPPER);
 
         int limit = pageable.getPageSize();
         long offset = pageable.getOffset();
         String querySql = select + where + " limit ? offset ?";
         List<Vehicle> result = jdbcTemplate.query(querySql, ROW_MAPPER, limit, offset);
         return new PageImpl<>(result, pageable, total);
+    }
+
+    @Override
+    RowMapper<Vehicle> getRowMapper() {
+        return ROW_MAPPER;
     }
 }

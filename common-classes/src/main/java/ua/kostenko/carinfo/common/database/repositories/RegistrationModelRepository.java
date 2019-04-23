@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import ua.kostenko.carinfo.common.Utils;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.records.Model;
 import ua.kostenko.carinfo.common.database.Constants;
@@ -32,13 +31,16 @@ class RegistrationModelRepository extends CommonDBRepository<Model> {
         super(jdbcTemplate);
     }
 
+    @Override
+    RowMapper<Model> getRowMapper() {
+        return ROW_MAPPER;
+    }
+
     @Nullable
     @Override
     public Model create(@NonNull @Nonnull Model entity) {
         String jdbcTemplateInsert = "insert into carinfo.model (model_name) values (?);";
-        jdbcTemplate.update(jdbcTemplateInsert, entity.getModelName());
-        ParamsHolder searchParams = getBuilder().param(Model.MODEL_NAME, entity.getModelName()).build();
-        return findOne(searchParams);
+        return create(jdbcTemplateInsert, Constants.RegistrationModel.ID, entity.getModelName());
     }
 
     @Nullable
@@ -46,55 +48,48 @@ class RegistrationModelRepository extends CommonDBRepository<Model> {
     public Model update(@NonNull @Nonnull Model entity) {
         String jdbcTemplateUpdate = "update carinfo.model set model_name = ? where model_id = ?;";
         jdbcTemplate.update(jdbcTemplateUpdate, entity.getModelName(), entity.getModelId());
-        ParamsHolder searchParams = getBuilder().param(Model.MODEL_NAME, entity.getModelName()).build();
+        ParamsHolder searchParams = getParamsHolderBuilder().param(Model.MODEL_NAME, entity.getModelName()).build();
         return findOne(searchParams);
     }
 
     @Override
     public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.model where model_id = ?;";
-        int updated = jdbcTemplate.update(jdbcTemplateDelete, id);
-        return updated > 0;
+        return delete(jdbcTemplateDelete, id);
     }
 
     @Override
     public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(model_id) from carinfo.model where model_id = ?;";
-        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), id).stream().findFirst().orElse(0L);
-        return numberOfRows > 0;
+        return exist(jdbcTemplateSelectCount, id);
     }
 
     @Override
-    public boolean exist(@Nonnull Model entity) {
+    public boolean exist(@NonNull @Nonnull Model entity) {
         String jdbcTemplateSelectCount = "select count(model_id) from carinfo.model where model_name = ?;";
-        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), entity.getModelName())
-                                        .stream().findFirst().orElse(0L);
-        return numberOfRows > 0;
+        return exist(jdbcTemplateSelectCount, entity.getModelName());
     }
 
     @Nullable
     @Override
     public Model findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.model where model_id = ?;";
-        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER, id).stream().findFirst().orElse(null));
+        return findOne(jdbcTemplateSelect, id);
     }
 
     @Cacheable(cacheNames = "model", unless = "#result != null")
     @Nullable
     @Override
-    public Model findOne(@Nonnull ParamsHolder searchParams) {
+    public Model findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String param = searchParams.getString(Model.MODEL_NAME);
         String jdbcTemplateSelect = "select * from carinfo.model where model_name = ?;";
-        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER, param)
-                                                                      .stream()
-                                                                      .findFirst()
-                                                                      .orElse(null));
+        return findOne(jdbcTemplateSelect, param);
     }
 
     @Override
     public List<Model> find() {
         String jdbcTemplateSelect = "select * from carinfo.model;";
-        return jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER);
+        return find(jdbcTemplateSelect);
     }
 
     @Override
@@ -106,7 +101,7 @@ class RegistrationModelRepository extends CommonDBRepository<Model> {
         String where = buildWhere().add("m.model_name", name, true).build();
 
         String countQuery = "select count(1) as row_count " + "from carinfo.model m " + where;
-        int total = jdbcTemplate.queryForObject(countQuery, (rs, rowNum) -> rs.getInt(1));
+        int total = jdbcTemplate.queryForObject(countQuery, FIND_TOTAL_MAPPER);
 
         String querySql = select + where + " limit " + pageable.getPageSize() + " offset " + pageable.getOffset();
         List<Model> result = jdbcTemplate.query(querySql, ROW_MAPPER);

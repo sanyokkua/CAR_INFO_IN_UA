@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import ua.kostenko.carinfo.common.Utils;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.records.Color;
 import ua.kostenko.carinfo.common.database.Constants;
@@ -32,13 +31,16 @@ class RegistrationColorRepository extends CommonDBRepository<Color> {
         super(jdbcTemplate);
     }
 
+    @Override
+    RowMapper<Color> getRowMapper() {
+        return ROW_MAPPER;
+    }
+
     @Nullable
     @Override
     public Color create(@NonNull @Nonnull Color entity) {
         String jdbcTemplateInsert = "insert into carinfo.color (color_name) values (?);";
-        jdbcTemplate.update(jdbcTemplateInsert, entity.getColorName());
-        ParamsHolder holder = getBuilder().param(Color.COLOR_NAME, entity.getColorName()).build();
-        return findOne(holder);
+        return create(jdbcTemplateInsert, Constants.RegistrationColor.ID, entity.getColorName());
     }
 
     @Nullable
@@ -46,55 +48,48 @@ class RegistrationColorRepository extends CommonDBRepository<Color> {
     public Color update(@NonNull @Nonnull Color entity) {
         String jdbcTemplateUpdate = "update carinfo.color set color_name = ? where color_id = ?;";
         jdbcTemplate.update(jdbcTemplateUpdate, entity.getColorName(), entity.getColorId());
-        ParamsHolder holder = getBuilder().param(Color.COLOR_NAME, entity.getColorName()).build();
+        ParamsHolder holder = getParamsHolderBuilder().param(Color.COLOR_NAME, entity.getColorName()).build();
         return findOne(holder);
     }
 
     @Override
     public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.color where color_id = ?;";
-        int updated = jdbcTemplate.update(jdbcTemplateDelete, id);
-        return updated > 0;
+        return delete(jdbcTemplateDelete, id);
     }
 
     @Override
     public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(color_id) from carinfo.color where color_id = ?;";
-        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), id).stream().findFirst().orElse(0L);
-        return numberOfRows > 0;
+        return exist(jdbcTemplateSelectCount, id);
     }
 
     @Override
-    public boolean exist(@Nonnull Color entity) {
+    public boolean exist(@NonNull @Nonnull Color entity) {
         String jdbcTemplateSelectCount = "select count(color_id) from carinfo.color where color_name = ?;";
-        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), entity.getColorName())
-                                        .stream().findFirst().orElse(0L);
-        return numberOfRows > 0;
+        return exist(jdbcTemplateSelectCount, entity.getColorName());
     }
 
     @Nullable
     @Override
     public Color findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.color where color_id = ?;";
-        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER, id).stream().findFirst().orElse(null));
+        return findOne(jdbcTemplateSelect, id);
     }
 
     @Cacheable(cacheNames = "color", unless = "#result != null")
     @Nullable
     @Override
-    public Color findOne(@Nonnull ParamsHolder searchParams) {
+    public Color findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String param = searchParams.getString(Color.COLOR_NAME);
         String jdbcTemplateSelect = "select * from carinfo.color where color_name = ?;";
-        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER, param)
-                                                                      .stream()
-                                                                      .findFirst()
-                                                                      .orElse(null));
+        return findOne(jdbcTemplateSelect, param);
     }
 
     @Override
     public List<Color> find() {
         String jdbcTemplateSelect = "select * from carinfo.color;";
-        return jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER);
+        return find(jdbcTemplateSelect);
     }
 
     @Override
@@ -107,7 +102,7 @@ class RegistrationColorRepository extends CommonDBRepository<Color> {
         String where = buildWhere().add("c.color_name", name, true).build();
 
         String countQuery = "select count(1) as row_count " + from + where;
-        int total = jdbcTemplate.queryForObject(countQuery, (rs, rowNum) -> rs.getInt(1));
+        int total = jdbcTemplate.queryForObject(countQuery, FIND_TOTAL_MAPPER);
 
         String querySql = select + from + where + " limit " + pageable.getPageSize() + " offset " + pageable.getOffset();
         List<Color> result = jdbcTemplate.query(querySql, ROW_MAPPER);

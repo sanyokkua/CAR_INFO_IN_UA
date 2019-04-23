@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import ua.kostenko.carinfo.common.Utils;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.records.BodyType;
 import ua.kostenko.carinfo.common.database.Constants;
@@ -32,13 +31,16 @@ class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType> {
         super(jdbcTemplate);
     }
 
+    @Override
+    RowMapper<BodyType> getRowMapper() {
+        return ROW_MAPPER;
+    }
+
     @Nullable
     @Override
     public BodyType create(@NonNull @Nonnull BodyType entity) {
         String jdbcTemplateInsert = "insert into carinfo.body_type (body_type_name) values (?);";
-        jdbcTemplate.update(jdbcTemplateInsert, entity.getBodyTypeName());
-        ParamsHolder holder = getBuilder().param(BodyType.BODY_TYPE_NAME, entity.getBodyTypeName()).build();
-        return findOne(holder);
+        return create(jdbcTemplateInsert, Constants.RegistrationBodyType.ID, entity.getBodyTypeName());
     }
 
     @Nullable
@@ -46,55 +48,48 @@ class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType> {
     public BodyType update(@NonNull @Nonnull BodyType entity) {
         String jdbcTemplateUpdate = "update carinfo.body_type set body_type_name = ? where body_type_id = ?;";
         jdbcTemplate.update(jdbcTemplateUpdate, entity.getBodyTypeName(), entity.getBodyTypeId());
-        ParamsHolder holder = getBuilder().param(BodyType.BODY_TYPE_NAME, entity.getBodyTypeName()).build();
+        ParamsHolder holder = getParamsHolderBuilder().param(BodyType.BODY_TYPE_NAME, entity.getBodyTypeName()).build();
         return findOne(holder);
     }
 
     @Override
     public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.body_type where body_type_id = ?;";
-        int updated = jdbcTemplate.update(jdbcTemplateDelete, id);
-        return updated > 0;
+        return delete(jdbcTemplateDelete, id);
     }
 
     @Override
     public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(body_type_id) from carinfo.body_type where body_type_id = ?;";
-        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), id).stream().findFirst().orElse(0L);
-        return numberOfRows > 0;
+        return exist(jdbcTemplateSelectCount, id);
     }
 
     @Override
-    public boolean exist(@Nonnull BodyType entity) {
+    public boolean exist(@NonNull @Nonnull BodyType entity) {
         String jdbcTemplateSelectCount = "select count(body_type_id) from carinfo.body_type where body_type_name = ?;";
-        long numberOfRows = jdbcTemplate.query(jdbcTemplateSelectCount, (rs, rowNum) -> rs.getLong(1), entity.getBodyTypeName())
-                                        .stream().findFirst().orElse(0L);
-        return numberOfRows > 0;
+        return exist(jdbcTemplateSelectCount, entity.getBodyTypeName());
     }
 
     @Nullable
     @Override
     public BodyType findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.body_type where body_type_id = ?;";
-        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER, id).stream().findFirst().orElse(null));
+        return findOne(jdbcTemplateSelect, id);
     }
 
     @Cacheable(cacheNames = "bodyType", unless = "#result != null")
     @Nullable
     @Override
-    public BodyType findOne(@Nonnull ParamsHolder searchParams) {
+    public BodyType findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String param = searchParams.getString(BodyType.BODY_TYPE_NAME);
         String jdbcTemplateSelect = "select * from carinfo.body_type where body_type_name = ?;";
-        return Utils.getResultOrWrapExceptionToNull(() -> jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER, param)
-                                                                      .stream()
-                                                                      .findFirst()
-                                                                      .orElse(null));
+        return findOne(jdbcTemplateSelect, param);
     }
 
     @Override
     public List<BodyType> find() {
         String jdbcTemplateSelect = "select * from carinfo.body_type;";
-        return jdbcTemplate.query(jdbcTemplateSelect, ROW_MAPPER);
+        return find(jdbcTemplateSelect);
     }
 
     @Override
@@ -107,7 +102,7 @@ class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType> {
         String where = buildWhere().add("bt.body_type_name", name, true).build();
 
         String countQuery = "select count(1) as row_count " + from + where;
-        int total = jdbcTemplate.queryForObject(countQuery, (rs, rowNum) -> rs.getInt(1));
+        int total = jdbcTemplate.queryForObject(countQuery, FIND_TOTAL_MAPPER);
 
         String querySql = select + from + where + " limit " + pageable.getPageSize() + " offset " + pageable.getOffset();
         List<BodyType> result = jdbcTemplate.query(querySql, ROW_MAPPER);
