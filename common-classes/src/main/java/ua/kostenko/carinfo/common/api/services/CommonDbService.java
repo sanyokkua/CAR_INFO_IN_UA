@@ -26,16 +26,31 @@ abstract class CommonDbService<T> implements DBService<T> {
     @Override
     public Optional<T> create(@Nonnull @NonNull T entity) {
         if (isValid(entity)) {
-            return processIgnoreException(() -> {
+            Optional<T> result = Optional.empty();
+            try {
                 if (exists(entity)) {
                     log.info("create: entity {} already exists", entity);
-                    return get(entity);
+                    result = get(entity);
                 } else {
+                    log.info("create: trying to create entity: {}", entity);
                     T created = repository.create(entity);
+                    if (Objects.isNull(created) && exists(entity)){
+                        log.error("create: Entity was created but not found by query, retrying to get it once again");
+                        Optional<T> entityOptional = get(entity);
+                        if (entityOptional.isPresent()){
+                            log.info("create: Entity was created and found by query after retrying to get it once again");
+                            created = entityOptional.get();
+                        } else {
+                            log.error("create: Entity was created but not found by query even after retrying it to get once again");
+                        }
+                    }
                     log.info("create: created entity: {}", created);
-                    return Optional.ofNullable(created);
+                    result = Optional.ofNullable(created);
                 }
-            });
+            } catch (Exception ex) {
+                log.warn("Exception occurred due extracting value.", ex);
+            }
+            return result;
         }
         log.warn("create: entity {} is not valid", entity);
         return Optional.empty();

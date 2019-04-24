@@ -5,10 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.records.Brand;
@@ -27,7 +26,7 @@ class RegistrationBrandRepository extends CommonDBRepository<Brand> {
                                                                               .build();
 
     @Autowired
-    public RegistrationBrandRepository(@NonNull @Nonnull JdbcTemplate jdbcTemplate) {
+    public RegistrationBrandRepository(@NonNull @Nonnull NamedParameterJdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
     }
 
@@ -38,74 +37,76 @@ class RegistrationBrandRepository extends CommonDBRepository<Brand> {
 
     @Nullable
     @Override
-    public Brand create(@NonNull @Nonnull Brand entity) {
-        String jdbcTemplateInsert = "insert into carinfo.brand (brand_name) values (?);";
-        return create(jdbcTemplateInsert, Constants.RegistrationBrand.ID, entity.getBrandName());
+    public synchronized Brand create(@NonNull @Nonnull Brand entity) {
+        String jdbcTemplateInsert = "insert into carinfo.brand (brand_name) values (:name);";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getBrandName()).build();
+        return create(jdbcTemplateInsert, Constants.RegistrationBrand.ID, parameterSource);
     }
 
     @Nullable
     @Override
-    public Brand update(@NonNull @Nonnull Brand entity) {
-        String jdbcTemplateUpdate = "update carinfo.brand set brand_name = ? where brand_id = ?;";
-        jdbcTemplate.update(jdbcTemplateUpdate, entity.getBrandName(), entity.getBrandId());
+    public synchronized Brand update(@NonNull @Nonnull Brand entity) {
+        String jdbcTemplateUpdate = "update carinfo.brand set brand_name = :name where brand_id = :id;";
+        SqlParameterSource parameterSource = getSqlParamBuilder()
+                .addParam("name", entity.getBrandName())
+                .addParam("id", entity.getBrandId())
+                .build();
+        jdbcTemplate.update(jdbcTemplateUpdate, parameterSource);
         ParamsHolder holder = getParamsHolderBuilder().param(Brand.BRAND_NAME, entity.getBrandName()).build();
         return findOne(holder);
     }
 
     @Override
-    public boolean delete(long id) {
-        String jdbcTemplateDelete = "delete from carinfo.brand where brand_id = ?;";
-        return delete(jdbcTemplateDelete, id);
+    public synchronized boolean delete(long id) {
+        String jdbcTemplateDelete = "delete from carinfo.brand where brand_id = :id;";
+        SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
+        return delete(jdbcTemplateDelete, params);
     }
 
     @Override
-    public boolean existId(long id) {
-        String jdbcTemplateSelectCount = "select count(brand_id) from carinfo.brand where brand_id = ?;";
-        return exist(jdbcTemplateSelectCount, id);
+    public synchronized boolean existId(long id) {
+        String jdbcTemplateSelectCount = "select count(brand_id) from carinfo.brand where brand_id = :id;";
+        SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
+        return exist(jdbcTemplateSelectCount, params);
     }
 
     @Override
-    public boolean exist(@NonNull @Nonnull Brand entity) {
-        String jdbcTemplateSelectCount = "select count(brand_id) from carinfo.brand where brand_name = ?;";
-        return exist(jdbcTemplateSelectCount, entity.getBrandName());
+    public synchronized boolean exist(@NonNull @Nonnull Brand entity) {
+        String jdbcTemplateSelectCount = "select count(brand_id) from carinfo.brand where brand_name = :name;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getBrandName()).build();
+        return exist(jdbcTemplateSelectCount, parameterSource);
     }
 
     @Cacheable(cacheNames = "brand", unless = "#result != null")
     @Nullable
     @Override
-    public Brand findOne(long id) {
-        String jdbcTemplateSelect = "select * from carinfo.brand where brand_id = ?;";
-        return findOne(jdbcTemplateSelect, id);
+    public synchronized Brand findOne(long id) {
+        String jdbcTemplateSelect = "select * from carinfo.brand where brand_id = :id;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("id", id).build();
+        return findOne(jdbcTemplateSelect, parameterSource);
     }
 
     @Nullable
     @Override
-    public Brand findOne(@NonNull @Nonnull ParamsHolder searchParams) {
+    public synchronized Brand findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String param = searchParams.getString(Brand.BRAND_NAME);
-        String jdbcTemplateSelect = "select * from carinfo.brand where brand_name = ?;";
-        return findOne(jdbcTemplateSelect, param);
+        String jdbcTemplateSelect = "select * from carinfo.brand where brand_name = :name;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", param).build();
+        return findOne(jdbcTemplateSelect, parameterSource);
     }
 
     @Override
-    public List<Brand> find() {
+    public synchronized List<Brand> find() {
         String jdbcTemplateSelect = "select * from carinfo.brand;";
         return find(jdbcTemplateSelect);
     }
 
     @Override
-    public Page<Brand> find(@NonNull @Nonnull ParamsHolder searchParams) {
-        Pageable pageable = searchParams.getPage();
+    public synchronized Page<Brand> find(@NonNull @Nonnull ParamsHolder searchParams) {
         String select = "select * ";
         String from = "from carinfo.brand b ";
         String name = searchParams.getString(Brand.BRAND_NAME);
+        return findPage(searchParams, select, from, buildWhere().addFieldParam("b.brand_name", "name", name));
 
-        String where = buildWhere().add("b.brand_name", name, true).build();
-
-        String countQuery = "select count(1) as row_count " + from + where;
-        int total = jdbcTemplate.queryForObject(countQuery, FIND_TOTAL_MAPPER);
-
-        String querySql = select + from + where + " limit " + pageable.getPageSize() + " offset " + pageable.getOffset();
-        List<Brand> result = jdbcTemplate.query(querySql, ROW_MAPPER);
-        return new PageImpl<>(result, pageable, total);
     }
 }

@@ -5,10 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.records.Color;
@@ -27,7 +26,7 @@ class RegistrationColorRepository extends CommonDBRepository<Color> {
                                                                               .build();
 
     @Autowired
-    public RegistrationColorRepository(@NonNull @Nonnull JdbcTemplate jdbcTemplate) {
+    public RegistrationColorRepository(@NonNull @Nonnull NamedParameterJdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
     }
 
@@ -38,74 +37,75 @@ class RegistrationColorRepository extends CommonDBRepository<Color> {
 
     @Nullable
     @Override
-    public Color create(@NonNull @Nonnull Color entity) {
-        String jdbcTemplateInsert = "insert into carinfo.color (color_name) values (?);";
-        return create(jdbcTemplateInsert, Constants.RegistrationColor.ID, entity.getColorName());
+    public synchronized Color create(@NonNull @Nonnull Color entity) {
+        String jdbcTemplateInsert = "insert into carinfo.color (color_name) values (:name);";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getColorName()).build();
+        return create(jdbcTemplateInsert, Constants.RegistrationColor.ID, parameterSource);
     }
 
     @Nullable
     @Override
-    public Color update(@NonNull @Nonnull Color entity) {
-        String jdbcTemplateUpdate = "update carinfo.color set color_name = ? where color_id = ?;";
-        jdbcTemplate.update(jdbcTemplateUpdate, entity.getColorName(), entity.getColorId());
+    public synchronized Color update(@NonNull @Nonnull Color entity) {
+        String jdbcTemplateUpdate = "update carinfo.color set color_name = :name where color_id = :id;";
+        SqlParameterSource parameterSource = getSqlParamBuilder()
+                .addParam("name", entity.getColorName())
+                .addParam("id", entity.getColorId())
+                .build();
+        jdbcTemplate.update(jdbcTemplateUpdate, parameterSource);
         ParamsHolder holder = getParamsHolderBuilder().param(Color.COLOR_NAME, entity.getColorName()).build();
         return findOne(holder);
     }
 
     @Override
-    public boolean delete(long id) {
-        String jdbcTemplateDelete = "delete from carinfo.color where color_id = ?;";
-        return delete(jdbcTemplateDelete, id);
+    public synchronized boolean delete(long id) {
+        String jdbcTemplateDelete = "delete from carinfo.color where color_id = :id;";
+        SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
+        return delete(jdbcTemplateDelete, params);
     }
 
     @Override
-    public boolean existId(long id) {
-        String jdbcTemplateSelectCount = "select count(color_id) from carinfo.color where color_id = ?;";
-        return exist(jdbcTemplateSelectCount, id);
+    public synchronized boolean existId(long id) {
+        String jdbcTemplateSelectCount = "select count(color_id) from carinfo.color where color_id = :id;";
+        SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
+        return exist(jdbcTemplateSelectCount, params);
     }
 
     @Override
-    public boolean exist(@NonNull @Nonnull Color entity) {
-        String jdbcTemplateSelectCount = "select count(color_id) from carinfo.color where color_name = ?;";
-        return exist(jdbcTemplateSelectCount, entity.getColorName());
+    public synchronized boolean exist(@NonNull @Nonnull Color entity) {
+        String jdbcTemplateSelectCount = "select count(color_id) from carinfo.color where color_name = :name;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getColorName()).build();
+        return exist(jdbcTemplateSelectCount, parameterSource);
     }
 
     @Nullable
     @Override
-    public Color findOne(long id) {
-        String jdbcTemplateSelect = "select * from carinfo.color where color_id = ?;";
-        return findOne(jdbcTemplateSelect, id);
+    public synchronized Color findOne(long id) {
+        String jdbcTemplateSelect = "select * from carinfo.color where color_id = :id;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("id", id).build();
+        return findOne(jdbcTemplateSelect, parameterSource);
     }
 
     @Cacheable(cacheNames = "color", unless = "#result != null")
     @Nullable
     @Override
-    public Color findOne(@NonNull @Nonnull ParamsHolder searchParams) {
+    public synchronized Color findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String param = searchParams.getString(Color.COLOR_NAME);
-        String jdbcTemplateSelect = "select * from carinfo.color where color_name = ?;";
-        return findOne(jdbcTemplateSelect, param);
+        String jdbcTemplateSelect = "select * from carinfo.color where color_name = :name;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", param).build();
+        return findOne(jdbcTemplateSelect, parameterSource);
     }
 
     @Override
-    public List<Color> find() {
+    public synchronized List<Color> find() {
         String jdbcTemplateSelect = "select * from carinfo.color;";
         return find(jdbcTemplateSelect);
     }
 
     @Override
-    public Page<Color> find(@NonNull @Nonnull ParamsHolder searchParams) {
-        Pageable pageable = searchParams.getPage();
+    public synchronized Page<Color> find(@NonNull @Nonnull ParamsHolder searchParams) {
         String select = "select * ";
         String from = "from carinfo.color c ";
         String name = searchParams.getString(Color.COLOR_NAME);
-
-        String where = buildWhere().add("c.color_name", name, true).build();
-
-        String countQuery = "select count(1) as row_count " + from + where;
-        int total = jdbcTemplate.queryForObject(countQuery, FIND_TOTAL_MAPPER);
-
-        String querySql = select + from + where + " limit " + pageable.getPageSize() + " offset " + pageable.getOffset();
-        List<Color> result = jdbcTemplate.query(querySql, ROW_MAPPER);
-        return new PageImpl<>(result, pageable, total);
+        return findPage(searchParams, select, from, buildWhere().addFieldParam("c.color_name", "name", name));
     }
 }

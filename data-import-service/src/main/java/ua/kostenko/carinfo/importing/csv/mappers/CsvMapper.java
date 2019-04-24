@@ -4,6 +4,7 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
+import java.nio.charset.Charset;
 
 public interface CsvMapper<T> {
     T map(CSVRecord csvRecord);
@@ -22,9 +23,10 @@ public interface CsvMapper<T> {
     @Nullable
     default String getString(String value) {
         if (StringUtils.isNotBlank(value)) {
-            return value.trim();
+            String s = StringUtils.toEncodedString(value.getBytes(), Charset.forName("UTF-8"));
+            return s.trim();
         }
-        return value;
+        return null;
     }
 
     @Nullable

@@ -172,7 +172,7 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
                                                         .registrationDate(record.getDate())//non NULLABLE
                                                         .build();
                 Optional<Registration> result = registrationDBService.create(registration);
-                if (!result.isPresent()) {
+                if (!registrationDBService.exists(registration)) {
                     log.warn("Record {} is not created!", record);
                 }
             } else {

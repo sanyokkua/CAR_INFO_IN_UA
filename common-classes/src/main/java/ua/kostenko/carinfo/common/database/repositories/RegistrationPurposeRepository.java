@@ -5,10 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.records.Purpose;
@@ -27,7 +26,7 @@ class RegistrationPurposeRepository extends CommonDBRepository<Purpose> {
                                                                                   .build();
 
     @Autowired
-    public RegistrationPurposeRepository(@NonNull @Nonnull JdbcTemplate jdbcTemplate) {
+    public RegistrationPurposeRepository(@NonNull @Nonnull NamedParameterJdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
     }
 
@@ -38,73 +37,74 @@ class RegistrationPurposeRepository extends CommonDBRepository<Purpose> {
 
     @Nullable
     @Override
-    public Purpose create(@NonNull @Nonnull Purpose entity) {
-        String jdbcTemplateInsert = "insert into carinfo.purpose (purpose_name) values (?);";
-        return create(jdbcTemplateInsert, Constants.RegistrationPurpose.ID, entity.getPurposeName());
+    public synchronized Purpose create(@NonNull @Nonnull Purpose entity) {
+        String jdbcTemplateInsert = "insert into carinfo.purpose (purpose_name) values (:name);";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getPurposeName()).build();
+        return create(jdbcTemplateInsert, Constants.RegistrationPurpose.ID, parameterSource);
     }
 
     @Nullable
     @Override
-    public Purpose update(@NonNull @Nonnull Purpose entity) {
-        String jdbcTemplateUpdate = "update carinfo.purpose set purpose_name = ? where purpose_id = ?;";
-        jdbcTemplate.update(jdbcTemplateUpdate, entity.getPurposeName(), entity.getPurposeId());
+    public synchronized Purpose update(@NonNull @Nonnull Purpose entity) {
+        String jdbcTemplateUpdate = "update carinfo.purpose set purpose_name = :name where purpose_id = :id;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getPurposeName())
+                                                                 .addParam("id", entity.getPurposeId())
+                                                                 .build();
+        jdbcTemplate.update(jdbcTemplateUpdate, parameterSource);
         ParamsHolder searchParams = getParamsHolderBuilder().param(Purpose.PURPOSE_NAME, entity.getPurposeName()).build();
         return findOne(searchParams);
     }
 
     @Override
-    public boolean delete(long id) {
-        String jdbcTemplateDelete = "delete from carinfo.purpose where purpose_id = ?;";
-        return delete(jdbcTemplateDelete, id);
+    public synchronized boolean delete(long id) {
+        String jdbcTemplateDelete = "delete from carinfo.purpose where purpose_id = :id;";
+        SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
+        return delete(jdbcTemplateDelete, params);
     }
 
     @Override
-    public boolean existId(long id) {
-        String jdbcTemplateSelectCount = "select count(purpose_id) from carinfo.purpose where purpose_id = ?;";
-        return exist(jdbcTemplateSelectCount, id);
+    public synchronized boolean existId(long id) {
+        String jdbcTemplateSelectCount = "select count(purpose_id) from carinfo.purpose where purpose_id = :id;";
+        SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
+        return exist(jdbcTemplateSelectCount, params);
     }
 
     @Override
-    public boolean exist(@NonNull @Nonnull Purpose entity) {
-        String jdbcTemplateSelectCount = "select count(purpose_id) from carinfo.purpose where purpose_name = ?;";
-        return exist(jdbcTemplateSelectCount, entity.getPurposeName());
+    public synchronized boolean exist(@NonNull @Nonnull Purpose entity) {
+        String jdbcTemplateSelectCount = "select count(purpose_id) from carinfo.purpose where purpose_name = :name;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getPurposeName()).build();
+        return exist(jdbcTemplateSelectCount, parameterSource);
     }
 
     @Nullable
     @Override
-    public Purpose findOne(long id) {
-        String jdbcTemplateSelect = "select * from carinfo.purpose where purpose_id = ?;";
-        return findOne(jdbcTemplateSelect, id);
+    public synchronized Purpose findOne(long id) {
+        String jdbcTemplateSelect = "select * from carinfo.purpose where purpose_id = :id;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("id", id).build();
+        return findOne(jdbcTemplateSelect, parameterSource);
     }
 
     @Cacheable(cacheNames = "purpose", unless = "#result != null")
     @Nullable
     @Override
-    public Purpose findOne(@NonNull @Nonnull ParamsHolder searchParams) {
+    public synchronized Purpose findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String param = searchParams.getString(Purpose.PURPOSE_NAME);
-        String jdbcTemplateSelect = "select * from carinfo.purpose where purpose_name = ?;";
-        return findOne(jdbcTemplateSelect, param);
+        String jdbcTemplateSelect = "select * from carinfo.purpose where purpose_name = :name;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", param).build();
+        return findOne(jdbcTemplateSelect, parameterSource);
     }
 
     @Override
-    public List<Purpose> find() {
+    public synchronized List<Purpose> find() {
         String jdbcTemplateSelect = "select * from carinfo.purpose;";
         return find(jdbcTemplateSelect);
     }
 
     @Override
-    public Page<Purpose> find(@NonNull @Nonnull ParamsHolder searchParams) {
-        Pageable pageable = searchParams.getPage();
-        String select = "select * from carinfo.purpose p ";
+    public synchronized Page<Purpose> find(@NonNull @Nonnull ParamsHolder searchParams) {
+        String select = "select * ";
+        String from = "from carinfo.purpose p ";
         String name = searchParams.getString(Purpose.PURPOSE_NAME);
-
-        String where = buildWhere().add("p.purpose_name", name, true).build();
-
-        String countQuery = "select count(1) as row_count " + "from carinfo.purpose p " + where;
-        int total = jdbcTemplate.queryForObject(countQuery, FIND_TOTAL_MAPPER);
-
-        String querySql = select + where + " limit " + pageable.getPageSize() + " offset " + pageable.getOffset();
-        List<Purpose> result = jdbcTemplate.query(querySql, ROW_MAPPER);
-        return new PageImpl<>(result, pageable, total);
+        return findPage(searchParams, select, from, buildWhere().addFieldParam("p.purpose_name", "name", name));
     }
 }
