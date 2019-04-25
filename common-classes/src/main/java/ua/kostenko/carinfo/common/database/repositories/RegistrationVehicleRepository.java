@@ -121,7 +121,7 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
-    @Cacheable(cacheNames = "vehicle", unless = "#result != null")
+    @Cacheable(cacheNames = "vehicle", unless = "#result != null", key = "#searchParams.hashCode()")
     @Nullable
     @Override
     public synchronized Vehicle findOne(@NonNull @Nonnull ParamsHolder searchParams) {

@@ -84,7 +84,7 @@ class RegistrationKindRepository extends CommonDBRepository<Kind> {
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
-    @Cacheable(cacheNames = "kind", unless = "#result != null")
+    @Cacheable(cacheNames = "kind", unless = "#result != null", key = "#searchParams.hashCode()")
     @Nullable
     @Override
     public synchronized Kind findOne(@NonNull @Nonnull ParamsHolder searchParams) {

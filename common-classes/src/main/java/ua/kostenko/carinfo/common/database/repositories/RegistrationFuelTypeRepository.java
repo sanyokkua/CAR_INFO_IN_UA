@@ -85,7 +85,7 @@ class RegistrationFuelTypeRepository extends CommonDBRepository<FuelType> {
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
-    @Cacheable(cacheNames = "fuel", unless = "#result != null")
+    @Cacheable(cacheNames = "fuel", unless = "#result != null", key = "#searchParams.hashCode()")
     @Nullable
     @Override
     public synchronized FuelType findOne(@NonNull @Nonnull ParamsHolder searchParams) {

@@ -39,4 +39,16 @@ public class StringTest {
         int i1 = build2.hashCode();
         Assert.assertEquals(i, i1);
     }
+
+    @Test
+    public void testParamsHolder(){
+        ParamsHolder build1 = new ParamsHolderBuilder().param("hello", 1).param("world", "2").build();
+        ParamsHolder build2 = new ParamsHolderBuilder().param("world", "2").param("hello", 1).build();
+        ParamsHolder build3 = new ParamsHolderBuilder().param("hello", 1).param("world", 2).build();
+        String s1 = build1.toString();
+        String s2 = build2.toString();
+        String s3 = build3.toString();
+        Assert.assertEquals(s1, s2);
+        Assert.assertNotEquals(s1, s3);
+    }
 }

@@ -220,7 +220,7 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration> {
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
-    @Cacheable(cacheNames = "registration", unless = "#result != null")
+    @Cacheable(cacheNames = "registration", unless = "#result != null", key = "#searchParams.hashCode()")
     @Nullable
     @Override
     public synchronized Registration findOne(@NonNull @Nonnull ParamsHolder searchParams) {
