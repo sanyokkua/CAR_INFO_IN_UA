@@ -24,12 +24,10 @@ import java.util.Objects;
 @Repository
 @Slf4j
 class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
-    private static final String BRAND = "brand";
-    private static final String MODEL = "model";
     private static final RowMapper<Vehicle> ROW_MAPPER = (resultSet, i) -> Vehicle.builder()
                                                                                   .vehicleId(resultSet.getLong(Constants.RegistrationVehicle.ID))
-                                                                                  .modelName(resultSet.getString(MODEL))
-                                                                                  .brandName(resultSet.getString(BRAND))
+                                                                                  .modelName(resultSet.getString(Constants.RegistrationModel.NAME))
+                                                                                  .brandName(resultSet.getString(Constants.RegistrationBrand.NAME))
                                                                                   .build();
     private final DBRepository<Brand> brandCommonDBRepository;
     private final DBRepository<Model> modelCommonDBRepository;
@@ -107,8 +105,8 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
 
     @Override
     public synchronized boolean exist(@NonNull @Nonnull Vehicle entity) {
-        String jdbcTemplateSelectCount = "select count(v.vehicle_id) from carinfo.vehicle v, carinfo.brand b, carinfo.model m " +
-                "where v.brand_id = b.brand_id and m.model_id = v.model_id and m.model_name = :model and b.brand_name = :brand;";
+        String jdbcTemplateSelectCount = "select count(vehicle_id) from carinfo.vehicle_view " +
+                "where model_name = :model and brand_name = :brand;";
         SqlParameterSource parameterSource = getSqlParamBuilder()
                 .addParam("model", entity.getModelName())
                 .addParam("brand", entity.getBrandName())
@@ -119,9 +117,9 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
     @Nullable
     @Override
     public synchronized Vehicle findOne(long id) {
-        String jdbcTemplateSelect = "select v.vehicle_id, v.model_id, v.brand_id, b.brand_name as brand, m.model_name as model " +
-                "from carinfo.vehicle v, carinfo.brand b, carinfo.model m " +
-                "where vehicle_id = :id and v.brand_id = b.brand_id and m.model_id = v.model_id;";
+        String jdbcTemplateSelect = "select * " +
+                "from carinfo.vehicle_view" +
+                "where vehicle_id = :id";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("id", id).build();
         return findOne(jdbcTemplateSelect, parameterSource);
     }
@@ -136,9 +134,9 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
             log.warn("Brand ({}) or Model ({}) is null", brandName, modelName);
             return null;
         }
-        String jdbcTemplateSelect = "select v.vehicle_id, v.model_id, v.brand_id, b.brand_name as brand, m.model_name as model " +
-                "from carinfo.vehicle v, carinfo.brand b, carinfo.model m " +
-                "where v.brand_id = b.brand_id and m.model_id = v.model_id and b.brand_name = :brand and m.model_name = :model;";
+        String jdbcTemplateSelect = "select * " +
+                "from carinfo.vehicle_view " +
+                "where brand_name = :brand and model_name = :model;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("model", modelName)
                                                                  .addParam("brand", brandName)
                                                                  .build();
@@ -147,23 +145,20 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
 
     @Override
     public synchronized List<Vehicle> find() {
-        String jdbcTemplateSelect = "select v.vehicle_id, v.model_id, v.brand_id, b.brand_name as brand, m.model_name as model " +
-                "from carinfo.vehicle v, carinfo.brand b, carinfo.model m " +
-                "where v.brand_id = b.brand_id and m.model_id = v.model_id;";
+        String jdbcTemplateSelect = "select * " +
+                "from carinfo.vehicle_view ";
         return find(jdbcTemplateSelect);
     }
 
     @Override
     public synchronized Page<Vehicle> find(@NonNull @Nonnull ParamsHolder searchParams) {
-        String select = "select v.vehicle_id, v.model_id, v.brand_id, b.brand_name as brand, m.model_name as model ";
-        String from = "from carinfo.vehicle v, carinfo.brand b, carinfo.model m ";
+        String select = "select * ";
+        String from = "from carinfo.vehicle_view ";
         String modelName = searchParams.getString(Vehicle.MODEL_NAME);
         String brandName = searchParams.getString(Vehicle.BRAND_NAME);
         return findPage(searchParams, select, from, buildWhere()
-                .addEqualFields("v.model_id", "m.model_id")
-                .addEqualFields("v.brand_id", "b.brand_id")
-                .addFieldParam("m.model_name", "model", modelName)
-                .addFieldParam("b.brand_name", "brand", brandName));
+                .addFieldParam("model_name", "model", modelName)
+                .addFieldParam("brand_name", "brand", brandName));
     }
 
     @Override
