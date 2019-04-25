@@ -119,7 +119,7 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
 
     @Override
     public void persist(@NonNull @Nonnull RegistrationCsvRecord record) {
-        log.info("persist: Thread N: {}, record: {}", Thread.currentThread().getId(), record);
+        log.debug("persist: Thread N: {}, record: {}", Thread.currentThread().getId(), record);
         try {
             final Optional<AdministrativeObject> administrativeObject = getAdministrativeObject(record);
             final Optional<Operation> operation = getOperation(record);

@@ -1,233 +1,159 @@
 package ua.kostenko.carinfo.rest.data.persistent.services;
 
-import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.text.StringSubstitutor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import ua.kostenko.carinfo.common.entities.RegionCodeEntity;
-import ua.kostenko.carinfo.rest.data.persistent.repositories.RegionCodeCrudRepository;
+import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
+import ua.kostenko.carinfo.common.api.records.*;
+import ua.kostenko.carinfo.common.api.services.DBService;
 import ua.kostenko.carinfo.rest.data.presentation.Auto;
 import ua.kostenko.carinfo.rest.data.presentation.CombinedInformation;
-import ua.kostenko.carinfo.rest.data.presentation.Registration;
+import ua.kostenko.carinfo.rest.data.presentation.VRegistration;
 import ua.kostenko.carinfo.rest.data.presentation.ServiceCenter;
 
-import javax.sql.DataSource;
 import javax.transaction.Transactional;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static ua.kostenko.carinfo.common.TablesAndFieldsConstants.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @Slf4j
 public class DBSearchService implements SearchService {
-    private final DataSource dataSource;
-    private final RegionCodeCrudRepository regionCodeCRUD;
+    private final DBService<Registration> registrationDBService;
+    private final DBService<AdministrativeObject> administrativeObjectDBService;
+    private final DBService<BodyType> bodyTypeDBService;
+    private final DBService<Brand> brandDBService;
+    private final DBService<Color> colorDBService;
+    private final DBService<Department> departmentDBService;
+    private final DBService<FuelType> fuelTypeDBService;
+    private final DBService<Kind> kindDBService;
+    private final DBService<Model> modelDBService;
+    private final DBService<Operation> operationDBService;
+    private final DBService<Purpose> purposeDBService;
+    private final DBService<Vehicle> vehicleDBService;
 
     @Autowired
-    public DBSearchService(DataSource dataSource, RegionCodeCrudRepository regionCodeCRUD) {
-        Preconditions.checkNotNull(dataSource);
-        Preconditions.checkNotNull(regionCodeCRUD);
-        this.dataSource = dataSource;
-        this.regionCodeCRUD = regionCodeCRUD;
+    public DBSearchService(DBService<Registration> registrationDBService,
+                           DBService<AdministrativeObject> administrativeObjectDBService,
+                           DBService<BodyType> bodyTypeDBService,
+                           DBService<Brand> brandDBService,
+                           DBService<Color> colorDBService,
+                           DBService<Department> departmentDBService,
+                           DBService<FuelType> fuelTypeDBService,
+                           DBService<Kind> kindDBService,
+                           DBService<Model> modelDBService,
+                           DBService<Operation> operationDBService,
+                           DBService<Purpose> purposeDBService,
+                           DBService<Vehicle> vehicleDBService) {
+        this.registrationDBService = registrationDBService;
+        this.administrativeObjectDBService = administrativeObjectDBService;
+        this.bodyTypeDBService = bodyTypeDBService;
+        this.brandDBService = brandDBService;
+        this.colorDBService = colorDBService;
+        this.departmentDBService = departmentDBService;
+        this.fuelTypeDBService = fuelTypeDBService;
+        this.kindDBService = kindDBService;
+        this.modelDBService = modelDBService;
+        this.operationDBService = operationDBService;
+        this.purposeDBService = purposeDBService;
+        this.vehicleDBService = vehicleDBService;
     }
 
 
     @Override
     public List<CombinedInformation> searchAllByRegistrationNumber(String number) {
-        Map<String, String> params = new HashMap<>();
-        params.put("registration_information", RegistrationInformationTable.TABLE);
-        params.put("administrative_object", AdministrativeObjectTable.TABLE);
-        params.put("service_center", ServiceCenterTable.TABLE);
-        params.put("id", AdministrativeObjectTable.FIELD_ID);
-        params.put("administrative_object_code", RegistrationInformationTable.FIELD_ADMIN_OBJECT_CODE);
-        params.put("dep_code", ServiceCenterTable.FIELD_DEPARTMENT_CODE);
-        params.put("department_code", RegistrationInformationTable.FIELD_DEPARTMENT_CODE);
-        params.put("car_new_registration_number", RegistrationInformationTable.FIELD_CAR_NEW_REG_NUMBER);
-        params.put("registration_date", RegistrationInformationTable.FIELD_REGISTRATION_DATE);
-        params.put("value", number);
-        String sqlTemplate = new StringSubstitutor(params).replace("SELECT * " +
-                "FROM ${registration_information} " +
-                "JOIN ${administrative_object} ON ${administrative_object}.${id} = ${registration_information}.${administrative_object_code} " +
-                "JOIN ${service_center} ON ${service_center}.${dep_code} = ${registration_information}.${department_code} " +
-                "WHERE ${registration_information}.${car_new_registration_number} = '${value}' " +
-                "ORDER BY ${registration_information}.${registration_date} DESC");
+        ParamsHolderBuilder params = new ParamsHolderBuilder().param(Registration.REGISTRATION_NUMBER, number);
+        Page<Registration> registration = registrationDBService.getAll(params);
 
-        try (Connection c = dataSource.getConnection()) {
-            return new JdbcTemplate(new SingleConnectionDataSource(c, true)).query(sqlTemplate, (resultSet, i) -> {
-                String car_new_registration_number = resultSet.getString(RegistrationInformationTable.FIELD_CAR_NEW_REG_NUMBER);
-                String code = car_new_registration_number.substring(0, 2);
-                RegionCodeEntity defaultIfEmpty = new RegionCodeEntity("", "");
-                RegionCodeEntity registrationNumberRegionName = regionCodeCRUD.findById(code).orElse(defaultIfEmpty);
-
-                Auto auto = Auto.map(resultSet);
-                Registration registration = Registration.map(resultSet, registrationNumberRegionName);
-                ServiceCenter serviceCenter = ServiceCenter.map(resultSet);
-                return new CombinedInformation(auto, registration, serviceCenter);
-            });
-        } catch (SQLException e) {
-            log.error("Exception with SQL query", e);
+        if (registration.getContent().size() > 0) {
+            List<CombinedInformation> collect = registration.getContent().stream().map(record -> {
+                Auto auto = Auto.map(record);
+                VRegistration vRegistration = VRegistration.map(record);
+                ServiceCenter serviceCenter = ServiceCenter.map(record);
+                return CombinedInformation.builder().auto(auto).registration(vRegistration).serviceCenter(serviceCenter).build();
+            }).collect(Collectors.toList());
+            return collect;
         }
         return Collections.emptyList();
     }
 
     @Override
     public List<String> getAllBrands() {
-        return findAllDistinctFromTableByField(RegistrationInformationTable.FIELD_CAR_BRAND);
-    }
-
-    private List<String> findAllDistinctFromTableByField(String field) {
-        Map<String, String> params = new HashMap<>();
-        params.put("table", RegistrationInformationTable.TABLE);
-        params.put("field", field);
-        StringSubstitutor StringSubstitutor = new StringSubstitutor(params);
-        String sql = StringSubstitutor.replace("SELECT distinct ${field} FROM ${table} order by ${field}");
-        try (Connection c = dataSource.getConnection()) {
-            return new JdbcTemplate(new SingleConnectionDataSource(c, true)).query(sql, (resultSet, i) -> resultSet.getString(field));
-        } catch (SQLException e) {
-            log.error("Exception with SQL query", e);
-        }
-        return Collections.emptyList();
+        return brandDBService.getAll().stream().map(Brand::getBrandName).collect(Collectors.toList());
     }
 
     @Override
     public List<String> getAllModelsForBrand(String brand) {
-        Map<String, String> params = new HashMap<>();
-        params.put("table", RegistrationInformationTable.TABLE);
-        params.put("fieldToSelect", RegistrationInformationTable.FIELD_CAR_MODEL);
-        params.put("fieldToCompare", RegistrationInformationTable.FIELD_CAR_BRAND);
-        params.put("value", brand);
-        StringSubstitutor StringSubstitutor = new StringSubstitutor(params);
-        String sql = StringSubstitutor.replace("SELECT distinct ${fieldToSelect} FROM ${table} where ${fieldToCompare}='${value}' order by ${fieldToSelect}");
-        try (Connection c = dataSource.getConnection()) {
-            return new JdbcTemplate(new SingleConnectionDataSource(c, true)).query(sql, (resultSet, i) -> resultSet.getString(RegistrationInformationTable.FIELD_CAR_MODEL));
-        } catch (SQLException e) {
-            log.error("Exception with SQL query", e);
+        Page<Vehicle> all = vehicleDBService.getAll(new ParamsHolderBuilder().param(Vehicle.BRAND_NAME, brand));
+        if (all.getContent().size() > 0) {
+            return all.getContent().stream().map(Vehicle::getModelName).collect(Collectors.toList());
         }
         return Collections.emptyList();
     }
 
     @Override
     public List<String> getAllColors() {
-        return findAllDistinctFromTableByField(RegistrationInformationTable.FIELD_CAR_COLOR);
+        return colorDBService.getAll().stream().map(Color::getColorName).collect(Collectors.toList());
     }
 
     @Override
     public List<String> getAllFuelTypes() {
-        return findAllDistinctFromTableByField(RegistrationInformationTable.FIELD_CAR_FUEL);
+        return fuelTypeDBService.getAll().stream().map(FuelType::getFuelTypeName).collect(Collectors.toList());
     }
 
     @Override
     public List<String> getAllCarKinds() {
-        return findAllDistinctFromTableByField(RegistrationInformationTable.FIELD_CAR_KIND);
+        return kindDBService.getAll().stream().map(Kind::getKindName).collect(Collectors.toList());
     }
 
     @Override
     public List<String> getAllRegions() {
-        String sql = String.format("SELECT * FROM %s", RegionCodeTable.TABLE);
-        try (Connection c = dataSource.getConnection()) {
-            return new JdbcTemplate(new SingleConnectionDataSource(c, true)).query(sql, (resultSet, i) -> resultSet.getString(RegionCodeTable.FIELD_REGION));
-        } catch (SQLException e) {
-            log.error("Exception with SQL query", e);
-        }
         return Collections.emptyList();
     }
 
     @Override
     public long countAllRegistrations() {
-        Map<String, String> params = new HashMap<>();
-        params.put("table", RegistrationInformationTable.TABLE);
-        params.put("field", RegistrationInformationTable.FIELD_CAR_NEW_REG_NUMBER);
-        StringSubstitutor StringSubstitutor = new StringSubstitutor(params);
-        String sql = StringSubstitutor.replace("select count(${field}) from ${table}");
-        try (Connection c = dataSource.getConnection()) {
-            return new JdbcTemplate(new SingleConnectionDataSource(c, true)).queryForObject(sql, Long.class);
-        } catch (NullPointerException | SQLException e) {
-            log.error("Exception with SQL query", e);
-        }
         return 0;
     }
 
     private long countForTableByField(String field, String value) {
-        Map<String, String> params = new HashMap<>();
-        params.put("table", RegistrationInformationTable.TABLE);
-        params.put("field", field);
-        params.put("value", value);
-        StringSubstitutor StringSubstitutor = new StringSubstitutor(params);
-        String sql = StringSubstitutor.replace("select count(${field}) from ${table} where ${field} = '${value}'");
-        try (Connection c = dataSource.getConnection()) {
-            return new JdbcTemplate(new SingleConnectionDataSource(c, true)).queryForObject(sql, Long.class);
-        } catch (NullPointerException | SQLException e) {
-            log.error("Exception with SQL query", e);
-        }
         return 0;
     }
 
     @Override
     public long countAllByBrand(String brand) {
-        return countForTableByField(RegistrationInformationTable.FIELD_CAR_BRAND, brand);
+        return 0;
     }
 
     @Override
     public long countAllByCarBrandAndModel(String brand, String model) {
-        Map<String, String> params = new HashMap<>();
-        params.put("table", RegistrationInformationTable.TABLE);
-        params.put("fieldModel", RegistrationInformationTable.FIELD_CAR_MODEL);
-        params.put("fieldBrand", RegistrationInformationTable.FIELD_CAR_BRAND);
-        params.put("valueBrand", brand);
-        params.put("valueModel", model);
-        StringSubstitutor StringSubstitutor = new StringSubstitutor(params);
-        String sql = StringSubstitutor.replace("select count(${fieldBrand}) from ${table} where ${fieldBrand} = '${valueBrand}' and ${fieldModel} = '${valueModel}'");
-        try (Connection c = dataSource.getConnection()) {
-            return new JdbcTemplate(new SingleConnectionDataSource(c, true)).queryForObject(sql, Long.class);
-        } catch (NullPointerException | SQLException e) {
-            log.error("Exception with SQL query", e);
-        }
         return 0;
     }
 
     @Override
     public long countAllByCarColor(String color) {
-        return countForTableByField(RegistrationInformationTable.FIELD_CAR_COLOR, color);
+        return 0;
     }
 
     @Override
     public long countAllByFuelType(String fuelType) {
-        return countForTableByField(RegistrationInformationTable.FIELD_CAR_FUEL, fuelType);
+        return 0;
     }
 
     @Override
     public long countAllByCarKind(String carKind) {
-        return countForTableByField(RegistrationInformationTable.FIELD_CAR_KIND, carKind);
+        return 0;
     }
 
     @Override
     public long countAllCarsByYear(int year) {
-        return countForTableByField(RegistrationInformationTable.FIELD_CAR_MAKE_YEAR, "" + year);
+        return 0;
     }
 
     @Override
     public long countAllCarsInRegion(String region) {
-        final RegionCodeEntity codeEntity = regionCodeCRUD.findByRegion(region);
-        Map<String, String> params = new HashMap<>();
-        params.put("table", RegistrationInformationTable.TABLE);
-        params.put("field", RegistrationInformationTable.FIELD_CAR_NEW_REG_NUMBER);
-        params.put("value", codeEntity.getCode());
-        StringSubstitutor StringSubstitutor = new StringSubstitutor(params);
-        String sql = StringSubstitutor.replace("select count(distinct ${table}) from ${table} where ${field} like '${value}%'");
-        try (Connection c = dataSource.getConnection()) {
-            return new JdbcTemplate(new SingleConnectionDataSource(c, true)).queryForObject(sql, Long.class);
-        } catch (NullPointerException | SQLException e) {
-            log.error("Exception with SQL query", e);
-        }
         return 0;
     }
 

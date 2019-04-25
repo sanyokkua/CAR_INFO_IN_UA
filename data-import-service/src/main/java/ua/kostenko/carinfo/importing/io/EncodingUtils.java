@@ -16,7 +16,7 @@ public class EncodingUtils {
     public synchronized static String getEncoding(@NonNull @Nonnull File textFile) {
         String encoding = null;
         try {
-            log.info("getEncoding: Trying to distinguish encoding of file: {}", textFile.getAbsolutePath());
+            log.debug("getEncoding: Trying to distinguish encoding of file: {}", textFile.getAbsolutePath());
             encoding = UniversalDetector.detectCharset(textFile);
         } catch (IOException e) {
             log.error("getEncoding: Exception occurred due encoding detecting", e);

@@ -10,7 +10,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
-import ua.kostenko.carinfo.common.Utils;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
 
@@ -58,10 +57,14 @@ abstract class CommonDBRepository<T> implements DBRepository<T> {
     abstract RowMapper<T> getRowMapper();
 
     synchronized T findOne(@NonNull @Nonnull String sql, SqlParameterSource sqlParams) {
-        return Utils.getResultOrWrapExceptionToNull(() -> {
+        try {
             List<T> list = jdbcTemplate.query(sql, sqlParams, getRowMapper());
             return list.stream().findFirst().orElse(null);
-        });
+        } catch (Exception ex) {
+            log.warn("Exception occurred due extracting value.", ex);
+        }
+        return null;
+
     }
 
     synchronized Page<T> findPage(@NonNull @Nonnull ParamsHolder paramsHolder, @NonNull @Nonnull String selectSql, @NonNull @Nonnull String fromSql, @NonNull @Nonnull WhereBuilder whereBuilder) {

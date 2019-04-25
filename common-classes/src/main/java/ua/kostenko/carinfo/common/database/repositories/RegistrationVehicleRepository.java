@@ -105,8 +105,7 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
 
     @Override
     public synchronized boolean exist(@NonNull @Nonnull Vehicle entity) {
-        String jdbcTemplateSelectCount = "select count(vehicle_id) from carinfo.vehicle_view " +
-                "where model_name = :model and brand_name = :brand;";
+        String jdbcTemplateSelectCount = "select count(vehicle_id) from carinfo.vehicle_view where model_name = :model and brand_name = :brand;";
         SqlParameterSource parameterSource = getSqlParamBuilder()
                 .addParam("model", entity.getModelName())
                 .addParam("brand", entity.getBrandName())
@@ -117,9 +116,7 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
     @Nullable
     @Override
     public synchronized Vehicle findOne(long id) {
-        String jdbcTemplateSelect = "select * " +
-                "from carinfo.vehicle_view" +
-                "where vehicle_id = :id";
+        String jdbcTemplateSelect = "select * from carinfo.vehicle_view where vehicle_id = :id";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("id", id).build();
         return findOne(jdbcTemplateSelect, parameterSource);
     }
@@ -134,9 +131,7 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
             log.warn("Brand ({}) or Model ({}) is null", brandName, modelName);
             return null;
         }
-        String jdbcTemplateSelect = "select * " +
-                "from carinfo.vehicle_view " +
-                "where brand_name = :brand and model_name = :model;";
+        String jdbcTemplateSelect = "select * from carinfo.vehicle_view where brand_name = :brand and model_name = :model;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("model", modelName)
                                                                  .addParam("brand", brandName)
                                                                  .build();
@@ -145,8 +140,7 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
 
     @Override
     public synchronized List<Vehicle> find() {
-        String jdbcTemplateSelect = "select * " +
-                "from carinfo.vehicle_view ";
+        String jdbcTemplateSelect = "select * from carinfo.vehicle_view ";
         return find(jdbcTemplateSelect);
     }
 

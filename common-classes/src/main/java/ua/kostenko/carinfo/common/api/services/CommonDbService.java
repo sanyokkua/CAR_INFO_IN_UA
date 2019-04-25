@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static ua.kostenko.carinfo.common.Utils.processIgnoreException;
-
 @Slf4j
 abstract class CommonDbService<T> implements DBService<T> {
     protected final DBRepository<T> repository;
@@ -29,16 +27,16 @@ abstract class CommonDbService<T> implements DBService<T> {
             Optional<T> result = Optional.empty();
             try {
                 if (exists(entity)) {
-                    log.info("create: entity {} already exists", entity);
+                    log.debug("create: entity {} already exists", entity);
                     result = get(entity);
                 } else {
-                    log.info("create: trying to create entity: {}", entity);
+                    log.debug("create: trying to create entity: {}", entity);
                     T created = repository.create(entity);
-                    if (Objects.isNull(created) && exists(entity)){
+                    if (Objects.isNull(created) && exists(entity)) {
                         log.error("create: Entity was created but not found by query, retrying to get it once again");
                         Optional<T> entityOptional = get(entity);
-                        if (entityOptional.isPresent()){
-                            log.info("create: Entity was created and found by query after retrying to get it once again");
+                        if (entityOptional.isPresent()) {
+                            log.debug("create: Entity was created and found by query after retrying to get it once again");
                             created = entityOptional.get();
                         } else {
                             log.error("create: Entity was created but not found by query even after retrying it to get once again");
@@ -59,16 +57,20 @@ abstract class CommonDbService<T> implements DBService<T> {
     @Override
     public Optional<T> update(@Nonnull T entity) {
         if (isValid(entity)) {
-            return processIgnoreException(() -> {
+            Optional<T> t = Optional.empty();
+            try {
                 if (exists(entity)) {
                     log.info("update: entity {} exists, will be updated", entity);
                     T updated = repository.update(entity);
-                    return Optional.ofNullable(updated);
+                    t = Optional.ofNullable(updated);
                 } else {
                     log.warn("update: entity: {} doesn't exist, nothing to update", entity);
-                    return Optional.empty();
+                    return t;
                 }
-            });
+            } catch (Exception ex) {
+                log.warn("Exception occurred due extracting value.", ex);
+            }
+            return t;
         }
         log.warn("update: entity {} is not valid", entity);
         return Optional.empty();
@@ -84,49 +86,49 @@ abstract class CommonDbService<T> implements DBService<T> {
     @Override
     public boolean exists(@NonNull @Nonnull T entity) {
         boolean exist = repository.exist(entity);
-        log.info("exists: Entity {} exists: {}", entity, exist);
+        log.debug("exists: Entity {} exists: {}", entity, exist);
         return exist;
     }
 
     @Override
     public Optional<T> get(long id) {
-        log.info("get: Looking for entity with id: {}", id);
+        log.debug("get: Looking for entity with id: {}", id);
         T found = repository.findOne(id);
-        log.info("get: Entity with id: {} is {}", id, found);
+        log.debug("get: Entity with id: {} is {}", id, found);
         return Optional.ofNullable(found);
     }
 
     @Override
     public Optional<T> get(@Nonnull ParamsHolderBuilder builder) {
         ParamsHolder paramsHolder = builder.build();
-        log.info("get: Looking for entity with params: {}", paramsHolder);
+        log.debug("get: Looking for entity with params: {}", paramsHolder);
         T found = repository.findOne(paramsHolder);
-        log.info("get: Entity is {}", found);
+        log.debug("get: Entity is {}", found);
         return Optional.ofNullable(found);
     }
 
     @Override
     public List<T> getAll() {
-        log.info("getAll: trying to find all records");
+        log.debug("getAll: trying to find all records");
         List<T> resultList = repository.find();
         if (Objects.nonNull(resultList)) {
-            log.info("getAll: found {} records", resultList.size());
+            log.debug("getAll: found {} records", resultList.size());
             return resultList;
         }
-        log.info("getAll: found 0 records");
+        log.debug("getAll: found 0 records");
         return Lists.newArrayList();
     }
 
     @Override
     public Page<T> getAll(@Nonnull ParamsHolderBuilder builder) {
         ParamsHolder paramsHolder = builder.build();
-        log.info("getAll: Looking for entities with params: {}", paramsHolder);
+        log.debug("getAll: Looking for entities with params: {}", paramsHolder);
         Page<T> page = repository.find(paramsHolder);
         if (Objects.nonNull(page)) {
-            log.info("getAll: found {} records for {}", page.getTotalElements(), paramsHolder);
+            log.debug("getAll: found {} records for {}", page.getTotalElements(), paramsHolder);
             return page;
         }
-        log.info("getAll: found 0 records for {}", paramsHolder);
+        log.debug("getAll: found 0 records for {}", paramsHolder);
         return Page.empty();
     }
 }
