@@ -85,7 +85,7 @@ class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType> {
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
-    @Cacheable(cacheNames = "bodyType", unless = "#result != null", key = "#searchParams.hashCode()")
+    @Cacheable(cacheNames = "bodyType", unless = "#result == null", key = "#searchParams.hashCode()")
     @Nullable
     @Override
     public synchronized BodyType findOne(@NonNull @Nonnull ParamsHolder searchParams) {

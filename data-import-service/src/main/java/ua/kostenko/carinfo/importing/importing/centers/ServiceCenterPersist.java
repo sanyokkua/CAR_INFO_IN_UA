@@ -23,7 +23,7 @@ public class ServiceCenterPersist implements Persist<ServiceCenter> {
 
     @Override
     public void persist(@NonNull @Nonnull ServiceCenter record) {
-        log.info(record.toString());
+        log.debug(record.toString());
         Department dep = Department.builder()
                                    .departmentCode(record.getDepId())
                                    .departmentAddress(record.getAddress())
@@ -37,7 +37,7 @@ public class ServiceCenterPersist implements Persist<ServiceCenter> {
                 log.warn("Department is not created. {}", record);
             }
         } else {
-            log.info("Department {} already exists", dep);
+            log.debug("Department {} already exists", dep);
         }
     }
 }

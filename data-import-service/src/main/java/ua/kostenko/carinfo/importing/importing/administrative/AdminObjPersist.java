@@ -24,7 +24,7 @@ public class AdminObjPersist implements Persist<AdministrativeObjectCsvRecord> {
 
     @Override
     public void persist(@NonNull @Nonnull AdministrativeObjectCsvRecord record) {
-        log.info(record.toString());
+        log.debug(record.toString());
         AdministrativeObject build = AdministrativeObject.builder()
                                                          .adminObjId(record.getId())
                                                          .adminObjType(record.getType())
@@ -38,7 +38,7 @@ public class AdminObjPersist implements Persist<AdministrativeObjectCsvRecord> {
                 log.warn("Not created: {}", record);
             }
         } else {
-            log.info("Object exists: {}", build.toString());
+            log.debug("Object exists: {}", build.toString());
         }
 
     }

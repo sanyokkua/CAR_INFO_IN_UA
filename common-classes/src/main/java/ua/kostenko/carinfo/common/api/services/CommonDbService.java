@@ -42,7 +42,9 @@ abstract class CommonDbService<T> implements DBService<T> {
                             log.error("create: Entity was created but not found by query even after retrying it to get once again");
                         }
                     }
-                    log.info("create: created entity: {}", created);
+                    if (Objects.nonNull(created)){
+                        log.info("create: created entity: {}", created);
+                    }
                     result = Optional.ofNullable(created);
                 }
             } catch (Exception ex) {

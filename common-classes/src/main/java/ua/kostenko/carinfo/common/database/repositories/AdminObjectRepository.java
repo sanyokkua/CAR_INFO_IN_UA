@@ -91,7 +91,7 @@ class AdminObjectRepository extends CommonDBRepository<AdministrativeObject> {
         return findOne(jdbcTemplateSelect, params);
     }
 
-    @Cacheable(cacheNames = "adminObj", unless = "#result != null", key = "#searchParams.hashCode()")
+    @Cacheable(cacheNames = "adminObj", unless = "#result == null", key = "#searchParams.hashCode()")
     @Nullable
     @Override
     public synchronized AdministrativeObject findOne(@NonNull @Nonnull ParamsHolder searchParams) {

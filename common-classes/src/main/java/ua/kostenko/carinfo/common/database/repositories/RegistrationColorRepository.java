@@ -85,7 +85,7 @@ class RegistrationColorRepository extends CommonDBRepository<Color> {
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
-    @Cacheable(cacheNames = "color", unless = "#result != null", key = "#searchParams.hashCode()")
+    @Cacheable(cacheNames = "color", unless = "#result == null", key = "#searchParams.hashCode()")
     @Nullable
     @Override
     public synchronized Color findOne(@NonNull @Nonnull ParamsHolder searchParams) {

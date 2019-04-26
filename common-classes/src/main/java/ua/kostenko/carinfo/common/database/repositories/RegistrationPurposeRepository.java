@@ -84,7 +84,7 @@ class RegistrationPurposeRepository extends CommonDBRepository<Purpose> {
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
-    @Cacheable(cacheNames = "purpose", unless = "#result != null", key = "#searchParams.hashCode()")
+    @Cacheable(cacheNames = "purpose", unless = "#result == null", key = "#searchParams.hashCode()")
     @Nullable
     @Override
     public synchronized Purpose findOne(@NonNull @Nonnull ParamsHolder searchParams) {

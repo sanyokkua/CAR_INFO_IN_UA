@@ -88,7 +88,7 @@ class RegistrationOperationRepository extends CommonDBRepository<Operation> {
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
-    @Cacheable(cacheNames = "operation", unless = "#result != null", key = "#searchParams.hashCode()")
+    @Cacheable(cacheNames = "operation", unless = "#result == null", key = "#searchParams.hashCode()")
     @Nullable
     @Override
     public synchronized Operation findOne(@NonNull @Nonnull ParamsHolder searchParams) {

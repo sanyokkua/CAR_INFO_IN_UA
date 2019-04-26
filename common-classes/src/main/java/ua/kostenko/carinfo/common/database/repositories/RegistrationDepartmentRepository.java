@@ -92,7 +92,7 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department> {
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
-    @Cacheable(cacheNames = "department", unless = "#result != null", key = "#searchParams.hashCode()")
+    @Cacheable(cacheNames = "department", unless = "#result == null", key = "#searchParams.hashCode()")
     @Nullable
     @Override
     public synchronized Department findOne(@NonNull @Nonnull ParamsHolder searchParams) {

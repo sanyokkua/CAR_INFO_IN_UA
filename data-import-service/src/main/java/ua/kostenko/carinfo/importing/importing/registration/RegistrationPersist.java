@@ -171,9 +171,8 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
                                                         .registrationNumber(vehicleRegistrationNumber)//NULLABLE
                                                         .registrationDate(record.getDate())//non NULLABLE
                                                         .build();
-                Optional<Registration> result = registrationDBService.create(registration);
                 if (!registrationDBService.exists(registration)) {
-                    log.warn("Record {} is not created!", record);
+                    registrationDBService.create(registration);
                 }
             } else {
                 log.warn("Registration record is not valid. Record = {}", record);

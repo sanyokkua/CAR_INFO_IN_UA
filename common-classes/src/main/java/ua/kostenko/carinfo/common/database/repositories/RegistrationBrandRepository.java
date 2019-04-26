@@ -85,7 +85,7 @@ class RegistrationBrandRepository extends CommonDBRepository<Brand> {
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
-    @Cacheable(cacheNames = "brand", unless = "#result != null", key = "#searchParams.hashCode()")
+    @Cacheable(cacheNames = "brand", unless = "#result == null", key = "#searchParams.hashCode()")
     @Nullable
     @Override
     public synchronized Brand findOne(@NonNull @Nonnull ParamsHolder searchParams) {

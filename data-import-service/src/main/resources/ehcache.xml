@@ -1,0 +1,47 @@
+<ehcache:config
+        xmlns:ehcache="http://www.ehcache.org/v3"
+        xmlns:jcache="http://www.ehcache.org/v3/jsr107">
+
+    <ehcache:service>
+        <jcache:defaults>
+            <jcache:cache name="default" template="config-cache"/>
+        </jcache:defaults>
+    </ehcache:service>
+
+    <ehcache:cache alias="adminObj" uses-template="config-cache"/>
+    <ehcache:cache alias="bodyType" uses-template="config-cache"/>
+    <ehcache:cache alias="brand" uses-template="config-cache"/>
+    <ehcache:cache alias="color" uses-template="config-cache"/>
+    <ehcache:cache alias="department" uses-template="config-cache"/>
+    <ehcache:cache alias="fuel" uses-template="config-cache"/>
+    <ehcache:cache alias="kind" uses-template="config-cache"/>
+    <ehcache:cache alias="model" uses-template="config-cache"/>
+    <ehcache:cache alias="operation" uses-template="config-cache"/>
+    <ehcache:cache alias="purpose" uses-template="config-cache"/>
+    <ehcache:cache alias="registration" uses-template="config-cache"/>
+    <ehcache:cache alias="vehicle" uses-template="config-cache"/>
+
+    <ehcache:cache-template name="config-cache">
+        <ehcache:expiry>
+            <ehcache:tti unit="minutes">2</ehcache:tti>
+        </ehcache:expiry>
+
+        <ehcache:listeners>
+            <ehcache:listener>
+                <ehcache:class>ua.kostenko.carinfo.common.api.CacheEventLogger</ehcache:class>
+                <ehcache:event-firing-mode>ASYNCHRONOUS</ehcache:event-firing-mode>
+                <ehcache:event-ordering-mode>UNORDERED</ehcache:event-ordering-mode>
+                <ehcache:events-to-fire-on>CREATED</ehcache:events-to-fire-on>
+                <ehcache:events-to-fire-on>UPDATED</ehcache:events-to-fire-on>
+<!--                <ehcache:events-to-fire-on>EXPIRED</ehcache:events-to-fire-on>-->
+                <ehcache:events-to-fire-on>REMOVED</ehcache:events-to-fire-on>
+<!--                <ehcache:events-to-fire-on>EVICTED</ehcache:events-to-fire-on>-->
+            </ehcache:listener>
+        </ehcache:listeners>
+        <ehcache:resources>
+            <ehcache:heap>100</ehcache:heap>
+            <ehcache:offheap unit="MB">10</ehcache:offheap>
+        </ehcache:resources>
+    </ehcache:cache-template>
+
+</ehcache:config>
