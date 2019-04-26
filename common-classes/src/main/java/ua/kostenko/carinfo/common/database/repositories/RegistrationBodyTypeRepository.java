@@ -70,6 +70,7 @@ class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType> {
         return exist(jdbcTemplateSelectCount, parameterSource);
     }
 
+    @Cacheable(cacheNames = "bodyTypeCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
     public synchronized boolean exist(@NonNull @Nonnull BodyType entity) {
         String jdbcTemplateSelectCount = "select count(body_type_id) from carinfo.body_type where body_type_name = :name;";

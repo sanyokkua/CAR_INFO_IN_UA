@@ -103,6 +103,7 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
         return exist(jdbcTemplateSelectCount, params);
     }
 
+    @Cacheable(cacheNames = "vehicleCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
     public synchronized boolean exist(@NonNull @Nonnull Vehicle entity) {
         String jdbcTemplateSelectCount = "select count(vehicle_id) from carinfo.vehicle_view where model_name = :model and brand_name = :brand;";

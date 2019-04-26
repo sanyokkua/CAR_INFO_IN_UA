@@ -21,9 +21,22 @@
     <ehcache:cache alias="registration" uses-template="config-cache"/>
     <ehcache:cache alias="vehicle" uses-template="config-cache"/>
 
+    <ehcache:cache alias="modelCheck" uses-template="config-cache"/>
+    <ehcache:cache alias="bodyTypeCheck" uses-template="config-cache"/>
+    <ehcache:cache alias="departmentCheck" uses-template="config-cache"/>
+    <ehcache:cache alias="kindCheck" uses-template="config-cache"/>
+    <ehcache:cache alias="purposeCheck" uses-template="config-cache"/>
+    <ehcache:cache alias="brandCheck" uses-template="config-cache"/>
+    <ehcache:cache alias="operationCheck" uses-template="config-cache"/>
+    <ehcache:cache alias="adminObjCheck" uses-template="config-cache"/>
+    <ehcache:cache alias="colorCheck" uses-template="config-cache"/>
+    <ehcache:cache alias="vehicleCheck" uses-template="config-cache"/>
+    <ehcache:cache alias="fuelCheck" uses-template="config-cache"/>
+    <ehcache:cache alias="registrationCheck" uses-template="config-cache"/>
+
     <ehcache:cache-template name="config-cache">
         <ehcache:expiry>
-            <ehcache:tti unit="minutes">2</ehcache:tti>
+            <ehcache:tti unit="minutes">5</ehcache:tti>
         </ehcache:expiry>
 
         <ehcache:listeners>
@@ -39,7 +52,7 @@
             </ehcache:listener>
         </ehcache:listeners>
         <ehcache:resources>
-            <ehcache:heap>100</ehcache:heap>
+            <ehcache:heap>1000</ehcache:heap>
             <ehcache:offheap unit="MB">10</ehcache:offheap>
         </ehcache:resources>
     </ehcache:cache-template>

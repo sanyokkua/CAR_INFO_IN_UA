@@ -69,6 +69,7 @@ class RegistrationKindRepository extends CommonDBRepository<Kind> {
         return exist(jdbcTemplateSelectCount, params);
     }
 
+    @Cacheable(cacheNames = "kindCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
     public synchronized boolean exist(@NonNull @Nonnull Kind entity) {
         String jdbcTemplateSelectCount = "select count(kind_id) from carinfo.kind where kind_name = :name;";

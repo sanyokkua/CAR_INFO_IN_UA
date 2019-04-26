@@ -70,6 +70,7 @@ class RegistrationFuelTypeRepository extends CommonDBRepository<FuelType> {
         return exist(jdbcTemplateSelectCount, params);
     }
 
+    @Cacheable(cacheNames = "fuelCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
     public synchronized boolean exist(@NonNull @Nonnull FuelType entity) {
         String jdbcTemplateSelectCount = "select count(fuel_type_id) from carinfo.fuel_type where fuel_type_name = :name;";

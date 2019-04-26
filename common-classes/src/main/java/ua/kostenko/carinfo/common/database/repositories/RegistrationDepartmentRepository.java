@@ -77,6 +77,7 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department> {
         return exist(jdbcTemplateSelectCount, params);
     }
 
+    @Cacheable(cacheNames = "departmentCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
     public synchronized boolean exist(@NonNull @Nonnull Department entity) {
         String jdbcTemplateSelectCount = "select count(dep_code) from carinfo.department where dep_code = :code;";

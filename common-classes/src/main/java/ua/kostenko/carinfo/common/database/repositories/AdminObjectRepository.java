@@ -76,6 +76,7 @@ class AdminObjectRepository extends CommonDBRepository<AdministrativeObject> {
         return exist(jdbcTemplateSelectCount, params);
     }
 
+    @Cacheable(cacheNames = "adminObjCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
     public synchronized boolean exist(@NonNull @Nonnull AdministrativeObject entity) {
         String jdbcTemplateSelectCount = "select count(admin_obj_id) from carinfo.admin_object where admin_obj_name = :name;";

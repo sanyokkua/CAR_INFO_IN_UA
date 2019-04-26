@@ -70,6 +70,7 @@ class RegistrationBrandRepository extends CommonDBRepository<Brand> {
         return exist(jdbcTemplateSelectCount, params);
     }
 
+    @Cacheable(cacheNames = "brandCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
     public synchronized boolean exist(@NonNull @Nonnull Brand entity) {
         String jdbcTemplateSelectCount = "select count(brand_id) from carinfo.brand where brand_name = :name;";

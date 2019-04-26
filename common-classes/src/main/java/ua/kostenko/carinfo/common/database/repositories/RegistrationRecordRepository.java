@@ -180,6 +180,7 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration> {
         return exist(jdbcTemplateSelectCount, params);
     }
 
+    @Cacheable(cacheNames = "registrationCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
     public synchronized boolean exist(@NonNull @Nonnull Registration entity) {
         String select = "select count(id) ";

@@ -69,6 +69,7 @@ class RegistrationPurposeRepository extends CommonDBRepository<Purpose> {
         return exist(jdbcTemplateSelectCount, params);
     }
 
+    @Cacheable(cacheNames = "purposeCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
     public synchronized boolean exist(@NonNull @Nonnull Purpose entity) {
         String jdbcTemplateSelectCount = "select count(purpose_id) from carinfo.purpose where purpose_name = :name;";

@@ -73,6 +73,7 @@ class RegistrationOperationRepository extends CommonDBRepository<Operation> {
         return exist(jdbcTemplateSelectCount, params);
     }
 
+    @Cacheable(cacheNames = "operationCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
     public synchronized boolean exist(@NonNull @Nonnull Operation entity) {
         String jdbcTemplateSelectCount = "select count(op_code) from carinfo.operation where op_code = :code;";

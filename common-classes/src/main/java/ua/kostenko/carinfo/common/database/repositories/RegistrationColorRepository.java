@@ -70,6 +70,7 @@ class RegistrationColorRepository extends CommonDBRepository<Color> {
         return exist(jdbcTemplateSelectCount, params);
     }
 
+    @Cacheable(cacheNames = "colorCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
     public synchronized boolean exist(@NonNull @Nonnull Color entity) {
         String jdbcTemplateSelectCount = "select count(color_id) from carinfo.color where color_name = :name;";
