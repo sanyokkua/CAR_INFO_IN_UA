@@ -44,7 +44,7 @@ public class InitController {
         log.info("Initializing of {}. Start time: {}", className, before.toString());
         initializer.init();
         LocalTime after = LocalTime.now();
-        log.info("Initialization of {} finished. Finish Time: {}, duration: in minutes {}, in seconds, in millis {}", className,
+        log.info("Initialization of {} finished. Finish Time: {}, duration: in minutes {}, in seconds {}, in millis {}", className,
                  after.toString(),
                  Duration.between(before, after).toMinutes(),
                  Duration.between(before, after).getSeconds(),

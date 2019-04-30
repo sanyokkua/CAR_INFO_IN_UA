@@ -23,7 +23,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 @Slf4j
-public class FileProcessingTask implements Runnable {
+class FileProcessingTask implements Runnable {
     private final String link;
     private final File tempDirectory;
     private final DBService<Registration> registrationDBService;
@@ -39,8 +39,7 @@ public class FileProcessingTask implements Runnable {
     private final DBService<Purpose> purposeDBService;
     private final DBService<Vehicle> vehicleDBService;
 
-    public FileProcessingTask(@NonNull @Nonnull String link,
-                              @NonNull @Nonnull File tempDirectory,
+    public FileProcessingTask(@NonNull @Nonnull String link, @NonNull @Nonnull File tempDirectory,
                               @NonNull @Nonnull DBService<Registration> registrationDBService,
                               @NonNull @Nonnull DBService<AdministrativeObject> administrativeObjectDBService,
                               @NonNull @Nonnull DBService<BodyType> bodyTypeDBService,
@@ -94,6 +93,9 @@ public class FileProcessingTask implements Runnable {
         if (Objects.nonNull(tempDirectory)) {
             String name = fileName.substring(0, fileName.lastIndexOf("."));
             File destinationDirectory = ArchiveUtils.extractZipArchive(file, Paths.get(tempDirectory.getAbsolutePath() + File.separator + name).toFile());
+            if (Objects.isNull(destinationDirectory)) {
+                throw new NullPointerException("destinationDirectory is null. Problem with extracting zip archive");
+            }
             processExtractedFiles(destinationDirectory);
         } else {
             throw new RuntimeException("extractArchive: Temp directory is null");
@@ -101,7 +103,11 @@ public class FileProcessingTask implements Runnable {
     }
 
     private void processExtractedFiles(@NonNull @Nonnull File destinationDirectory) {
-        Stream.of(destinationDirectory.listFiles()).forEach(fileInDirectory -> {
+        File[] listFiles = destinationDirectory.listFiles();
+        if (Objects.isNull(listFiles)) {
+            throw new IllegalArgumentException("List of files in destination directory is null");
+        }
+        Stream.of(listFiles).forEach(fileInDirectory -> {
             CsvUtils<RegistrationHeaders> csvUtils = new RegistrationCsvUtils(fileInDirectory);
             Options<RegistrationHeaders> options = csvUtils.getOptions();
             if (Objects.nonNull(options)) {

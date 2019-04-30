@@ -9,7 +9,7 @@ public enum AdminObjCsvRecord {
     NP("NP"),
     NU("NU");
 
-    final String fieldName;
+    private final String fieldName;
 
     AdminObjCsvRecord(@NonNull @Nonnull String fieldName) {
         this.fieldName = fieldName;

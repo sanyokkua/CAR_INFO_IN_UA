@@ -131,6 +131,7 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
             final Optional<Purpose> purpose = getPurpose(record);
             final Optional<FuelType> fuelType = getFuelType(record);
             final Optional<Department> department = getDepartment(record);
+            @SuppressWarnings("ConstantConditions")
             final Optional<Vehicle> createdVehicle = getVehicle(model.orElseGet(null), brand.orElseGet(null));
 
             final Date registrationDate = record.getDate();
@@ -147,7 +148,8 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
                     isPresent(kind, "kind") && isPresent(purpose, "purpose") &&
                     isPresent(department, "department") && isPresent(createdVehicle, "createdVehicle") &&
                     isNotNull(vehicleMakeYear, "vehicleMakeYear") && isNotNull(registrationDate, "registrationDate") &&
-                    isNotBlank(personType, "personType")) {
+                    isNotBlankPersonType(personType)) {
+                @SuppressWarnings("OptionalGetWithoutIsPresent")
                 Registration registration = Registration.builder()
                                                         .adminObjName(administrativeObject.map(AdministrativeObject::getAdminObjName).orElse(null))//NULLABLE
                                                         .adminObjType(administrativeObject.map(AdministrativeObject::getAdminObjType).orElse(null))//NULLABLE
@@ -183,6 +185,7 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
         }
     }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private static <T> boolean isPresent(Optional<T> optional, String objectName) {
         if (!optional.isPresent()) {
             log.warn("{} is not present", objectName);
@@ -197,9 +200,9 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
         return Objects.nonNull(object);
     }
 
-    private static boolean isNotBlank(String object, String objectName) {
+    private static boolean isNotBlankPersonType(String object) {
         if (StringUtils.isBlank(object)) {
-            log.warn("{} is blank", objectName);
+            log.warn("{} is blank", "personType");
         }
         return StringUtils.isNotBlank(object);
     }

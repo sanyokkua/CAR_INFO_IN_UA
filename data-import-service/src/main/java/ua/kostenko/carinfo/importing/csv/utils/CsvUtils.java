@@ -19,7 +19,7 @@ import java.util.Objects;
 public abstract class CsvUtils <T extends CsvHeaders> {
     private final File file;
 
-    public CsvUtils(@NonNull @Nonnull File file) {
+    protected CsvUtils(@NonNull @Nonnull File file) {
         this.file = file;
     }
 

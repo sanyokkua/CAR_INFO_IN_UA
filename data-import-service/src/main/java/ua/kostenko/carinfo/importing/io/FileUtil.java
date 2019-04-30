@@ -12,8 +12,8 @@ import java.util.Objects;
 
 @Slf4j
 public class FileUtil {
-    public static final String SYSTEM_TMP_FOLDER_PROPERTY = "java.io.tmpdir";
-    public static final String SUB_DIRECTORY = "/registration";
+    private static final String SYSTEM_TMP_FOLDER_PROPERTY = "java.io.tmpdir";
+    private static final String SUB_DIRECTORY = "/registration";
 
     @Nullable
     public synchronized static File getTempDirectory() {
@@ -35,7 +35,7 @@ public class FileUtil {
     }
 
     @Nullable
-    public synchronized static File createDirectory(@NonNull @Nonnull String filePath) {
+    private synchronized static File createDirectory(@NonNull @Nonnull String filePath) {
         log.info("createDirectory: Creating directory by path: " + filePath);
         File directory = new File(filePath);
         if (directory.exists()) {
