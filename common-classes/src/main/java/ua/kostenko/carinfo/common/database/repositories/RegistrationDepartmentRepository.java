@@ -39,7 +39,7 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department> {
 
     @Nullable
     @Override
-    public synchronized Department create(@NonNull @Nonnull Department entity) {
+    public Department create(@NonNull @Nonnull Department entity) {
         String jdbcTemplateInsert = "insert into carinfo.department (dep_code, dep_addr, dep_email) values (:code, :addr, :email);";
         SqlParameterSource parameterSource = getSqlParamBuilder()
                 .addParam("code", entity.getDepartmentCode())
@@ -51,7 +51,7 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department> {
 
     @Nullable
     @Override
-    public synchronized Department update(@NonNull @Nonnull Department entity) {
+    public Department update(@NonNull @Nonnull Department entity) {
         String jdbcTemplateUpdate = "update carinfo.department set dep_addr = :addr, dep_email = :email where dep_code = :code;";
         SqlParameterSource parameterSource = getSqlParamBuilder()
                 .addParam("code", entity.getDepartmentCode())
@@ -64,14 +64,14 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department> {
     }
 
     @Override
-    public synchronized boolean delete(long id) {
+    public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.department where dep_code = :code;";
         SqlParameterSource params = getSqlParamBuilder().addParam("code", id).build();
         return delete(jdbcTemplateDelete, params);
     }
 
     @Override
-    public synchronized boolean existId(long id) {
+    public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(dep_code) from carinfo.department where dep_code = :code;";
         SqlParameterSource params = getSqlParamBuilder().addParam("code", id).build();
         return exist(jdbcTemplateSelectCount, params);
@@ -79,7 +79,7 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department> {
 
     @Cacheable(cacheNames = "departmentCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
-    public synchronized boolean exist(@NonNull @Nonnull Department entity) {
+    public boolean exist(@NonNull @Nonnull Department entity) {
         String jdbcTemplateSelectCount = "select count(dep_code) from carinfo.department where dep_code = :code;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("code", entity.getDepartmentCode()).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
@@ -87,7 +87,7 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department> {
 
     @Nullable
     @Override
-    public synchronized Department findOne(long id) {
+    public Department findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.department where dep_code = :code;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("code", id).build();
         return findOne(jdbcTemplateSelect, parameterSource);
@@ -96,7 +96,7 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department> {
     @Cacheable(cacheNames = "department", unless = "#result == null", key = "#searchParams.hashCode()")
     @Nullable
     @Override
-    public synchronized Department findOne(@NonNull @Nonnull ParamsHolder searchParams) {
+    public Department findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         Long depCode = searchParams.getLong(Department.DEPARTMENT_CODE);
         if (Objects.isNull(depCode)) {
             return null;
@@ -105,13 +105,13 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department> {
     }
 
     @Override
-    public synchronized List<Department> find() {
+    public List<Department> find() {
         String jdbcTemplateSelect = "select * from carinfo.department;";
         return find(jdbcTemplateSelect);
     }
 
     @Override
-    public synchronized Page<Department> find(@NonNull @Nonnull ParamsHolder searchParams) {
+    public Page<Department> find(@NonNull @Nonnull ParamsHolder searchParams) {
         String select = "select * ";
         String from = "from carinfo.department d ";
         Long code = searchParams.getLong(Department.DEPARTMENT_CODE);

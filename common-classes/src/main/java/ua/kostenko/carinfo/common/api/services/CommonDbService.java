@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @Slf4j
 abstract class CommonDbService<T> implements DBService<T> {
-    protected final DBRepository<T> repository;
+    final DBRepository<T> repository;
 
     protected CommonDbService(@NonNull @Nonnull DBRepository<T> repository) {
         this.repository = repository;
@@ -43,7 +43,7 @@ abstract class CommonDbService<T> implements DBService<T> {
                         }
                     }
                     if (Objects.nonNull(created)){
-                        log.info("create: created entity: {}", created);
+                        log.debug("create: created entity: {}", created);
                     }
                     result = Optional.ofNullable(created);
                 }

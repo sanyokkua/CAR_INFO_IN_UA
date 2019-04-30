@@ -37,7 +37,7 @@ class RegistrationOperationRepository extends CommonDBRepository<Operation> {
 
     @Nullable
     @Override
-    public synchronized Operation create(@NonNull @Nonnull Operation entity) {
+    public Operation create(@NonNull @Nonnull Operation entity) {
         String jdbcTemplateInsert = "insert into carinfo.operation (op_code, op_name) values (:code, :name);";
         SqlParameterSource parameterSource = getSqlParamBuilder()
                 .addParam("code", entity.getOperationCode())
@@ -48,7 +48,7 @@ class RegistrationOperationRepository extends CommonDBRepository<Operation> {
 
     @Nullable
     @Override
-    public synchronized Operation update(@NonNull @Nonnull Operation entity) {
+    public Operation update(@NonNull @Nonnull Operation entity) {
         String jdbcTemplateUpdate = "update carinfo.operation set op_name = :name where op_code = :code;";
         SqlParameterSource parameterSource = getSqlParamBuilder()
                 .addParam("code", entity.getOperationCode())
@@ -60,14 +60,14 @@ class RegistrationOperationRepository extends CommonDBRepository<Operation> {
     }
 
     @Override
-    public synchronized boolean delete(long id) {
+    public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.operation where op_code = :code;";
         SqlParameterSource params = getSqlParamBuilder().addParam("code", id).build();
         return delete(jdbcTemplateDelete, params);
     }
 
     @Override
-    public synchronized boolean existId(long id) {
+    public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(op_code) from carinfo.operation where op_code = :code;";
         SqlParameterSource params = getSqlParamBuilder().addParam("code", id).build();
         return exist(jdbcTemplateSelectCount, params);
@@ -75,7 +75,7 @@ class RegistrationOperationRepository extends CommonDBRepository<Operation> {
 
     @Cacheable(cacheNames = "operationCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
-    public synchronized boolean exist(@NonNull @Nonnull Operation entity) {
+    public boolean exist(@NonNull @Nonnull Operation entity) {
         String jdbcTemplateSelectCount = "select count(op_code) from carinfo.operation where op_code = :code;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("code", entity.getOperationCode()).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
@@ -83,7 +83,7 @@ class RegistrationOperationRepository extends CommonDBRepository<Operation> {
 
     @Nullable
     @Override
-    public synchronized Operation findOne(long id) {
+    public Operation findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.operation where op_code = :code;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("code", id).build();
         return findOne(jdbcTemplateSelect, parameterSource);
@@ -92,7 +92,7 @@ class RegistrationOperationRepository extends CommonDBRepository<Operation> {
     @Cacheable(cacheNames = "operation", unless = "#result == null", key = "#searchParams.hashCode()")
     @Nullable
     @Override
-    public synchronized Operation findOne(@NonNull @Nonnull ParamsHolder searchParams) {
+    public Operation findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         Long param = searchParams.getLong(Operation.OPERATION_CODE);
         String jdbcTemplateSelect = "select * from carinfo.operation where op_code = :code;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("code", param).build();
@@ -100,13 +100,13 @@ class RegistrationOperationRepository extends CommonDBRepository<Operation> {
     }
 
     @Override
-    public synchronized List<Operation> find() {
+    public List<Operation> find() {
         String jdbcTemplateSelect = "select * from carinfo.operation;";
         return find(jdbcTemplateSelect);
     }
 
     @Override
-    public synchronized Page<Operation> find(@NonNull @Nonnull ParamsHolder searchParams) {
+    public Page<Operation> find(@NonNull @Nonnull ParamsHolder searchParams) {
         String select = "select * ";
         String from = "from carinfo.operation o ";
         Long code = searchParams.getLong(Operation.OPERATION_CODE);

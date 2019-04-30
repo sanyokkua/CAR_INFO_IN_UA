@@ -37,7 +37,7 @@ class RegistrationBrandRepository extends CommonDBRepository<Brand> {
 
     @Nullable
     @Override
-    public synchronized Brand create(@NonNull @Nonnull Brand entity) {
+    public Brand create(@NonNull @Nonnull Brand entity) {
         String jdbcTemplateInsert = "insert into carinfo.brand (brand_name) values (:name);";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getBrandName()).build();
         return create(jdbcTemplateInsert, Constants.RegistrationBrand.ID, parameterSource);
@@ -45,7 +45,7 @@ class RegistrationBrandRepository extends CommonDBRepository<Brand> {
 
     @Nullable
     @Override
-    public synchronized Brand update(@NonNull @Nonnull Brand entity) {
+    public Brand update(@NonNull @Nonnull Brand entity) {
         String jdbcTemplateUpdate = "update carinfo.brand set brand_name = :name where brand_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder()
                 .addParam("name", entity.getBrandName())
@@ -57,14 +57,14 @@ class RegistrationBrandRepository extends CommonDBRepository<Brand> {
     }
 
     @Override
-    public synchronized boolean delete(long id) {
+    public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.brand where brand_id = :id;";
         SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
         return delete(jdbcTemplateDelete, params);
     }
 
     @Override
-    public synchronized boolean existId(long id) {
+    public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(brand_id) from carinfo.brand where brand_id = :id;";
         SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
         return exist(jdbcTemplateSelectCount, params);
@@ -72,7 +72,7 @@ class RegistrationBrandRepository extends CommonDBRepository<Brand> {
 
     @Cacheable(cacheNames = "brandCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
-    public synchronized boolean exist(@NonNull @Nonnull Brand entity) {
+    public boolean exist(@NonNull @Nonnull Brand entity) {
         String jdbcTemplateSelectCount = "select count(brand_id) from carinfo.brand where brand_name = :name;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getBrandName()).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
@@ -80,7 +80,7 @@ class RegistrationBrandRepository extends CommonDBRepository<Brand> {
 
     @Nullable
     @Override
-    public synchronized Brand findOne(long id) {
+    public Brand findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.brand where brand_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("id", id).build();
         return findOne(jdbcTemplateSelect, parameterSource);
@@ -89,7 +89,7 @@ class RegistrationBrandRepository extends CommonDBRepository<Brand> {
     @Cacheable(cacheNames = "brand", unless = "#result == null", key = "#searchParams.hashCode()")
     @Nullable
     @Override
-    public synchronized Brand findOne(@NonNull @Nonnull ParamsHolder searchParams) {
+    public Brand findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String param = searchParams.getString(Brand.BRAND_NAME);
         String jdbcTemplateSelect = "select * from carinfo.brand where brand_name = :name;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", param).build();
@@ -97,13 +97,13 @@ class RegistrationBrandRepository extends CommonDBRepository<Brand> {
     }
 
     @Override
-    public synchronized List<Brand> find() {
+    public List<Brand> find() {
         String jdbcTemplateSelect = "select * from carinfo.brand;";
         return find(jdbcTemplateSelect);
     }
 
     @Override
-    public synchronized Page<Brand> find(@NonNull @Nonnull ParamsHolder searchParams) {
+    public Page<Brand> find(@NonNull @Nonnull ParamsHolder searchParams) {
         String select = "select * ";
         String from = "from carinfo.brand b ";
         String name = searchParams.getString(Brand.BRAND_NAME);

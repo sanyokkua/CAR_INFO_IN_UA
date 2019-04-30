@@ -38,7 +38,7 @@ class AdminObjectRepository extends CommonDBRepository<AdministrativeObject> {
 
     @Nullable
     @Override
-    public synchronized AdministrativeObject create(@NonNull @Nonnull AdministrativeObject entity) {
+    public AdministrativeObject create(@NonNull @Nonnull AdministrativeObject entity) {
         String jdbcTemplateInsert = "insert into carinfo.admin_object (admin_obj_id, admin_obj_type, admin_obj_name) values (:id, :type, :name);";
         SqlParameterSource params = getSqlParamBuilder()
                 .addParam("id", entity.getAdminObjId())
@@ -50,7 +50,7 @@ class AdminObjectRepository extends CommonDBRepository<AdministrativeObject> {
 
     @Nullable
     @Override
-    public synchronized AdministrativeObject update(@NonNull @Nonnull AdministrativeObject entity) {
+    public AdministrativeObject update(@NonNull @Nonnull AdministrativeObject entity) {
         String jdbcTemplateUpdate = "update carinfo.admin_object set admin_obj_type = :type, admin_obj_name = :name where admin_obj_id = :id;";
         SqlParameterSource params = getSqlParamBuilder()
                 .addParam("id", entity.getAdminObjId())
@@ -63,14 +63,14 @@ class AdminObjectRepository extends CommonDBRepository<AdministrativeObject> {
     }
 
     @Override
-    public synchronized boolean delete(long id) {
+    public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.admin_object where admin_obj_id = :id;";
         SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
         return delete(jdbcTemplateDelete, params);
     }
 
     @Override
-    public synchronized boolean existId(long id) {
+    public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(admin_obj_id) from carinfo.admin_object where admin_obj_id = :id;";
         SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
         return exist(jdbcTemplateSelectCount, params);
@@ -78,7 +78,7 @@ class AdminObjectRepository extends CommonDBRepository<AdministrativeObject> {
 
     @Cacheable(cacheNames = "adminObjCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
-    public synchronized boolean exist(@NonNull @Nonnull AdministrativeObject entity) {
+    public boolean exist(@NonNull @Nonnull AdministrativeObject entity) {
         String jdbcTemplateSelectCount = "select count(admin_obj_id) from carinfo.admin_object where admin_obj_name = :name;";
         SqlParameterSource params = getSqlParamBuilder().addParam("name", entity.getAdminObjName()).build();
         return exist(jdbcTemplateSelectCount, params);
@@ -86,7 +86,7 @@ class AdminObjectRepository extends CommonDBRepository<AdministrativeObject> {
 
     @Nullable
     @Override
-    public synchronized AdministrativeObject findOne(long id) {
+    public AdministrativeObject findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.admin_object where admin_obj_id = :id;";
         SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
         return findOne(jdbcTemplateSelect, params);
@@ -95,7 +95,7 @@ class AdminObjectRepository extends CommonDBRepository<AdministrativeObject> {
     @Cacheable(cacheNames = "adminObj", unless = "#result == null", key = "#searchParams.hashCode()")
     @Nullable
     @Override
-    public synchronized AdministrativeObject findOne(@NonNull @Nonnull ParamsHolder searchParams) {
+    public AdministrativeObject findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String param = searchParams.getString(AdministrativeObject.ADMIN_OBJ_NAME);
         String jdbcTemplateSelect = "select * from carinfo.admin_object where admin_obj_name = :name;";
         SqlParameterSource params = getSqlParamBuilder().addParam("name", param).build();
@@ -103,13 +103,13 @@ class AdminObjectRepository extends CommonDBRepository<AdministrativeObject> {
     }
 
     @Override
-    public synchronized List<AdministrativeObject> find() {
+    public List<AdministrativeObject> find() {
         String jdbcTemplateSelect = "select * from carinfo.admin_object;";
         return find(jdbcTemplateSelect);
     }
 
     @Override
-    public synchronized Page<AdministrativeObject> find(@NonNull @Nonnull ParamsHolder searchParams) {
+    public Page<AdministrativeObject> find(@NonNull @Nonnull ParamsHolder searchParams) {
         String select = "select * ";
         String from = "from carinfo.admin_object a ";
         String name = searchParams.getString(AdministrativeObject.ADMIN_OBJ_NAME);

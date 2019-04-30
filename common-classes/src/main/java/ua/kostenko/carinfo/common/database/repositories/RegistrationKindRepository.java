@@ -37,7 +37,7 @@ class RegistrationKindRepository extends CommonDBRepository<Kind> {
 
     @Nullable
     @Override
-    public synchronized Kind create(@NonNull @Nonnull Kind entity) {
+    public Kind create(@NonNull @Nonnull Kind entity) {
         String jdbcTemplateInsert = "insert into carinfo.kind (kind_name) values (:name);";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getKindName()).build();
         return create(jdbcTemplateInsert, Constants.RegistrationKind.ID, parameterSource);
@@ -45,7 +45,7 @@ class RegistrationKindRepository extends CommonDBRepository<Kind> {
 
     @Nullable
     @Override
-    public synchronized Kind update(@NonNull @Nonnull Kind entity) {
+    public Kind update(@NonNull @Nonnull Kind entity) {
         String jdbcTemplateUpdate = "update carinfo.kind set kind_name = :name where kind_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getKindName())
                                                                  .addParam("id", entity.getKindId())
@@ -56,14 +56,14 @@ class RegistrationKindRepository extends CommonDBRepository<Kind> {
     }
 
     @Override
-    public synchronized boolean delete(long id) {
+    public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.kind where kind_id = :id;";
         SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
         return delete(jdbcTemplateDelete, params);
     }
 
     @Override
-    public synchronized boolean existId(long id) {
+    public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(kind_id) from carinfo.kind where kind_id = :id;";
         SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
         return exist(jdbcTemplateSelectCount, params);
@@ -71,7 +71,7 @@ class RegistrationKindRepository extends CommonDBRepository<Kind> {
 
     @Cacheable(cacheNames = "kindCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
-    public synchronized boolean exist(@NonNull @Nonnull Kind entity) {
+    public boolean exist(@NonNull @Nonnull Kind entity) {
         String jdbcTemplateSelectCount = "select count(kind_id) from carinfo.kind where kind_name = :name;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getKindName()).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
@@ -79,7 +79,7 @@ class RegistrationKindRepository extends CommonDBRepository<Kind> {
 
     @Nullable
     @Override
-    public synchronized Kind findOne(long id) {
+    public Kind findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.kind where kind_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("id", id).build();
         return findOne(jdbcTemplateSelect, parameterSource);
@@ -88,7 +88,7 @@ class RegistrationKindRepository extends CommonDBRepository<Kind> {
     @Cacheable(cacheNames = "kind", unless = "#result == null", key = "#searchParams.hashCode()")
     @Nullable
     @Override
-    public synchronized Kind findOne(@NonNull @Nonnull ParamsHolder searchParams) {
+    public Kind findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String param = searchParams.getString(Kind.KIND_NAME);
         String jdbcTemplateSelect = "select * from carinfo.kind where kind_name = :name;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", param).build();
@@ -96,13 +96,13 @@ class RegistrationKindRepository extends CommonDBRepository<Kind> {
     }
 
     @Override
-    public synchronized List<Kind> find() {
+    public List<Kind> find() {
         String jdbcTemplateSelect = "select * from carinfo.kind;";
         return find(jdbcTemplateSelect);
     }
 
     @Override
-    public synchronized Page<Kind> find(@NonNull @Nonnull ParamsHolder searchParams) {
+    public Page<Kind> find(@NonNull @Nonnull ParamsHolder searchParams) {
         String select = "select * ";
         String from = "from carinfo.kind k ";
         String name = searchParams.getString(Kind.KIND_NAME);

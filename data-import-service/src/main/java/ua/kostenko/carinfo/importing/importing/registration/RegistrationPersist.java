@@ -11,8 +11,14 @@ import ua.kostenko.carinfo.importing.importing.Persist;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.sql.Date;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
@@ -28,19 +34,26 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
     private final DBService<Operation> operationDBService;
     private final DBService<Purpose> purposeDBService;
     private final DBService<Vehicle> vehicleDBService;
+    private static volatile AtomicInteger globalPersistentCounter = new AtomicInteger(0);
+    private static volatile AtomicInteger globalProcessedCounter = new AtomicInteger(0);
+    private final LocalDateTime startTime = LocalDateTime.now();
+    private final long threadId;
+    private int localPersistentCounter = 0;
+    private int localProcessedCounter = 0;
+    private int lastLocalProcessedCounter = 0;
 
-    public RegistrationPersist(@NonNull @Nonnull DBService<Registration> registrationDBService,
-                               @NonNull @Nonnull DBService<AdministrativeObject> administrativeObjectDBService,
-                               @NonNull @Nonnull DBService<BodyType> bodyTypeDBService,
-                               @NonNull @Nonnull DBService<Brand> brandDBService,
-                               @NonNull @Nonnull DBService<Color> colorDBService,
-                               @NonNull @Nonnull DBService<Department> departmentDBService,
-                               @NonNull @Nonnull DBService<FuelType> fuelTypeDBService,
-                               @NonNull @Nonnull DBService<Kind> kindDBService,
-                               @NonNull @Nonnull DBService<Model> modelDBService,
-                               @NonNull @Nonnull DBService<Operation> operationDBService,
-                               @NonNull @Nonnull DBService<Purpose> purposeDBService,
-                               @NonNull @Nonnull DBService<Vehicle> vehicleDBService) {
+    RegistrationPersist(@NonNull @Nonnull DBService<Registration> registrationDBService,
+                        @NonNull @Nonnull DBService<AdministrativeObject> administrativeObjectDBService,
+                        @NonNull @Nonnull DBService<BodyType> bodyTypeDBService,
+                        @NonNull @Nonnull DBService<Brand> brandDBService,
+                        @NonNull @Nonnull DBService<Color> colorDBService,
+                        @NonNull @Nonnull DBService<Department> departmentDBService,
+                        @NonNull @Nonnull DBService<FuelType> fuelTypeDBService,
+                        @NonNull @Nonnull DBService<Kind> kindDBService,
+                        @NonNull @Nonnull DBService<Model> modelDBService,
+                        @NonNull @Nonnull DBService<Operation> operationDBService,
+                        @NonNull @Nonnull DBService<Purpose> purposeDBService,
+                        @NonNull @Nonnull DBService<Vehicle> vehicleDBService) {
         this.registrationDBService = registrationDBService;
         this.administrativeObjectDBService = administrativeObjectDBService;
         this.bodyTypeDBService = bodyTypeDBService;
@@ -53,6 +66,29 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
         this.operationDBService = operationDBService;
         this.purposeDBService = purposeDBService;
         this.vehicleDBService = vehicleDBService;
+        ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
+        exec.scheduleAtFixedRate(this::logNumberOfSavedRecords, 1, 1, TimeUnit.MINUTES);
+        threadId = Thread.currentThread().getId();
+    }
+
+    private void logNumberOfSavedRecords() {
+        final LocalDateTime localDateTime = LocalDateTime.now();
+        final int hour = localDateTime.getHour();
+        final int minute = localDateTime.getMinute();
+        final int second = localDateTime.getSecond();
+        final int year = localDateTime.getYear();
+        final int monthValue = localDateTime.getMonthValue();
+        final int dayOfMonth = localDateTime.getDayOfMonth();
+        final int globalPersistedNumber = globalPersistentCounter.get();
+        final int globalProcessesNumber = globalProcessedCounter.get();
+        final int differenceNumber = localProcessedCounter - lastLocalProcessedCounter;
+        final long minutesBetweenStartAndCurrentMoment = Duration.between(startTime, localDateTime).toMinutes();
+        final long globalThroughput = minutesBetweenStartAndCurrentMoment > 0 ? globalProcessesNumber / minutesBetweenStartAndCurrentMoment : 0;
+        log.info("Time: {}:{}:{} {}-{}-{}. For thread id = {}, processed: {}, saved: {}, processed from previous time: {}.",
+                 hour, minute, second, year, monthValue, dayOfMonth, threadId, localProcessedCounter, localPersistentCounter, differenceNumber);
+        log.info("Time: {}:{}:{} {}-{}-{}. For thread id = {} In GENERAL processed: {}, saved: {}, globalThroughput: {}",
+                 hour, minute, second, year, monthValue, dayOfMonth, threadId, globalProcessesNumber, globalPersistedNumber, globalThroughput);
+        lastLocalProcessedCounter = localProcessedCounter;
     }
 
     private Optional<Operation> getOperation(@NonNull @Nonnull RegistrationCsvRecord record) {
@@ -131,8 +167,7 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
             final Optional<Purpose> purpose = getPurpose(record);
             final Optional<FuelType> fuelType = getFuelType(record);
             final Optional<Department> department = getDepartment(record);
-            @SuppressWarnings("ConstantConditions")
-            final Optional<Vehicle> createdVehicle = getVehicle(model.orElseGet(null), brand.orElseGet(null));
+            @SuppressWarnings("ConstantConditions") final Optional<Vehicle> createdVehicle = getVehicle(model.orElseGet(null), brand.orElseGet(null));
 
             final Date registrationDate = record.getDate();
 
@@ -175,6 +210,8 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
                                                         .build();
                 if (!registrationDBService.exists(registration)) {
                     registrationDBService.create(registration);
+                    globalPersistentCounter.incrementAndGet();
+                    localPersistentCounter++;
                 }
             } else {
                 log.warn("Registration record is not valid. Record = {}", record);
@@ -183,6 +220,8 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
             log.warn("Problem with saving record: {}", record);
             log.error("ERROR OCCURRED IN PERSISTING CURRENT RECORD", ex);
         }
+        globalProcessedCounter.incrementAndGet();
+        localProcessedCounter++;
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")

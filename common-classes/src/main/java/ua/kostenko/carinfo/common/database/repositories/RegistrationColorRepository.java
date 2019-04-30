@@ -37,7 +37,7 @@ class RegistrationColorRepository extends CommonDBRepository<Color> {
 
     @Nullable
     @Override
-    public synchronized Color create(@NonNull @Nonnull Color entity) {
+    public Color create(@NonNull @Nonnull Color entity) {
         String jdbcTemplateInsert = "insert into carinfo.color (color_name) values (:name);";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getColorName()).build();
         return create(jdbcTemplateInsert, Constants.RegistrationColor.ID, parameterSource);
@@ -45,7 +45,7 @@ class RegistrationColorRepository extends CommonDBRepository<Color> {
 
     @Nullable
     @Override
-    public synchronized Color update(@NonNull @Nonnull Color entity) {
+    public Color update(@NonNull @Nonnull Color entity) {
         String jdbcTemplateUpdate = "update carinfo.color set color_name = :name where color_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder()
                 .addParam("name", entity.getColorName())
@@ -57,14 +57,14 @@ class RegistrationColorRepository extends CommonDBRepository<Color> {
     }
 
     @Override
-    public synchronized boolean delete(long id) {
+    public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.color where color_id = :id;";
         SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
         return delete(jdbcTemplateDelete, params);
     }
 
     @Override
-    public synchronized boolean existId(long id) {
+    public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(color_id) from carinfo.color where color_id = :id;";
         SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
         return exist(jdbcTemplateSelectCount, params);
@@ -72,7 +72,7 @@ class RegistrationColorRepository extends CommonDBRepository<Color> {
 
     @Cacheable(cacheNames = "colorCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
-    public synchronized boolean exist(@NonNull @Nonnull Color entity) {
+    public boolean exist(@NonNull @Nonnull Color entity) {
         String jdbcTemplateSelectCount = "select count(color_id) from carinfo.color where color_name = :name;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getColorName()).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
@@ -80,7 +80,7 @@ class RegistrationColorRepository extends CommonDBRepository<Color> {
 
     @Nullable
     @Override
-    public synchronized Color findOne(long id) {
+    public Color findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.color where color_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("id", id).build();
         return findOne(jdbcTemplateSelect, parameterSource);
@@ -89,7 +89,7 @@ class RegistrationColorRepository extends CommonDBRepository<Color> {
     @Cacheable(cacheNames = "color", unless = "#result == null", key = "#searchParams.hashCode()")
     @Nullable
     @Override
-    public synchronized Color findOne(@NonNull @Nonnull ParamsHolder searchParams) {
+    public Color findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String param = searchParams.getString(Color.COLOR_NAME);
         String jdbcTemplateSelect = "select * from carinfo.color where color_name = :name;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", param).build();
@@ -97,13 +97,13 @@ class RegistrationColorRepository extends CommonDBRepository<Color> {
     }
 
     @Override
-    public synchronized List<Color> find() {
+    public List<Color> find() {
         String jdbcTemplateSelect = "select * from carinfo.color;";
         return find(jdbcTemplateSelect);
     }
 
     @Override
-    public synchronized Page<Color> find(@NonNull @Nonnull ParamsHolder searchParams) {
+    public Page<Color> find(@NonNull @Nonnull ParamsHolder searchParams) {
         String select = "select * ";
         String from = "from carinfo.color c ";
         String name = searchParams.getString(Color.COLOR_NAME);

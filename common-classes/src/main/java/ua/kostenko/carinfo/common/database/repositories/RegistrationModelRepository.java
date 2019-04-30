@@ -37,7 +37,7 @@ class RegistrationModelRepository extends CommonDBRepository<Model> {
 
     @Nullable
     @Override
-    public synchronized Model create(@NonNull @Nonnull Model entity) {
+    public Model create(@NonNull @Nonnull Model entity) {
         String jdbcTemplateInsert = "insert into carinfo.model (model_name) values (:name);";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getModelName()).build();
         return create(jdbcTemplateInsert, Constants.RegistrationModel.ID, parameterSource);
@@ -45,7 +45,7 @@ class RegistrationModelRepository extends CommonDBRepository<Model> {
 
     @Nullable
     @Override
-    public synchronized Model update(@NonNull @Nonnull Model entity) {
+    public Model update(@NonNull @Nonnull Model entity) {
         String jdbcTemplateUpdate = "update carinfo.model set model_name = :name where model_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getModelName())
                                                                  .addParam("id", entity.getModelId())
@@ -56,14 +56,14 @@ class RegistrationModelRepository extends CommonDBRepository<Model> {
     }
 
     @Override
-    public synchronized boolean delete(long id) {
+    public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.model where model_id = :id;";
         SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
         return delete(jdbcTemplateDelete, params);
     }
 
     @Override
-    public synchronized boolean existId(long id) {
+    public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(model_id) from carinfo.model where model_id = :id;";
         SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
         return exist(jdbcTemplateSelectCount, params);
@@ -71,7 +71,7 @@ class RegistrationModelRepository extends CommonDBRepository<Model> {
 
     @Cacheable(cacheNames = "modelCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
-    public synchronized boolean exist(@NonNull @Nonnull Model entity) {
+    public boolean exist(@NonNull @Nonnull Model entity) {
         String jdbcTemplateSelectCount = "select count(model_id) from carinfo.model where model_name = :name;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getModelName()).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
@@ -79,7 +79,7 @@ class RegistrationModelRepository extends CommonDBRepository<Model> {
 
     @Nullable
     @Override
-    public synchronized Model findOne(long id) {
+    public Model findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.model where model_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("id", id).build();
         return findOne(jdbcTemplateSelect, parameterSource);
@@ -88,7 +88,7 @@ class RegistrationModelRepository extends CommonDBRepository<Model> {
     @Cacheable(cacheNames = "model", unless = "#result == null", key = "#searchParams.hashCode()")
     @Nullable
     @Override
-    public synchronized Model findOne(@NonNull @Nonnull ParamsHolder searchParams) {
+    public Model findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String param = searchParams.getString(Model.MODEL_NAME);
         String jdbcTemplateSelect = "select * from carinfo.model where model_name = :name;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", param).build();
@@ -96,13 +96,13 @@ class RegistrationModelRepository extends CommonDBRepository<Model> {
     }
 
     @Override
-    public synchronized List<Model> find() {
+    public List<Model> find() {
         String jdbcTemplateSelect = "select * from carinfo.model;";
         return find(jdbcTemplateSelect);
     }
 
     @Override
-    public synchronized Page<Model> find(@NonNull @Nonnull ParamsHolder searchParams) {
+    public Page<Model> find(@NonNull @Nonnull ParamsHolder searchParams) {
         String select = "select * ";
         String from = "from carinfo.model m ";
         String name = searchParams.getString(Model.MODEL_NAME);

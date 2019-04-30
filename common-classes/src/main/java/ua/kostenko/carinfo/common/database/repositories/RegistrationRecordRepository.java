@@ -83,7 +83,7 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration> {
 
     @Nullable
     @Override
-    public synchronized Registration create(@NonNull @Nonnull Registration entity) {
+    public Registration create(@NonNull @Nonnull Registration entity) {
         String jdbcTemplateInsert = "insert into carinfo.record (" +
                 "admin_obj_id, " +
                 "op_code, " +
@@ -152,7 +152,7 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration> {
 
     @Nullable
     @Override
-    public synchronized Registration update(@NonNull @Nonnull Registration entity) {
+    public Registration update(@NonNull @Nonnull Registration entity) {
         String jdbcTemplateUpdate = "update carinfo.record set admin_obj_id = :adminObjId," +
                 " op_code = :operationCode, dep_code = :departmentCode, kind_id = :kindId, vehicle_id = :vehicleId," +
                 " color_id = :colorId, body_type_id = :bodyTypeId, purpose_id = :purposeId, fuel_type_id = :fuelTypeId," +
@@ -167,14 +167,14 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration> {
     }
 
     @Override
-    public synchronized boolean delete(long id) {
+    public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.record where id = :id;";
         SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
         return delete(jdbcTemplateDelete, params);
     }
 
     @Override
-    public synchronized boolean existId(long id) {
+    public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(id) from carinfo.record where id = :id;";
         SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
         return exist(jdbcTemplateSelectCount, params);
@@ -182,7 +182,7 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration> {
 
     @Cacheable(cacheNames = "registrationCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
-    public synchronized boolean exist(@NonNull @Nonnull Registration entity) {
+    public boolean exist(@NonNull @Nonnull Registration entity) {
         String select = "select count(id) ";
         String from = "from carinfo.record_view  ";
         WhereBuilder.BuildResult buildResult = buildWhere()
@@ -215,7 +215,7 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration> {
 
     @Nullable
     @Override
-    public synchronized Registration findOne(long id) {
+    public Registration findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.record_view where id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("id", id).build();
         return findOne(jdbcTemplateSelect, parameterSource);
@@ -224,7 +224,7 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration> {
     @Cacheable(cacheNames = "registration", unless = "#result == null", key = "#searchParams.hashCode()")
     @Nullable
     @Override
-    public synchronized Registration findOne(@NonNull @Nonnull ParamsHolder searchParams) {
+    public Registration findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String jdbcTemplateSelect = "select * from carinfo.record_view ";
         WhereBuilder.BuildResult buildResult = buildWhereForFind(searchParams).build();
         String where = buildResult.getWhereSql();
@@ -232,7 +232,7 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration> {
     }
 
     @Override
-    public synchronized List<Registration> find() {
+    public List<Registration> find() {
         String jdbcTemplateSelect = "select * from carinfo.record_view ";
         return find(jdbcTemplateSelect);
     }
@@ -284,7 +284,7 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration> {
     }
 
     @Override
-    public synchronized Page<Registration> find(@NonNull @Nonnull ParamsHolder searchParams) {
+    public Page<Registration> find(@NonNull @Nonnull ParamsHolder searchParams) {
         String select = "select * ";
         String from = "from carinfo.record_view  ";
         WhereBuilder buildWhere = buildWhereForFind(searchParams);

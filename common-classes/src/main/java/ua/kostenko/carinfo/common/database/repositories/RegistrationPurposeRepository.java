@@ -37,7 +37,7 @@ class RegistrationPurposeRepository extends CommonDBRepository<Purpose> {
 
     @Nullable
     @Override
-    public synchronized Purpose create(@NonNull @Nonnull Purpose entity) {
+    public Purpose create(@NonNull @Nonnull Purpose entity) {
         String jdbcTemplateInsert = "insert into carinfo.purpose (purpose_name) values (:name);";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getPurposeName()).build();
         return create(jdbcTemplateInsert, Constants.RegistrationPurpose.ID, parameterSource);
@@ -45,7 +45,7 @@ class RegistrationPurposeRepository extends CommonDBRepository<Purpose> {
 
     @Nullable
     @Override
-    public synchronized Purpose update(@NonNull @Nonnull Purpose entity) {
+    public Purpose update(@NonNull @Nonnull Purpose entity) {
         String jdbcTemplateUpdate = "update carinfo.purpose set purpose_name = :name where purpose_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getPurposeName())
                                                                  .addParam("id", entity.getPurposeId())
@@ -56,14 +56,14 @@ class RegistrationPurposeRepository extends CommonDBRepository<Purpose> {
     }
 
     @Override
-    public synchronized boolean delete(long id) {
+    public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.purpose where purpose_id = :id;";
         SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
         return delete(jdbcTemplateDelete, params);
     }
 
     @Override
-    public synchronized boolean existId(long id) {
+    public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(purpose_id) from carinfo.purpose where purpose_id = :id;";
         SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
         return exist(jdbcTemplateSelectCount, params);
@@ -71,7 +71,7 @@ class RegistrationPurposeRepository extends CommonDBRepository<Purpose> {
 
     @Cacheable(cacheNames = "purposeCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
-    public synchronized boolean exist(@NonNull @Nonnull Purpose entity) {
+    public boolean exist(@NonNull @Nonnull Purpose entity) {
         String jdbcTemplateSelectCount = "select count(purpose_id) from carinfo.purpose where purpose_name = :name;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getPurposeName()).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
@@ -79,7 +79,7 @@ class RegistrationPurposeRepository extends CommonDBRepository<Purpose> {
 
     @Nullable
     @Override
-    public synchronized Purpose findOne(long id) {
+    public Purpose findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.purpose where purpose_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("id", id).build();
         return findOne(jdbcTemplateSelect, parameterSource);
@@ -88,7 +88,7 @@ class RegistrationPurposeRepository extends CommonDBRepository<Purpose> {
     @Cacheable(cacheNames = "purpose", unless = "#result == null", key = "#searchParams.hashCode()")
     @Nullable
     @Override
-    public synchronized Purpose findOne(@NonNull @Nonnull ParamsHolder searchParams) {
+    public Purpose findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String param = searchParams.getString(Purpose.PURPOSE_NAME);
         String jdbcTemplateSelect = "select * from carinfo.purpose where purpose_name = :name;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", param).build();
@@ -96,13 +96,13 @@ class RegistrationPurposeRepository extends CommonDBRepository<Purpose> {
     }
 
     @Override
-    public synchronized List<Purpose> find() {
+    public List<Purpose> find() {
         String jdbcTemplateSelect = "select * from carinfo.purpose;";
         return find(jdbcTemplateSelect);
     }
 
     @Override
-    public synchronized Page<Purpose> find(@NonNull @Nonnull ParamsHolder searchParams) {
+    public Page<Purpose> find(@NonNull @Nonnull ParamsHolder searchParams) {
         String select = "select * ";
         String from = "from carinfo.purpose p ";
         String name = searchParams.getString(Purpose.PURPOSE_NAME);

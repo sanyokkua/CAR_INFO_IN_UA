@@ -28,7 +28,7 @@ abstract class CommonDBRepository<T> implements DBRepository<T> {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    synchronized T create(@NonNull @Nonnull String sql, String idFieldName, SqlParameterSource sqlParams) {
+    T create(@NonNull @Nonnull String sql, String idFieldName, SqlParameterSource sqlParams) {
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(sql, sqlParams, keyHolder);
         Map<String, Object> keys = keyHolder.getKeys();
@@ -40,23 +40,23 @@ abstract class CommonDBRepository<T> implements DBRepository<T> {
         }
     }
 
-    synchronized boolean exist(@NonNull @Nonnull String sql, SqlParameterSource sqlParams) {
+    boolean exist(@NonNull @Nonnull String sql, SqlParameterSource sqlParams) {
         long numberOfRows = jdbcTemplate.query(sql, sqlParams, EXISTENCE_COUNT_MAPPER).stream().findFirst().orElse(0L);
         return numberOfRows > 0;
     }
 
-    synchronized boolean delete(@NonNull @Nonnull String jdbcTemplateDelete, SqlParameterSource sqlParams) {
+    boolean delete(@NonNull @Nonnull String jdbcTemplateDelete, SqlParameterSource sqlParams) {
         int updated = jdbcTemplate.update(jdbcTemplateDelete, sqlParams);
         return updated > 0;
     }
 
-    synchronized List<T> find(@NonNull @Nonnull String jdbcTemplateSelect) {
+    List<T> find(@NonNull @Nonnull String jdbcTemplateSelect) {
         return jdbcTemplate.query(jdbcTemplateSelect, getRowMapper());
     }
 
     abstract RowMapper<T> getRowMapper();
 
-    synchronized T findOne(@NonNull @Nonnull String sql, SqlParameterSource sqlParams) {
+    T findOne(@NonNull @Nonnull String sql, SqlParameterSource sqlParams) {
         try {
             List<T> list = jdbcTemplate.query(sql, sqlParams, getRowMapper());
             return list.stream().findFirst().orElse(null);
@@ -67,7 +67,7 @@ abstract class CommonDBRepository<T> implements DBRepository<T> {
 
     }
 
-    synchronized Page<T> findPage(@NonNull @Nonnull ParamsHolder paramsHolder, @NonNull @Nonnull String selectSql, @NonNull @Nonnull String fromSql, @NonNull @Nonnull WhereBuilder whereBuilder) {
+    Page<T> findPage(@NonNull @Nonnull ParamsHolder paramsHolder, @NonNull @Nonnull String selectSql, @NonNull @Nonnull String fromSql, @NonNull @Nonnull WhereBuilder whereBuilder) {
         if (StringUtils.isBlank(selectSql) || StringUtils.isBlank(fromSql)) {
             throw new IllegalArgumentException("Select or From values can't be blank");
         }

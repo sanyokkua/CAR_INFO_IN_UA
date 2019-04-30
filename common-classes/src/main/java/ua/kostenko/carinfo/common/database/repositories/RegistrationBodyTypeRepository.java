@@ -37,7 +37,7 @@ class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType> {
 
     @Nullable
     @Override
-    public synchronized BodyType create(@NonNull @Nonnull BodyType entity) {
+    public BodyType create(@NonNull @Nonnull BodyType entity) {
         String jdbcTemplateInsert = "insert into carinfo.body_type (body_type_name) values (:name);";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getBodyTypeName()).build();
         return create(jdbcTemplateInsert, Constants.RegistrationBodyType.ID, parameterSource);
@@ -45,7 +45,7 @@ class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType> {
 
     @Nullable
     @Override
-    public synchronized BodyType update(@NonNull @Nonnull BodyType entity) {
+    public BodyType update(@NonNull @Nonnull BodyType entity) {
         String jdbcTemplateUpdate = "update carinfo.body_type set body_type_name = :name where body_type_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder()
                 .addParam("id", entity.getBodyTypeId())
@@ -57,14 +57,14 @@ class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType> {
     }
 
     @Override
-    public synchronized boolean delete(long id) {
+    public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.body_type where body_type_id = :id;";
         SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
         return delete(jdbcTemplateDelete, params);
     }
 
     @Override
-    public synchronized boolean existId(long id) {
+    public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(body_type_id) from carinfo.body_type where body_type_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("id", id).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
@@ -72,7 +72,7 @@ class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType> {
 
     @Cacheable(cacheNames = "bodyTypeCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
-    public synchronized boolean exist(@NonNull @Nonnull BodyType entity) {
+    public boolean exist(@NonNull @Nonnull BodyType entity) {
         String jdbcTemplateSelectCount = "select count(body_type_id) from carinfo.body_type where body_type_name = :name;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getBodyTypeName()).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
@@ -80,7 +80,7 @@ class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType> {
 
     @Nullable
     @Override
-    public synchronized BodyType findOne(long id) {
+    public BodyType findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.body_type where body_type_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("id", id).build();
         return findOne(jdbcTemplateSelect, parameterSource);
@@ -89,7 +89,7 @@ class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType> {
     @Cacheable(cacheNames = "bodyType", unless = "#result == null", key = "#searchParams.hashCode()")
     @Nullable
     @Override
-    public synchronized BodyType findOne(@NonNull @Nonnull ParamsHolder searchParams) {
+    public BodyType findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String param = searchParams.getString(BodyType.BODY_TYPE_NAME);
         String jdbcTemplateSelect = "select * from carinfo.body_type where body_type_name = :name;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", param).build();
@@ -97,13 +97,13 @@ class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType> {
     }
 
     @Override
-    public synchronized List<BodyType> find() {
+    public List<BodyType> find() {
         String jdbcTemplateSelect = "select * from carinfo.body_type;";
         return find(jdbcTemplateSelect);
     }
 
     @Override
-    public synchronized Page<BodyType> find(@NonNull @Nonnull ParamsHolder searchParams) {
+    public Page<BodyType> find(@NonNull @Nonnull ParamsHolder searchParams) {
         String select = "select * ";
         String from = "from carinfo.body_type bt ";
         String name = searchParams.getString(BodyType.BODY_TYPE_NAME);

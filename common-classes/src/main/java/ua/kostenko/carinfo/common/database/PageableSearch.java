@@ -30,7 +30,7 @@ public interface PageableSearch<T> {
             sqlParameters = new MapSqlParameterSource();
         }
 
-        public WhereBuilder addFieldParam(@NonNull @Nonnull String fieldName, @NonNull @Nonnull String paramName, @Nonnull Object value) {
+        public WhereBuilder addFieldParam(@NonNull @Nonnull String fieldName, @NonNull @Nonnull String paramName, Object value) {
             if (StringUtils.isBlank(fieldName) || StringUtils.isBlank(paramName) || Objects.isNull(value)) {
                 return this;
             }
@@ -39,7 +39,7 @@ public interface PageableSearch<T> {
             return this;
         }
 
-        public WhereBuilder addEqualFields(@NonNull @Nonnull String mainField, @NonNull @Nonnull String equalField) {
+        public WhereBuilder addEqualFields(@NonNull @Nonnull String mainField, String equalField) {
             if (StringUtils.isBlank(mainField) || StringUtils.isBlank(equalField)) {
                 return this;
             }
@@ -47,7 +47,7 @@ public interface PageableSearch<T> {
             return this;
         }
 
-        public WhereBuilder addOnlyParam(@NonNull @Nonnull String paramName, @Nonnull Object value) {
+        public WhereBuilder addOnlyParam(@NonNull @Nonnull String paramName, Object value) {
             if (StringUtils.isBlank(paramName) || Objects.isNull(value)) {
                 return this;
             }

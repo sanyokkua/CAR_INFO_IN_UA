@@ -37,7 +37,7 @@ class RegistrationFuelTypeRepository extends CommonDBRepository<FuelType> {
 
     @Nullable
     @Override
-    public synchronized FuelType create(@NonNull @Nonnull FuelType entity) {
+    public FuelType create(@NonNull @Nonnull FuelType entity) {
         String jdbcTemplateInsert = "insert into carinfo.fuel_type (fuel_type_name) values (:name);";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getFuelTypeName()).build();
         return create(jdbcTemplateInsert, Constants.RegistrationFuelType.ID, parameterSource);
@@ -45,7 +45,7 @@ class RegistrationFuelTypeRepository extends CommonDBRepository<FuelType> {
 
     @Nullable
     @Override
-    public synchronized FuelType update(@NonNull @Nonnull FuelType entity) {
+    public FuelType update(@NonNull @Nonnull FuelType entity) {
         String jdbcTemplateUpdate = "update carinfo.fuel_type set fuel_type_name = :name where fuel_type_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder()
                 .addParam("name", entity.getFuelTypeName())
@@ -57,14 +57,14 @@ class RegistrationFuelTypeRepository extends CommonDBRepository<FuelType> {
     }
 
     @Override
-    public synchronized boolean delete(long id) {
+    public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.fuel_type where fuel_type_id = :id;";
         SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
         return delete(jdbcTemplateDelete, params);
     }
 
     @Override
-    public synchronized boolean existId(long id) {
+    public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(fuel_type_id) from carinfo.fuel_type where fuel_type_id = :id;";
         SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
         return exist(jdbcTemplateSelectCount, params);
@@ -72,7 +72,7 @@ class RegistrationFuelTypeRepository extends CommonDBRepository<FuelType> {
 
     @Cacheable(cacheNames = "fuelCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
-    public synchronized boolean exist(@NonNull @Nonnull FuelType entity) {
+    public boolean exist(@NonNull @Nonnull FuelType entity) {
         String jdbcTemplateSelectCount = "select count(fuel_type_id) from carinfo.fuel_type where fuel_type_name = :name;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getFuelTypeName()).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
@@ -80,7 +80,7 @@ class RegistrationFuelTypeRepository extends CommonDBRepository<FuelType> {
 
     @Nullable
     @Override
-    public synchronized FuelType findOne(long id) {
+    public FuelType findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.fuel_type ft where fuel_type_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("id", id).build();
         return findOne(jdbcTemplateSelect, parameterSource);
@@ -89,7 +89,7 @@ class RegistrationFuelTypeRepository extends CommonDBRepository<FuelType> {
     @Cacheable(cacheNames = "fuel", unless = "#result == null", key = "#searchParams.hashCode()")
     @Nullable
     @Override
-    public synchronized FuelType findOne(@NonNull @Nonnull ParamsHolder searchParams) {
+    public FuelType findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String param = searchParams.getString(FuelType.FUEL_NAME);
         String jdbcTemplateSelect = "select * from carinfo.fuel_type where fuel_type_name = :name;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", param).build();
@@ -97,13 +97,13 @@ class RegistrationFuelTypeRepository extends CommonDBRepository<FuelType> {
     }
 
     @Override
-    public synchronized List<FuelType> find() {
+    public List<FuelType> find() {
         String jdbcTemplateSelect = "select * from carinfo.fuel_type;";
         return find(jdbcTemplateSelect);
     }
 
     @Override
-    public synchronized Page<FuelType> find(@NonNull @Nonnull ParamsHolder searchParams) {
+    public Page<FuelType> find(@NonNull @Nonnull ParamsHolder searchParams) {
         String select = "select * ";
         String from = "from carinfo.fuel_type ft ";
         String name = searchParams.getString(FuelType.FUEL_NAME);
