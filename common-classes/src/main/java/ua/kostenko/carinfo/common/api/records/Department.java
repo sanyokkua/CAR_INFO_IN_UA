@@ -11,11 +11,21 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Department implements Serializable {
+public class Department implements Serializable, GenericRecord<Long> {
     public static final String DEPARTMENT_CODE = "departmentCode";
     public static final String DEPARTMENT_ADDRESS = "departmentAddress";
     public static final String DEPARTMENT_EMAIL = "departmentEmail";
     private Long departmentCode;
     private String departmentAddress;
     private String departmentEmail;
+
+    @Override
+    public Long getId() {
+        return departmentCode;
+    }
+
+    @Override
+    public Long getIndexField() {
+        return departmentCode;
+    }
 }

@@ -14,10 +14,10 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-class BodyTypeService extends CommonDbService<BodyType> {
+class BodyTypeService extends CommonDbService<BodyType, String> {
 
     @Autowired
-    protected BodyTypeService(@NonNull @Nonnull DBRepository<BodyType> repository) {
+    protected BodyTypeService(@NonNull @Nonnull DBRepository<BodyType, String> repository) {
         super(repository);
     }
 

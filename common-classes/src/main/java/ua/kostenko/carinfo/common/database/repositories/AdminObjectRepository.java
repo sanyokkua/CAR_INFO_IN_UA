@@ -19,7 +19,7 @@ import java.util.List;
 
 @Repository
 @Slf4j
-class AdminObjectRepository extends CommonDBRepository<AdministrativeObject> {
+class AdminObjectRepository extends CommonDBRepository<AdministrativeObject, String> {
     private static final RowMapper<AdministrativeObject> ROW_MAPPER = (resultSet, i) -> AdministrativeObject.builder()
                                                                                                             .adminObjId(resultSet.getLong(Constants.AdminObject.ID))
                                                                                                             .adminObjType(resultSet.getString(Constants.AdminObject.TYPE))
@@ -41,7 +41,7 @@ class AdminObjectRepository extends CommonDBRepository<AdministrativeObject> {
     public AdministrativeObject create(@NonNull @Nonnull AdministrativeObject entity) {
         String jdbcTemplateInsert = "insert into carinfo.admin_object (admin_obj_id, admin_obj_type, admin_obj_name) values (:id, :type, :name);";
         SqlParameterSource params = getSqlParamBuilder()
-                .addParam("id", entity.getAdminObjId())
+                .addParam("id", entity.getId())
                 .addParam("type", entity.getAdminObjType())
                 .addParam("name", entity.getAdminObjName())
                 .build();
@@ -53,13 +53,21 @@ class AdminObjectRepository extends CommonDBRepository<AdministrativeObject> {
     public AdministrativeObject update(@NonNull @Nonnull AdministrativeObject entity) {
         String jdbcTemplateUpdate = "update carinfo.admin_object set admin_obj_type = :type, admin_obj_name = :name where admin_obj_id = :id;";
         SqlParameterSource params = getSqlParamBuilder()
-                .addParam("id", entity.getAdminObjId())
+                .addParam("id", entity.getId())
                 .addParam("type", entity.getAdminObjType())
                 .addParam("name", entity.getAdminObjName())
                 .build();
         jdbcTemplate.update(jdbcTemplateUpdate, params);
         ParamsHolder searchParams = getParamsHolderBuilder().param(AdministrativeObject.ADMIN_OBJ_NAME, entity.getAdminObjName()).build();
         return findOne(searchParams);
+    }
+
+    @Cacheable(cacheNames = "adminObjIndex", unless = "#result == false ", key = "#indexField")
+    @Override
+    public boolean existsByIndex(@Nonnull @NonNull String indexField) {
+        String jdbcTemplateSelectCount = "select count(admin_obj_id) from carinfo.admin_object where admin_obj_name = :name;";
+        SqlParameterSource params = getSqlParamBuilder().addParam("name", indexField).build();
+        return exist(jdbcTemplateSelectCount, params);
     }
 
     @Override

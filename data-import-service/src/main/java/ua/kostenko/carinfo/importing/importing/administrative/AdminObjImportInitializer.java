@@ -7,6 +7,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import ua.kostenko.carinfo.importing.configuration.ApplicationProperties;
 import ua.kostenko.carinfo.importing.csv.mappers.administrative.AdministrativeObjectCsvMapper;
+import ua.kostenko.carinfo.importing.csv.pojo.AdministrativeObjectCsvRecord;
 import ua.kostenko.carinfo.importing.csv.reader.CsvReader;
 import ua.kostenko.carinfo.importing.csv.reader.options.Options;
 import ua.kostenko.carinfo.importing.csv.structure.headers.administrative.AdministrativeHeaders;
@@ -55,7 +56,8 @@ public class AdminObjImportInitializer implements Initializer {
 
             if (Objects.nonNull(options)) {
                 AdministrativeObjectCsvMapper mapper = new AdministrativeObjectCsvMapper(options.getHeaders());
-                CsvReader.readCsvFile(options.getReaderOptions(), mapper, persist);
+                CsvReader<AdministrativeObjectCsvRecord> csvReader = new CsvReader<>();
+                csvReader.readCsvFile(options.getReaderOptions(), mapper, persist);
             } else {
                 log.error("processExtractedFiles: Options is null");
             }

@@ -11,8 +11,18 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FuelType implements Serializable {
+public class FuelType implements Serializable, GenericRecord<String> {
     public static final String FUEL_NAME = "fuelName";
     private Long fuelTypeId;
     private String fuelTypeName;
+
+    @Override
+    public Long getId() {
+        return fuelTypeId;
+    }
+
+    @Override
+    public String getIndexField() {
+        return fuelTypeName;
+    }
 }

@@ -15,10 +15,10 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-class OperationService extends CommonDbService<Operation> {
+class OperationService extends CommonDbService<Operation, Long> {
 
     @Autowired
-    protected OperationService(@NonNull @Nonnull DBRepository<Operation> repository) {
+    protected OperationService(@NonNull @Nonnull DBRepository<Operation, Long> repository) {
         super(repository);
     }
 

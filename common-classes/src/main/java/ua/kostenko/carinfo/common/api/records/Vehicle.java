@@ -8,7 +8,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Vehicle implements Serializable {
+public class Vehicle implements Serializable, GenericRecord<String> {
     public static final String BRAND_NAME = "brand_name";
     public static final String MODEL_NAME = "model_name";
     private Long vehicleId;
@@ -17,4 +17,13 @@ public class Vehicle implements Serializable {
     @NonNull
     private String modelName;
 
+    @Override
+    public Long getId() {
+        return vehicleId;
+    }
+
+    @Override
+    public String getIndexField() {
+        return brandName;
+    }
 }

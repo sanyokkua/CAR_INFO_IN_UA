@@ -11,8 +11,18 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Purpose implements Serializable {
+public class Purpose implements Serializable, GenericRecord<String> {
     public static final String PURPOSE_NAME = "purposeName";
     private Long purposeId;
     private String purposeName;
+
+    @Override
+    public Long getId() {
+        return purposeId;
+    }
+
+    @Override
+    public String getIndexField() {
+        return purposeName;
+    }
 }

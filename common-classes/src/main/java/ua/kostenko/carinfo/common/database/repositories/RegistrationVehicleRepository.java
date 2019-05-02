@@ -23,19 +23,19 @@ import java.util.Objects;
 
 @Repository
 @Slf4j
-class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
+class RegistrationVehicleRepository extends CommonDBRepository<Vehicle, String> {
     private static final RowMapper<Vehicle> ROW_MAPPER = (resultSet, i) -> Vehicle.builder()
                                                                                   .vehicleId(resultSet.getLong(Constants.RegistrationVehicle.ID))
                                                                                   .modelName(resultSet.getString(Constants.RegistrationModel.NAME))
                                                                                   .brandName(resultSet.getString(Constants.RegistrationBrand.NAME))
                                                                                   .build();
-    private final DBRepository<Brand> brandCommonDBRepository;
-    private final DBRepository<Model> modelCommonDBRepository;
+    private final DBRepository<Brand, String> brandCommonDBRepository;
+    private final DBRepository<Model, String> modelCommonDBRepository;
 
     @Autowired
     public RegistrationVehicleRepository(@NonNull @Nonnull NamedParameterJdbcTemplate jdbcTemplate,
-                                         @NonNull @Nonnull DBRepository<Brand> brandCommonDBRepository,
-                                         @NonNull @Nonnull DBRepository<Model> modelCommonDBRepository) {
+                                         @NonNull @Nonnull DBRepository<Brand, String> brandCommonDBRepository,
+                                         @NonNull @Nonnull DBRepository<Model, String> modelCommonDBRepository) {
         super(jdbcTemplate);
         this.brandCommonDBRepository = brandCommonDBRepository;
         this.modelCommonDBRepository = modelCommonDBRepository;
@@ -159,5 +159,15 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle> {
     @Override
     RowMapper<Vehicle> getRowMapper() {
         return ROW_MAPPER;
+    }
+
+    @Cacheable(cacheNames = "vehicleIndex", unless = "#result == false ", key = "#indexField")
+    @Override
+    public boolean existsByIndex(@Nonnull @NonNull String indexField) {
+        String jdbcTemplateSelectCount = "select count(vehicle_id) from carinfo.vehicle_view where model_name = :model;";
+        SqlParameterSource parameterSource = getSqlParamBuilder()
+                .addParam("model", indexField)
+                .build();
+        return exist(jdbcTemplateSelectCount, parameterSource);
     }
 }

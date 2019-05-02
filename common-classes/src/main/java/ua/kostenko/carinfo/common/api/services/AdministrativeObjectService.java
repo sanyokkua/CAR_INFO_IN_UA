@@ -14,10 +14,10 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-class AdministrativeObjectService extends CommonDbService<AdministrativeObject> {
+class AdministrativeObjectService extends CommonDbService<AdministrativeObject, String> {
 
     @Autowired
-    protected AdministrativeObjectService(@NonNull @Nonnull DBRepository<AdministrativeObject> repository) {
+    protected AdministrativeObjectService(@NonNull @Nonnull DBRepository<AdministrativeObject, String> repository) {
         super(repository);
     }
 

@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
+import ua.kostenko.carinfo.common.api.records.GenericRecord;
 import ua.kostenko.carinfo.common.database.repositories.DBRepository;
 
 import javax.annotation.Nonnull;
@@ -14,10 +15,10 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
-abstract class CommonDbService<T> implements DBService<T> {
-    final DBRepository<T> repository;
+abstract class CommonDbService<T extends GenericRecord<R>, R> implements DBService<T> {
+    final DBRepository<T, R> repository;
 
-    protected CommonDbService(@NonNull @Nonnull DBRepository<T> repository) {
+    protected CommonDbService(@NonNull @Nonnull DBRepository<T, R> repository) {
         this.repository = repository;
     }
 
@@ -87,9 +88,7 @@ abstract class CommonDbService<T> implements DBService<T> {
 
     @Override
     public boolean exists(@NonNull @Nonnull T entity) {
-        boolean exist = repository.exist(entity);
-        log.debug("exists: Entity {} exists: {}", entity, exist);
-        return exist;
+        return repository.existsByIndex(entity.getIndexField());
     }
 
     @Override

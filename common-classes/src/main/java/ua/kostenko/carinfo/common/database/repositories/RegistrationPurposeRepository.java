@@ -19,7 +19,7 @@ import java.util.List;
 
 @Repository
 @Slf4j
-class RegistrationPurposeRepository extends CommonDBRepository<Purpose> {
+class RegistrationPurposeRepository extends CommonDBRepository<Purpose, String> {
     private static final RowMapper<Purpose> ROW_MAPPER = (resultSet, i) -> Purpose.builder()
                                                                                   .purposeId(resultSet.getLong(Constants.RegistrationPurpose.ID))
                                                                                   .purposeName(resultSet.getString(Constants.RegistrationPurpose.NAME))
@@ -33,6 +33,14 @@ class RegistrationPurposeRepository extends CommonDBRepository<Purpose> {
     @Override
     RowMapper<Purpose> getRowMapper() {
         return ROW_MAPPER;
+    }
+
+    @Cacheable(cacheNames = "purposeIndex", unless = "#result == false ", key = "#indexField")
+    @Override
+    public boolean existsByIndex(@Nonnull @NonNull String indexField) {
+        String jdbcTemplateSelectCount = "select count(purpose_id) from carinfo.purpose where purpose_name = :name;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", indexField).build();
+        return exist(jdbcTemplateSelectCount, parameterSource);
     }
 
     @Nullable

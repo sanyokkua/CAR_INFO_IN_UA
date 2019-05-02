@@ -14,10 +14,10 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-class KindService extends CommonDbService<Kind> {
+class KindService extends CommonDbService<Kind, String> {
 
     @Autowired
-    protected KindService(@NonNull @Nonnull DBRepository<Kind> repository) {
+    protected KindService(@NonNull @Nonnull DBRepository<Kind, String> repository) {
         super(repository);
     }
 

@@ -20,7 +20,7 @@ import java.util.Objects;
 
 @Repository
 @Slf4j
-class RegistrationDepartmentRepository extends CommonDBRepository<Department> {
+class RegistrationDepartmentRepository extends CommonDBRepository<Department, Long> {
     private static final RowMapper<Department> ROW_MAPPER = (resultSet, i) -> Department.builder()
                                                                                         .departmentCode(resultSet.getLong(Constants.RegistrationDepartment.CODE))
                                                                                         .departmentAddress(resultSet.getString(Constants.RegistrationDepartment.ADDRESS))
@@ -35,6 +35,14 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department> {
     @Override
     RowMapper<Department> getRowMapper() {
         return ROW_MAPPER;
+    }
+
+    @Cacheable(cacheNames = "departmentIndex", unless = "#result == false ", key = "#indexField")
+    @Override
+    public boolean existsByIndex(@Nonnull @NonNull Long indexField) {
+        String jdbcTemplateSelectCount = "select count(dep_code) from carinfo.department where dep_code = :code;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("code", indexField).build();
+        return exist(jdbcTemplateSelectCount, parameterSource);
     }
 
     @Nullable

@@ -19,7 +19,7 @@ import java.util.List;
 
 @Repository
 @Slf4j
-class RegistrationOperationRepository extends CommonDBRepository<Operation> {
+class RegistrationOperationRepository extends CommonDBRepository<Operation, Long> {
     private static final RowMapper<Operation> ROW_MAPPER = (resultSet, i) -> Operation.builder()
                                                                                       .operationCode(resultSet.getLong(Constants.RegistrationOperation.CODE))
                                                                                       .operationName(resultSet.getString(Constants.RegistrationOperation.NAME))
@@ -33,6 +33,14 @@ class RegistrationOperationRepository extends CommonDBRepository<Operation> {
     @Override
     RowMapper<Operation> getRowMapper() {
         return ROW_MAPPER;
+    }
+
+    @Cacheable(cacheNames = "operationIndex", unless = "#result == false ", key = "#indexField")
+    @Override
+    public boolean existsByIndex(@Nonnull @NonNull Long indexField) {
+        String jdbcTemplateSelectCount = "select count(op_code) from carinfo.operation where op_code = :code;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("code", indexField).build();
+        return exist(jdbcTemplateSelectCount, parameterSource);
     }
 
     @Nullable

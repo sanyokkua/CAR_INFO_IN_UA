@@ -19,7 +19,7 @@ import java.util.List;
 
 @Repository
 @Slf4j
-class RegistrationBrandRepository extends CommonDBRepository<Brand> {
+class RegistrationBrandRepository extends CommonDBRepository<Brand, String> {
     private static final RowMapper<Brand> ROW_MAPPER = (resultSet, i) -> Brand.builder()
                                                                               .brandId(resultSet.getLong(Constants.RegistrationBrand.ID))
                                                                               .brandName(resultSet.getString(Constants.RegistrationBrand.NAME))
@@ -49,11 +49,19 @@ class RegistrationBrandRepository extends CommonDBRepository<Brand> {
         String jdbcTemplateUpdate = "update carinfo.brand set brand_name = :name where brand_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder()
                 .addParam("name", entity.getBrandName())
-                .addParam("id", entity.getBrandId())
+                .addParam("id", entity.getId())
                 .build();
         jdbcTemplate.update(jdbcTemplateUpdate, parameterSource);
         ParamsHolder holder = getParamsHolderBuilder().param(Brand.BRAND_NAME, entity.getBrandName()).build();
         return findOne(holder);
+    }
+
+    @Cacheable(cacheNames = "brandIndex", unless = "#result == false ", key = "#indexField")
+    @Override
+    public boolean existsByIndex(@Nonnull @NonNull String indexField) {
+        String jdbcTemplateSelectCount = "select count(brand_id) from carinfo.brand where brand_name = :name;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", indexField).build();
+        return exist(jdbcTemplateSelectCount, parameterSource);
     }
 
     @Override

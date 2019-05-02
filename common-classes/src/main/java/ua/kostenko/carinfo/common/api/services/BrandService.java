@@ -13,9 +13,9 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-class BrandService extends CommonDbService<Brand> {
+class BrandService extends CommonDbService<Brand, String> {
 
-    protected BrandService(@NonNull @Nonnull DBRepository<Brand> repository) {
+    protected BrandService(@NonNull @Nonnull DBRepository<Brand, String> repository) {
         super(repository);
     }
 

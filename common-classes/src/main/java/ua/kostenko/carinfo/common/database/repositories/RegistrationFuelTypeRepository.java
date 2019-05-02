@@ -19,7 +19,7 @@ import java.util.List;
 
 @Repository
 @Slf4j
-class RegistrationFuelTypeRepository extends CommonDBRepository<FuelType> {
+class RegistrationFuelTypeRepository extends CommonDBRepository<FuelType, String> {
     private static final RowMapper<FuelType> ROW_MAPPER = (resultSet, i) -> FuelType.builder()
                                                                                     .fuelTypeId(resultSet.getLong(Constants.RegistrationFuelType.ID))
                                                                                     .fuelTypeName(resultSet.getString(Constants.RegistrationFuelType.NAME))
@@ -49,11 +49,19 @@ class RegistrationFuelTypeRepository extends CommonDBRepository<FuelType> {
         String jdbcTemplateUpdate = "update carinfo.fuel_type set fuel_type_name = :name where fuel_type_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder()
                 .addParam("name", entity.getFuelTypeName())
-                .addParam("id", entity.getFuelTypeId())
+                .addParam("id", entity.getId())
                 .build();
         jdbcTemplate.update(jdbcTemplateUpdate, parameterSource);
         ParamsHolder searchParams = getParamsHolderBuilder().param(FuelType.FUEL_NAME, entity.getFuelTypeName()).build();
         return findOne(searchParams);
+    }
+
+    @Cacheable(cacheNames = "fuelIndex", unless = "#result == false ", key = "#indexField")
+    @Override
+    public boolean existsByIndex(@Nonnull @NonNull String indexField) {
+        String jdbcTemplateSelectCount = "select count(fuel_type_id) from carinfo.fuel_type where fuel_type_name = :name;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", indexField).build();
+        return exist(jdbcTemplateSelectCount, parameterSource);
     }
 
     @Override

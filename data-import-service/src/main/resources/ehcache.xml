@@ -21,22 +21,35 @@
     <ehcache:cache alias="registration" uses-template="config-cache"/>
     <ehcache:cache alias="vehicle" uses-template="config-cache"/>
 
-    <ehcache:cache alias="modelCheck" uses-template="config-cache"/>
-    <ehcache:cache alias="bodyTypeCheck" uses-template="config-cache"/>
-    <ehcache:cache alias="departmentCheck" uses-template="config-cache"/>
-    <ehcache:cache alias="kindCheck" uses-template="config-cache"/>
-    <ehcache:cache alias="purposeCheck" uses-template="config-cache"/>
-    <ehcache:cache alias="brandCheck" uses-template="config-cache"/>
-    <ehcache:cache alias="operationCheck" uses-template="config-cache"/>
-    <ehcache:cache alias="adminObjCheck" uses-template="config-cache"/>
-    <ehcache:cache alias="colorCheck" uses-template="config-cache"/>
-    <ehcache:cache alias="vehicleCheck" uses-template="config-cache"/>
-    <ehcache:cache alias="fuelCheck" uses-template="config-cache"/>
-    <ehcache:cache alias="registrationCheck" uses-template="config-cache"/>
+    <ehcache:cache alias="modelCheck" uses-template="config-bool-cache"/>
+    <ehcache:cache alias="bodyTypeCheck" uses-template="config-bool-cache"/>
+    <ehcache:cache alias="departmentCheck" uses-template="config-bool-cache"/>
+    <ehcache:cache alias="kindCheck" uses-template="config-bool-cache"/>
+    <ehcache:cache alias="purposeCheck" uses-template="config-bool-cache"/>
+    <ehcache:cache alias="brandCheck" uses-template="config-bool-cache"/>
+    <ehcache:cache alias="operationCheck" uses-template="config-bool-cache"/>
+    <ehcache:cache alias="adminObjCheck" uses-template="config-bool-cache"/>
+    <ehcache:cache alias="colorCheck" uses-template="config-bool-cache"/>
+    <ehcache:cache alias="vehicleCheck" uses-template="config-bool-cache"/>
+    <ehcache:cache alias="fuelCheck" uses-template="config-bool-cache"/>
+    <ehcache:cache alias="registrationCheck" uses-template="config-bool-cache"/>
+
+    <ehcache:cache alias="modelIndex" uses-template="config-bool-cache"/>
+    <ehcache:cache alias="bodyIndex" uses-template="config-bool-cache"/>
+    <ehcache:cache alias="departmentIndex" uses-template="config-bool-cache"/>
+    <ehcache:cache alias="kindIndex" uses-template="config-bool-cache"/>
+    <ehcache:cache alias="operationIndex" uses-template="config-bool-cache"/>
+    <ehcache:cache alias="colorIndex" uses-template="config-bool-cache"/>
+    <ehcache:cache alias="adminObjIndex" uses-template="config-bool-cache"/>
+    <ehcache:cache alias="vehicleIndex" uses-template="config-bool-cache"/>
+    <ehcache:cache alias="fuelIndex" uses-template="config-bool-cache"/>
+    <ehcache:cache alias="recordIndex" uses-template="config-bool-cache"/>
+    <ehcache:cache alias="purposeIndex" uses-template="config-bool-cache"/>
+    <ehcache:cache alias="brandIndex" uses-template="config-bool-cache"/>
 
     <ehcache:cache-template name="config-cache">
         <ehcache:expiry>
-            <ehcache:tti unit="minutes">5</ehcache:tti>
+            <ehcache:tti unit="minutes">1</ehcache:tti>
         </ehcache:expiry>
 
         <ehcache:listeners>
@@ -52,7 +65,30 @@
             </ehcache:listener>
         </ehcache:listeners>
         <ehcache:resources>
-            <ehcache:heap>1000</ehcache:heap>
+            <ehcache:heap>5000</ehcache:heap>
+            <ehcache:offheap unit="MB">50</ehcache:offheap>
+        </ehcache:resources>
+    </ehcache:cache-template>
+
+    <ehcache:cache-template name="config-bool-cache">
+        <ehcache:expiry>
+            <ehcache:tti unit="minutes">1</ehcache:tti>
+        </ehcache:expiry>
+
+        <ehcache:listeners>
+            <ehcache:listener>
+                <ehcache:class>ua.kostenko.carinfo.common.api.CacheEventLogger</ehcache:class>
+                <ehcache:event-firing-mode>ASYNCHRONOUS</ehcache:event-firing-mode>
+                <ehcache:event-ordering-mode>UNORDERED</ehcache:event-ordering-mode>
+                <ehcache:events-to-fire-on>CREATED</ehcache:events-to-fire-on>
+                <ehcache:events-to-fire-on>UPDATED</ehcache:events-to-fire-on>
+                <!--                <ehcache:events-to-fire-on>EXPIRED</ehcache:events-to-fire-on>-->
+                <ehcache:events-to-fire-on>REMOVED</ehcache:events-to-fire-on>
+                <!--                <ehcache:events-to-fire-on>EVICTED</ehcache:events-to-fire-on>-->
+            </ehcache:listener>
+        </ehcache:listeners>
+        <ehcache:resources>
+            <ehcache:heap>10000</ehcache:heap>
             <ehcache:offheap unit="MB">10</ehcache:offheap>
         </ehcache:resources>
     </ehcache:cache-template>

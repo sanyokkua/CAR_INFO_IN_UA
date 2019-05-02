@@ -14,10 +14,10 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-class VehicleService extends CommonDbService<Vehicle> {
+class VehicleService extends CommonDbService<Vehicle, String> {
 
     @Autowired
-    protected VehicleService(@NonNull @Nonnull DBRepository<Vehicle> repository) {
+    protected VehicleService(@NonNull @Nonnull DBRepository<Vehicle, String> repository) {
         super(repository);
     }
 
@@ -33,5 +33,12 @@ class VehicleService extends CommonDbService<Vehicle> {
         builder.param(Vehicle.MODEL_NAME, entity.getModelName());
         Vehicle foundEntity = this.repository.findOne(builder.build());
         return Optional.ofNullable(foundEntity);
+    }
+
+    @Override
+    public boolean exists(@NonNull @Nonnull Vehicle entity) {
+        boolean exist = repository.exist(entity);
+        log.debug("exists: Entity {} exists: {}", entity, exist);
+        return exist;
     }
 }

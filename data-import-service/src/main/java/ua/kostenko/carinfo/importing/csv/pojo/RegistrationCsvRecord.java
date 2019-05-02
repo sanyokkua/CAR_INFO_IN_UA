@@ -9,7 +9,8 @@ import org.apache.commons.lang3.StringUtils;
 import ua.kostenko.carinfo.common.api.records.*;
 
 import java.sql.Date;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Slf4j
 @Data
@@ -17,9 +18,7 @@ import java.text.SimpleDateFormat;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegistrationCsvRecord {
-    private static final SimpleDateFormat FORMAT_FIRST = new SimpleDateFormat("yyyy-MM-dd");//2013-02-02
-    private static final SimpleDateFormat FORMAT_SECOND = new SimpleDateFormat("dd-MM-yyyy");//19.02.2019
-
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("[yyyy-MM-dd][dd.MM.yyyy]");//2013-02-02 or 19.02.2019
     private String personType;
     private Long administrativeObject;
     private Long operationCode;
@@ -100,16 +99,10 @@ public class RegistrationCsvRecord {
         String registrationDate = this.getRegistrationDate();
         Date resultDate = null;
         try {
-            java.util.Date date = FORMAT_FIRST.parse(registrationDate);
-            resultDate = new Date(date.getTime());
+            LocalDate parse = LocalDate.parse(registrationDate, DATE_TIME_FORMATTER);
+            resultDate = Date.valueOf(parse);
         } catch (Exception ex) {
-            log.warn("Problem with parsing date with first formatter: {}", registrationDate);
-            try {
-                java.util.Date date = FORMAT_SECOND.parse(registrationDate);
-                resultDate = new Date(date.getTime());
-            } catch (Exception e) {
-                log.warn("Problem with parsing date with second formatter: {}", registrationDate);
-            }
+            log.warn("Problem with parsing date with formatter: {}", registrationDate);
         }
         return resultDate;
     }

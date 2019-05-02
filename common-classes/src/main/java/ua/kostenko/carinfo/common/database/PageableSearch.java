@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
+import ua.kostenko.carinfo.common.api.records.GenericRecord;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -13,7 +14,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-public interface PageableSearch<T> {
+public interface PageableSearch<T extends GenericRecord> {
 
     Page<T> find(@Nonnull @NonNull final ParamsHolder searchParams);
 

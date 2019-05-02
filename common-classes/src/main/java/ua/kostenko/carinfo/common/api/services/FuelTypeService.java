@@ -14,10 +14,10 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-class FuelTypeService extends CommonDbService<FuelType> {
+class FuelTypeService extends CommonDbService<FuelType, String> {
 
     @Autowired
-    protected FuelTypeService(@NonNull @Nonnull DBRepository<FuelType> repository) {
+    protected FuelTypeService(@NonNull @Nonnull DBRepository<FuelType, String> repository) {
         super(repository);
     }
 

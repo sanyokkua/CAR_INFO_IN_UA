@@ -11,8 +11,18 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Color implements Serializable {
+public class Color implements Serializable, GenericRecord<String> {
     public static final String COLOR_NAME = "colorName";
     private Long colorId;
     private String colorName;
+
+    @Override
+    public Long getId() {
+        return colorId;
+    }
+
+    @Override
+    public String getIndexField() {
+        return colorName;
+    }
 }

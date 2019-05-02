@@ -14,10 +14,10 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-class DepartmentService extends CommonDbService<Department> {
+class DepartmentService extends CommonDbService<Department, Long> {
 
     @Autowired
-    protected DepartmentService(@NonNull @Nonnull DBRepository<Department> repository) {
+    protected DepartmentService(@NonNull @Nonnull DBRepository<Department, Long> repository) {
         super(repository);
     }
 

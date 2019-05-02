@@ -11,8 +11,18 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BodyType implements Serializable {
+public class BodyType implements Serializable, GenericRecord<String> {
     public static final String BODY_TYPE_NAME = "bodyTypeName";
     private Long bodyTypeId;
     private String bodyTypeName;
+
+    @Override
+    public Long getId() {
+        return bodyTypeId;
+    }
+
+    @Override
+    public String getIndexField() {
+        return bodyTypeName;
+    }
 }

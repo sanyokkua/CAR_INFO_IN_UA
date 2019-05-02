@@ -23,7 +23,7 @@ import static ua.kostenko.carinfo.common.api.records.Registration.*;
 
 @Repository
 @Slf4j
-class RegistrationRecordRepository extends CommonDBRepository<Registration> {
+class RegistrationRecordRepository extends CommonDBRepository<Registration, String> {
     private static final RowMapper<Registration> ROW_MAPPER = (resultSet, i) -> Registration.builder()
                                                                                             .adminObjName(resultSet.getString(Constants.AdminObject.NAME))
                                                                                             .adminObjType(resultSet.getString(Constants.AdminObject.TYPE))
@@ -48,27 +48,27 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration> {
                                                                                             .registrationDate(resultSet.getDate(Constants.RegistrationRecord.REGISTRATION_DATE))
                                                                                             .id(resultSet.getLong(Constants.RegistrationRecord.ID))
                                                                                             .build();
-    private final DBRepository<AdministrativeObject> administrativeObjectDBRepository;
-    private final DBRepository<BodyType> bodyTypeDBRepository;
-    private final DBRepository<Color> colorDBRepository;
-    private final DBRepository<Department> departmentDBRepository;
-    private final DBRepository<FuelType> fuelTypeDBRepository;
-    private final DBRepository<Kind> kindDBRepository;
-    private final DBRepository<Operation> operationDBRepository;
-    private final DBRepository<Purpose> purposeDBRepository;
-    private final DBRepository<Vehicle> vehicleDBRepository;
+    private final DBRepository<AdministrativeObject, String> administrativeObjectDBRepository;
+    private final DBRepository<BodyType, String> bodyTypeDBRepository;
+    private final DBRepository<Color, String> colorDBRepository;
+    private final DBRepository<Department, Long> departmentDBRepository;
+    private final DBRepository<FuelType, String> fuelTypeDBRepository;
+    private final DBRepository<Kind, String> kindDBRepository;
+    private final DBRepository<Operation, Long> operationDBRepository;
+    private final DBRepository<Purpose, String> purposeDBRepository;
+    private final DBRepository<Vehicle, String> vehicleDBRepository;
 
     @Autowired
     public RegistrationRecordRepository(@NonNull @Nonnull NamedParameterJdbcTemplate jdbcTemplate,
-                                        @NonNull @Nonnull DBRepository<AdministrativeObject> administrativeObjectDBRepository,
-                                        @NonNull @Nonnull DBRepository<BodyType> bodyTypeDBRepository,
-                                        @NonNull @Nonnull DBRepository<Color> colorDBRepository,
-                                        @NonNull @Nonnull DBRepository<Department> departmentDBRepository,
-                                        @NonNull @Nonnull DBRepository<FuelType> fuelTypeDBRepository,
-                                        @NonNull @Nonnull DBRepository<Kind> kindDBRepository,
-                                        @NonNull @Nonnull DBRepository<Operation> operationDBRepository,
-                                        @NonNull @Nonnull DBRepository<Purpose> purposeDBRepository,
-                                        @NonNull @Nonnull DBRepository<Vehicle> vehicleDBRepository) {
+                                        @NonNull @Nonnull DBRepository<AdministrativeObject, String> administrativeObjectDBRepository,
+                                        @NonNull @Nonnull DBRepository<BodyType, String> bodyTypeDBRepository,
+                                        @NonNull @Nonnull DBRepository<Color, String> colorDBRepository,
+                                        @NonNull @Nonnull DBRepository<Department, Long> departmentDBRepository,
+                                        @NonNull @Nonnull DBRepository<FuelType, String> fuelTypeDBRepository,
+                                        @NonNull @Nonnull DBRepository<Kind, String> kindDBRepository,
+                                        @NonNull @Nonnull DBRepository<Operation, Long> operationDBRepository,
+                                        @NonNull @Nonnull DBRepository<Purpose, String> purposeDBRepository,
+                                        @NonNull @Nonnull DBRepository<Vehicle, String> vehicleDBRepository) {
         super(jdbcTemplate);
         this.administrativeObjectDBRepository = administrativeObjectDBRepository;
         this.bodyTypeDBRepository = bodyTypeDBRepository;
@@ -294,5 +294,18 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration> {
     @Override
     RowMapper<Registration> getRowMapper() {
         return ROW_MAPPER;
+    }
+
+    @Cacheable(cacheNames = "recordIndex", unless = "#result == false ", key = "#indexField")
+    @Override
+    public boolean existsByIndex(@Nonnull @NonNull String indexField) {
+        String select = "select count(id) ";
+        String from = "from carinfo.record_view  ";
+        WhereBuilder.BuildResult buildResult = buildWhere()
+                .addFieldParam("registration_number", REGISTRATION_NUMBER, indexField)
+                .build();
+        String where = buildResult.getWhereSql();
+        String selectSqlQuery = String.format("%s %s %s", select, from, where);
+        return exist(selectSqlQuery, buildResult.getSqlParameters());
     }
 }

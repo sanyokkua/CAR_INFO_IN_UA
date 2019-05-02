@@ -19,7 +19,7 @@ import java.util.List;
 
 @Repository
 @Slf4j
-class RegistrationColorRepository extends CommonDBRepository<Color> {
+class RegistrationColorRepository extends CommonDBRepository<Color, String> {
     private static final RowMapper<Color> ROW_MAPPER = (resultSet, i) -> Color.builder()
                                                                               .colorId(resultSet.getLong(Constants.RegistrationColor.ID))
                                                                               .colorName(resultSet.getString(Constants.RegistrationColor.NAME))
@@ -49,11 +49,19 @@ class RegistrationColorRepository extends CommonDBRepository<Color> {
         String jdbcTemplateUpdate = "update carinfo.color set color_name = :name where color_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder()
                 .addParam("name", entity.getColorName())
-                .addParam("id", entity.getColorId())
+                .addParam("id", entity.getId())
                 .build();
         jdbcTemplate.update(jdbcTemplateUpdate, parameterSource);
         ParamsHolder holder = getParamsHolderBuilder().param(Color.COLOR_NAME, entity.getColorName()).build();
         return findOne(holder);
+    }
+
+    @Cacheable(cacheNames = "colorIndex", unless = "#result == false ", key = "#indexField")
+    @Override
+    public boolean existsByIndex(@Nonnull @NonNull String indexField) {
+        String jdbcTemplateSelectCount = "select count(color_id) from carinfo.color where color_name = :name;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", indexField).build();
+        return exist(jdbcTemplateSelectCount, parameterSource);
     }
 
     @Override

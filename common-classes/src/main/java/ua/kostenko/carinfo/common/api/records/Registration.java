@@ -9,7 +9,7 @@ import java.sql.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Registration implements Serializable {
+public class Registration implements Serializable, GenericRecord<String> {
     public static final String ADMIN_OBJ_NAME = "adminobjname";
     public static final String ADMIN_OBJ_TYPE = "adminobjtype";
     public static final String OPERATION_CODE = "operationcode";
@@ -66,4 +66,9 @@ public class Registration implements Serializable {
     private String registrationNumber;//NULLABLE
     @NonNull
     private Date registrationDate;//non NULLABLE
+
+    @Override
+    public String getIndexField() {
+        return registrationNumber;
+    }
 }

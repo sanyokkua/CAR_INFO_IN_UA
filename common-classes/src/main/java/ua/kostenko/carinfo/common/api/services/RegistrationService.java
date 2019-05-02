@@ -18,10 +18,10 @@ import static java.util.Objects.nonNull;
 
 @Slf4j
 @Service
-class RegistrationService extends CommonDbService<Registration> {
+class RegistrationService extends CommonDbService<Registration, String> {
 
     @Autowired
-    protected RegistrationService(@NonNull @Nonnull DBRepository<Registration> repository) {
+    protected RegistrationService(@NonNull @Nonnull DBRepository<Registration, String> repository) {
         super(repository);
     }
 
@@ -71,5 +71,16 @@ class RegistrationService extends CommonDbService<Registration> {
         builder.param(Registration.REGISTRATION_DATE, entity.getRegistrationDate());
         Registration foundEntity = this.repository.findOne(builder.build());
         return Optional.ofNullable(foundEntity);
+    }
+
+    @Override
+    public boolean exists(@NonNull @Nonnull Registration entity) {
+        boolean existsByIndex = repository.existsByIndex(entity.getIndexField());
+        if (existsByIndex) {
+            boolean exist = repository.exist(entity);
+            log.debug("exists: Entity {} exists: {}", entity, exist);
+            return exist;
+        }
+        return false;
     }
 }

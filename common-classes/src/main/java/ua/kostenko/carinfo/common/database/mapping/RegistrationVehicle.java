@@ -16,7 +16,9 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = Constants.SCHEMA, name = Constants.RegistrationVehicle.TABLE)
+@Table(schema = Constants.SCHEMA, name = Constants.RegistrationVehicle.TABLE,
+        indexes = {@Index(columnList = Constants.RegistrationVehicle.MODEL_ID, name = Constants.RegistrationVehicle.MODEL_ID),
+                   @Index(columnList = Constants.RegistrationVehicle.BRAND_ID, name = Constants.RegistrationVehicle.BRAND_ID)})
 class RegistrationVehicle implements Serializable {
 
     @Id

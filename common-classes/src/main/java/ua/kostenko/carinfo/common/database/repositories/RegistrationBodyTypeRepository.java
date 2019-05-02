@@ -19,7 +19,7 @@ import java.util.List;
 
 @Repository
 @Slf4j
-class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType> {
+class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType, String> {
     private static final RowMapper<BodyType> ROW_MAPPER = (resultSet, i) -> BodyType.builder()
                                                                                     .bodyTypeId(resultSet.getLong(Constants.RegistrationBodyType.ID))
                                                                                     .bodyTypeName(resultSet.getString(Constants.RegistrationBodyType.NAME))
@@ -48,12 +48,20 @@ class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType> {
     public BodyType update(@NonNull @Nonnull BodyType entity) {
         String jdbcTemplateUpdate = "update carinfo.body_type set body_type_name = :name where body_type_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder()
-                .addParam("id", entity.getBodyTypeId())
+                .addParam("id", entity.getId())
                 .addParam("name", entity.getBodyTypeName())
                 .build();
         jdbcTemplate.update(jdbcTemplateUpdate, parameterSource);
         ParamsHolder holder = getParamsHolderBuilder().param(BodyType.BODY_TYPE_NAME, entity.getBodyTypeName()).build();
         return findOne(holder);
+    }
+
+    @Cacheable(cacheNames = "bodyIndex", unless = "#result == false ", key = "#indexField")
+    @Override
+    public boolean existsByIndex(@Nonnull @NonNull String indexField) {
+        String jdbcTemplateSelectCount = "select count(body_type_id) from carinfo.body_type where body_type_name = :name;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", indexField).build();
+        return exist(jdbcTemplateSelectCount, parameterSource);
     }
 
     @Override

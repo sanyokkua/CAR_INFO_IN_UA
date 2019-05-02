@@ -15,9 +15,9 @@ import java.time.LocalTime;
 import java.util.Objects;
 
 @Slf4j
-public class CsvReader {
+public class CsvReader<T> {
 
-    public static <T> void readCsvFile(@NonNull @Nonnull ReaderOptions options, @NonNull @Nonnull CsvMapper<T> csvMapper, @NonNull @Nonnull Persist<T> persist) {
+    public void readCsvFile(@NonNull @Nonnull ReaderOptions options, @NonNull @Nonnull CsvMapper<T> csvMapper, @NonNull @Nonnull Persist<T> persist) {
         log.info("readCsvFile: Going to parse csv file with options: {}", options.toString());
         File csvFile = options.getFile();
         if (Objects.nonNull(csvFile) && csvFile.exists()) {
@@ -37,7 +37,7 @@ public class CsvReader {
         }
     }
 
-    private static <T> void read(char delimiter, @NonNull @Nonnull CsvMapper<T> csvMapper, @NonNull @Nonnull Persist<T> persist, @NonNull @Nonnull Reader input) throws IOException {
+    private void read(char delimiter, @NonNull @Nonnull CsvMapper<T> csvMapper, @NonNull @Nonnull Persist<T> persist, @NonNull @Nonnull Reader input) throws IOException {
         Iterable<CSVRecord> records = CSVFormat.DEFAULT.withDelimiter(delimiter).withFirstRecordAsHeader().parse(input);
         for (CSVRecord record : records) {
             T obj = csvMapper.map(record);

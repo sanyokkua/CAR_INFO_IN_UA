@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
+import ua.kostenko.carinfo.common.api.records.GenericRecord;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
-abstract class CommonDBRepository<T> implements DBRepository<T> {
+abstract class CommonDBRepository<T extends GenericRecord<R>, R> implements DBRepository<T, R> {
     private static final RowMapper<Integer> FIND_TOTAL_MAPPER = (rs, rowNum) -> rs.getInt(1);
     private static final RowMapper<Long> EXISTENCE_COUNT_MAPPER = (rs, rowNum) -> rs.getLong(1);
     final NamedParameterJdbcTemplate jdbcTemplate;

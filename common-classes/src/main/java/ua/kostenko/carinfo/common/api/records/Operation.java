@@ -11,8 +11,18 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Operation implements Serializable {
+public class Operation implements Serializable, GenericRecord<Long> {
     public static final String OPERATION_CODE = "operationCode";
     private Long operationCode;
     private String operationName;
+
+    @Override
+    public Long getId() {
+        return operationCode;
+    }
+
+    @Override
+    public Long getIndexField() {
+        return operationCode;
+    }
 }

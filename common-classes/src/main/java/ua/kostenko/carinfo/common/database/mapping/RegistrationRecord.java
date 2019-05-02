@@ -15,7 +15,9 @@ import java.sql.Date;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = Constants.SCHEMA, name = Constants.RegistrationRecord.TABLE)
+@Table(schema = Constants.SCHEMA, name = Constants.RegistrationRecord.TABLE,
+        indexes = {@Index(columnList = Constants.RegistrationRecord.REGISTRATION_NUMBER, name = Constants.RegistrationRecord.REGISTRATION_NUMBER),
+                   @Index(columnList = Constants.RegistrationRecord.REGISTRATION_DATE, name = Constants.RegistrationRecord.REGISTRATION_DATE)})
 class RegistrationRecord implements Serializable {
 
     @Id

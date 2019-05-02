@@ -11,8 +11,18 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Kind implements Serializable {
+public class Kind implements Serializable, GenericRecord<String> {
     public static final String KIND_NAME = "kindName";
     private Long kindId;
     private String kindName;
+
+    @Override
+    public Long getId() {
+        return kindId;
+    }
+
+    @Override
+    public String getIndexField() {
+        return kindName;
+    }
 }

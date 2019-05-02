@@ -22,6 +22,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
+    private static final LocalDateTime START_TIME = LocalDateTime.now();
+    private static final ScheduledExecutorService SCHEDULED_EXECUTOR_SERVICE = Executors.newSingleThreadScheduledExecutor();
+    private static volatile AtomicInteger globalPersistentCounter = new AtomicInteger(0);
+    private static volatile AtomicInteger globalProcessedCounter = new AtomicInteger(0);
+
+    static {
+        SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(RegistrationPersist::logGlobalStatistics, 1, 2, TimeUnit.MINUTES);
+    }
+
     private final DBService<Registration> registrationDBService;
     private final DBService<AdministrativeObject> administrativeObjectDBService;
     private final DBService<BodyType> bodyTypeDBService;
@@ -34,9 +43,6 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
     private final DBService<Operation> operationDBService;
     private final DBService<Purpose> purposeDBService;
     private final DBService<Vehicle> vehicleDBService;
-    private static volatile AtomicInteger globalPersistentCounter = new AtomicInteger(0);
-    private static volatile AtomicInteger globalProcessedCounter = new AtomicInteger(0);
-    private final LocalDateTime startTime = LocalDateTime.now();
     private final long threadId;
     private int localPersistentCounter = 0;
     private int localProcessedCounter = 0;
@@ -67,28 +73,26 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
         this.purposeDBService = purposeDBService;
         this.vehicleDBService = vehicleDBService;
         ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
-        exec.scheduleAtFixedRate(this::logNumberOfSavedRecords, 1, 1, TimeUnit.MINUTES);
+        exec.scheduleAtFixedRate(this::logLocalStatistics, 1, 1, TimeUnit.MINUTES);
         threadId = Thread.currentThread().getId();
     }
 
-    private void logNumberOfSavedRecords() {
+    private void logLocalStatistics() {
         final LocalDateTime localDateTime = LocalDateTime.now();
-        final int hour = localDateTime.getHour();
-        final int minute = localDateTime.getMinute();
-        final int second = localDateTime.getSecond();
-        final int year = localDateTime.getYear();
-        final int monthValue = localDateTime.getMonthValue();
-        final int dayOfMonth = localDateTime.getDayOfMonth();
+        final int differenceNumber = localProcessedCounter - lastLocalProcessedCounter;
+        log.info("Thread: {}, Time: {}, processed: {}, saved: {}, processed from previous time: {}", threadId, localDateTime.toString(), localProcessedCounter,
+                 localPersistentCounter, differenceNumber);
+        lastLocalProcessedCounter = localProcessedCounter;
+    }
+
+    private static void logGlobalStatistics() {
+        final LocalDateTime localDateTime = LocalDateTime.now();
         final int globalPersistedNumber = globalPersistentCounter.get();
         final int globalProcessesNumber = globalProcessedCounter.get();
-        final int differenceNumber = localProcessedCounter - lastLocalProcessedCounter;
-        final long minutesBetweenStartAndCurrentMoment = Duration.between(startTime, localDateTime).toMinutes();
+        final long minutesBetweenStartAndCurrentMoment = Duration.between(START_TIME, localDateTime).toMinutes();
         final long globalThroughput = minutesBetweenStartAndCurrentMoment > 0 ? globalProcessesNumber / minutesBetweenStartAndCurrentMoment : 0;
-        log.info("Time: {}:{}:{} {}-{}-{}. For thread id = {}, processed: {}, saved: {}, processed from previous time: {}.",
-                 hour, minute, second, year, monthValue, dayOfMonth, threadId, localProcessedCounter, localPersistentCounter, differenceNumber);
-        log.info("Time: {}:{}:{} {}-{}-{}. For thread id = {} In GENERAL processed: {}, saved: {}, globalThroughput: {}",
-                 hour, minute, second, year, monthValue, dayOfMonth, threadId, globalProcessesNumber, globalPersistedNumber, globalThroughput);
-        lastLocalProcessedCounter = localProcessedCounter;
+        log.info("Time: {}. GLOBAL processed: {}, GLOBAL saved: {}, globalThroughput: {}",
+                 localDateTime.toString(), globalProcessesNumber, globalPersistedNumber, globalThroughput);
     }
 
     private Optional<Operation> getOperation(@NonNull @Nonnull RegistrationCsvRecord record) {

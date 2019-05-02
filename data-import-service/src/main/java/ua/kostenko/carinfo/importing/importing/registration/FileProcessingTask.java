@@ -124,7 +124,8 @@ class FileProcessingTask implements Runnable {
                                                                                  operationDBService,
                                                                                  purposeDBService,
                                                                                  vehicleDBService);
-                CsvReader.readCsvFile(options.getReaderOptions(), mapper, persist);
+                CsvReader<RegistrationCsvRecord> csvReader = new CsvReader<>();
+                csvReader.readCsvFile(options.getReaderOptions(), mapper, persist);
             } else {
                 log.error("processExtractedFiles: Options is null");
             }
