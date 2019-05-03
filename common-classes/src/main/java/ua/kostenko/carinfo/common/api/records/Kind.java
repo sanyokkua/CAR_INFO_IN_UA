@@ -23,6 +23,6 @@ public class Kind implements Serializable, GenericRecord<String> {
 
     @Override
     public String getIndexField() {
-        return kindName;
+        return getKindName();
     }
 }

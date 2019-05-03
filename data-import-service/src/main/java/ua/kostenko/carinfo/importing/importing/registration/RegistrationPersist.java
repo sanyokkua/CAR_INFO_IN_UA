@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 import java.sql.Date;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Executors;
@@ -23,12 +24,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
     private static final LocalDateTime START_TIME = LocalDateTime.now();
-    private static final ScheduledExecutorService SCHEDULED_EXECUTOR_SERVICE = Executors.newSingleThreadScheduledExecutor();
+    private static final ScheduledExecutorService GLOBAL_SCHEDULED_EXECUTOR_SERVICE = Executors.newSingleThreadScheduledExecutor();
     private static volatile AtomicInteger globalPersistentCounter = new AtomicInteger(0);
     private static volatile AtomicInteger globalProcessedCounter = new AtomicInteger(0);
+    private static volatile AtomicInteger globalLastProcessedCounter = new AtomicInteger(0);
 
     static {
-        SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(RegistrationPersist::logGlobalStatistics, 1, 2, TimeUnit.MINUTES);
+        GLOBAL_SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(RegistrationPersist::logGlobalStatistics, 2, 2, TimeUnit.MINUTES);
     }
 
     private final DBService<Registration> registrationDBService;
@@ -43,10 +45,12 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
     private final DBService<Operation> operationDBService;
     private final DBService<Purpose> purposeDBService;
     private final DBService<Vehicle> vehicleDBService;
-    private final long threadId;
+    private final long localThreadId;
+    private final String fileName;
+    private final ScheduledExecutorService localScheduledExecutorService;
     private int localPersistentCounter = 0;
     private int localProcessedCounter = 0;
-    private int lastLocalProcessedCounter = 0;
+    private int localLastProcessedCounter = 0;
 
     RegistrationPersist(@NonNull @Nonnull DBService<Registration> registrationDBService,
                         @NonNull @Nonnull DBService<AdministrativeObject> administrativeObjectDBService,
@@ -59,7 +63,7 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
                         @NonNull @Nonnull DBService<Model> modelDBService,
                         @NonNull @Nonnull DBService<Operation> operationDBService,
                         @NonNull @Nonnull DBService<Purpose> purposeDBService,
-                        @NonNull @Nonnull DBService<Vehicle> vehicleDBService) {
+                        @NonNull @Nonnull DBService<Vehicle> vehicleDBService, String fileName) {
         this.registrationDBService = registrationDBService;
         this.administrativeObjectDBService = administrativeObjectDBService;
         this.bodyTypeDBService = bodyTypeDBService;
@@ -72,89 +76,42 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
         this.operationDBService = operationDBService;
         this.purposeDBService = purposeDBService;
         this.vehicleDBService = vehicleDBService;
-        ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
-        exec.scheduleAtFixedRate(this::logLocalStatistics, 1, 1, TimeUnit.MINUTES);
-        threadId = Thread.currentThread().getId();
+        this.fileName = fileName;
+        this.localThreadId = Thread.currentThread().getId();
+        this.localScheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        this.localScheduledExecutorService.scheduleAtFixedRate(this::logLocalStatistics, 2, 1, TimeUnit.MINUTES);
     }
 
     private void logLocalStatistics() {
-        final LocalDateTime localDateTime = LocalDateTime.now();
-        final int differenceNumber = localProcessedCounter - lastLocalProcessedCounter;
-        log.info("Thread: {}, Time: {}, processed: {}, saved: {}, processed from previous time: {}", threadId, localDateTime.toString(), localProcessedCounter,
-                 localPersistentCounter, differenceNumber);
-        lastLocalProcessedCounter = localProcessedCounter;
+        final LocalDateTime timeNow = LocalDateTime.now();
+        final String formattedTime = timeNow.format(DateTimeFormatter.ISO_DATE_TIME);
+        final int difference = localProcessedCounter - localLastProcessedCounter;
+
+        log.info("Thread: {}, Time: {}, File: {} Processed: {}, Saved: {}, Processed from previous time: {}",
+                 localThreadId, formattedTime, fileName, localProcessedCounter, localPersistentCounter, difference);
+        localLastProcessedCounter = localProcessedCounter;
+        if (localProcessedCounter > 0 && difference == 0) {
+            log.info("localScheduledExecutorService will shutdown");
+            localScheduledExecutorService.shutdown();
+        }
     }
 
     private static void logGlobalStatistics() {
-        final LocalDateTime localDateTime = LocalDateTime.now();
+        final LocalDateTime timeNow = LocalDateTime.now();
+        final String formattedTime = timeNow.format(DateTimeFormatter.ISO_DATE_TIME);
         final int globalPersistedNumber = globalPersistentCounter.get();
         final int globalProcessesNumber = globalProcessedCounter.get();
-        final long minutesBetweenStartAndCurrentMoment = Duration.between(START_TIME, localDateTime).toMinutes();
-        final long globalThroughput = minutesBetweenStartAndCurrentMoment > 0 ? globalProcessesNumber / minutesBetweenStartAndCurrentMoment : 0;
-        log.info("Time: {}. GLOBAL processed: {}, GLOBAL saved: {}, globalThroughput: {}",
-                 localDateTime.toString(), globalProcessesNumber, globalPersistedNumber, globalThroughput);
-    }
+        final long minutesBetweenStartAndNow = Duration.between(START_TIME, timeNow).toMinutes();
+        final long globalThroughput = minutesBetweenStartAndNow > 0 ? globalProcessesNumber / minutesBetweenStartAndNow : 0;
+        final int difference = globalProcessesNumber - globalLastProcessedCounter.get();
+        log.info("Global: Time: {}. Processed: {}, Saved: {}, globalThroughput: {}, Processed from previous time: {}",
+                 formattedTime, globalProcessesNumber, globalPersistedNumber, globalThroughput, difference);
+        globalLastProcessedCounter.set(globalProcessesNumber);
 
-    private Optional<Operation> getOperation(@NonNull @Nonnull RegistrationCsvRecord record) {
-        Operation operation = record.getOperation();
-        return operationDBService.exists(operation) ? operationDBService.get(operation) : operationDBService.create(operation);
-    }
-
-    private Optional<Model> getModel(@NonNull @Nonnull RegistrationCsvRecord record) {
-        Model model = record.getModel();
-        return modelDBService.exists(model) ? modelDBService.get(model) : modelDBService.create(model);
-    }
-
-    private Optional<Brand> getBrand(@NonNull @Nonnull RegistrationCsvRecord record) {
-        Brand brand = record.getBrand();
-        return brandDBService.exists(brand) ? brandDBService.get(brand) : brandDBService.create(brand);
-    }
-
-    private Optional<Color> getColor(@NonNull @Nonnull RegistrationCsvRecord record) {
-        Color color = record.getColor();
-        return colorDBService.exists(color) ? colorDBService.get(color) : colorDBService.create(color);
-    }
-
-    private Optional<Kind> getKind(@NonNull @Nonnull RegistrationCsvRecord record) {
-        Kind kind = record.getKind();
-        return kindDBService.exists(kind) ? kindDBService.get(kind) : kindDBService.create(kind);
-    }
-
-    private Optional<BodyType> getBodyType(@NonNull @Nonnull RegistrationCsvRecord record) {
-        BodyType bodyType = record.getBodyType();
-        return bodyTypeDBService.exists(bodyType) ? bodyTypeDBService.get(bodyType) : bodyTypeDBService.create(bodyType);
-    }
-
-    private Optional<Purpose> getPurpose(@NonNull @Nonnull RegistrationCsvRecord record) {
-        Purpose purpose = record.getPurpose();
-        return purposeDBService.exists(purpose) ? purposeDBService.get(purpose) : purposeDBService.create(purpose);
-    }
-
-    private Optional<FuelType> getFuelType(@NonNull @Nonnull RegistrationCsvRecord record) {
-        FuelType fuelType = record.getFuelType();
-        return fuelTypeDBService.exists(fuelType) ? fuelTypeDBService.get(fuelType) : fuelTypeDBService.create(fuelType);
-    }
-
-    private Optional<AdministrativeObject> getAdministrativeObject(@NonNull @Nonnull RegistrationCsvRecord record) {
-        AdministrativeObject adminObject = record.getAdminObject();
-        Optional<Long> adminObjId = Optional.ofNullable(adminObject.getAdminObjId());
-        return adminObjId.isPresent() ? administrativeObjectDBService.get(adminObjId.get()) : Optional.empty();
-    }
-
-    private Optional<Department> getDepartment(@NonNull @Nonnull RegistrationCsvRecord record) {
-        Department department = record.getDepartment();
-        return departmentDBService.exists(department) ? departmentDBService.get(department) : departmentDBService.create(department);
-    }
-
-    private Optional<Vehicle> getVehicle(@Nullable Model createdModel, @Nullable Brand createdBrand) {
-        if (Objects.nonNull(createdBrand) && Objects.nonNull(createdModel)) {
-            Vehicle vehicle = Vehicle.builder()
-                                     .brandName(createdBrand.getBrandName())
-                                     .modelName(createdModel.getModelName())
-                                     .build();
-            return vehicleDBService.exists(vehicle) ? vehicleDBService.get(vehicle) : vehicleDBService.create(vehicle);
+        if (globalProcessesNumber > 0 && difference == 0) {
+            log.info("GLOBAL_SCHEDULED_EXECUTOR_SERVICE will shutdown");
+            GLOBAL_SCHEDULED_EXECUTOR_SERVICE.shutdown();
         }
-        return Optional.empty();
     }
 
     @Override
@@ -171,7 +128,8 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
             final Optional<Purpose> purpose = getPurpose(record);
             final Optional<FuelType> fuelType = getFuelType(record);
             final Optional<Department> department = getDepartment(record);
-            @SuppressWarnings("ConstantConditions") final Optional<Vehicle> createdVehicle = getVehicle(model.orElseGet(null), brand.orElseGet(null));
+            @SuppressWarnings("ConstantConditions")
+            final Optional<Vehicle> createdVehicle = getVehicle(model.orElseGet(null), brand.orElseGet(null));
 
             final Date registrationDate = record.getDate();
 
@@ -226,6 +184,68 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
         }
         globalProcessedCounter.incrementAndGet();
         localProcessedCounter++;
+    }
+
+    private Optional<AdministrativeObject> getAdministrativeObject(@NonNull @Nonnull RegistrationCsvRecord record) {
+        AdministrativeObject adminObject = record.getAdminObject();
+        Optional<Long> adminObjId = Optional.ofNullable(adminObject.getAdminObjId());
+        return adminObjId.isPresent() ? administrativeObjectDBService.get(adminObjId.get()) : Optional.empty();
+    }
+
+    private Optional<Operation> getOperation(@NonNull @Nonnull RegistrationCsvRecord record) {
+        Operation operation = record.getOperation();
+        return operationDBService.exists(operation) ? operationDBService.get(operation) : operationDBService.create(operation);
+    }
+
+    private Optional<Model> getModel(@NonNull @Nonnull RegistrationCsvRecord record) {
+        Model model = record.getModel();
+        return modelDBService.exists(model) ? modelDBService.get(model) : modelDBService.create(model);
+    }
+
+    private Optional<Brand> getBrand(@NonNull @Nonnull RegistrationCsvRecord record) {
+        Brand brand = record.getBrand();
+        return brandDBService.exists(brand) ? brandDBService.get(brand) : brandDBService.create(brand);
+    }
+
+    private Optional<Color> getColor(@NonNull @Nonnull RegistrationCsvRecord record) {
+        Color color = record.getColor();
+        return colorDBService.exists(color) ? colorDBService.get(color) : colorDBService.create(color);
+    }
+
+    private Optional<Kind> getKind(@NonNull @Nonnull RegistrationCsvRecord record) {
+        Kind kind = record.getKind();
+        return kindDBService.exists(kind) ? kindDBService.get(kind) : kindDBService.create(kind);
+    }
+
+    private Optional<BodyType> getBodyType(@NonNull @Nonnull RegistrationCsvRecord record) {
+        BodyType bodyType = record.getBodyType();
+        return bodyTypeDBService.exists(bodyType) ? bodyTypeDBService.get(bodyType) : bodyTypeDBService.create(bodyType);
+    }
+
+    private Optional<Purpose> getPurpose(@NonNull @Nonnull RegistrationCsvRecord record) {
+        Purpose purpose = record.getPurpose();
+        return purposeDBService.exists(purpose) ? purposeDBService.get(purpose) : purposeDBService.create(purpose);
+    }
+
+    private Optional<FuelType> getFuelType(@NonNull @Nonnull RegistrationCsvRecord record) {
+        FuelType fuelType = record.getFuelType();
+        return fuelTypeDBService.exists(fuelType) ? fuelTypeDBService.get(fuelType) : fuelTypeDBService.create(fuelType);
+    }
+
+    private Optional<Department> getDepartment(@NonNull @Nonnull RegistrationCsvRecord record) {
+        Department department = record.getDepartment();
+        return departmentDBService.exists(department) ? departmentDBService.get(department) : departmentDBService.create(department);
+    }
+
+    private Optional<Vehicle> getVehicle(@Nullable Model createdModel, @Nullable Brand createdBrand) {
+        if (Objects.nonNull(createdBrand) && Objects.nonNull(createdModel)) {
+            Vehicle vehicle = Vehicle.builder()
+                                     .brandName(createdBrand.getBrandName())
+                                     .modelName(createdModel.getModelName())
+                                     .build();
+            return vehicleDBService.exists(vehicle) ? vehicleDBService.get(vehicle) : vehicleDBService.create(vehicle);
+        }
+        return Optional.empty();
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")

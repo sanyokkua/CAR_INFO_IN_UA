@@ -23,6 +23,6 @@ public class Purpose implements Serializable, GenericRecord<String> {
 
     @Override
     public String getIndexField() {
-        return purposeName;
+        return getPurposeName();
     }
 }

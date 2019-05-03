@@ -25,6 +25,6 @@ public class AdministrativeObject implements Serializable, GenericRecord<String>
 
     @Override
     public String getIndexField() {
-        return adminObjName;
+        return getAdminObjName();
     }
 }

@@ -23,6 +23,6 @@ public class BodyType implements Serializable, GenericRecord<String> {
 
     @Override
     public String getIndexField() {
-        return bodyTypeName;
+        return getBodyTypeName();
     }
 }

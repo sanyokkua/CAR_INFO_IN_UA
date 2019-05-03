@@ -69,6 +69,6 @@ public class Registration implements Serializable, GenericRecord<String> {
 
     @Override
     public String getIndexField() {
-        return registrationNumber;
+        return getRegistrationNumber();
     }
 }

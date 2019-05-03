@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 
@@ -14,7 +15,12 @@ import java.io.Serializable;
 public class Model implements Serializable, GenericRecord<String> {
     public static final String MODEL_NAME = "modelName";
     private Long modelId;
-    private String modelName;
+    @Builder.Default
+    private String modelName = "—";
+
+    public String getModelName() {
+        return StringUtils.isBlank(modelName) ? "—" : modelName;
+    }
 
     @Override
     public Long getId() {
@@ -23,6 +29,6 @@ public class Model implements Serializable, GenericRecord<String> {
 
     @Override
     public String getIndexField() {
-        return modelName;
+        return getModelName();
     }
 }

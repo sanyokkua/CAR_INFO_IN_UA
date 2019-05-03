@@ -43,7 +43,7 @@ abstract class CommonDbService<T extends GenericRecord<R>, R> implements DBServi
                             log.error("create: Entity was created but not found by query even after retrying it to get once again");
                         }
                     }
-                    if (Objects.nonNull(created)){
+                    if (Objects.nonNull(created)) {
                         log.debug("create: created entity: {}", created);
                     }
                     result = Optional.ofNullable(created);
@@ -88,7 +88,11 @@ abstract class CommonDbService<T extends GenericRecord<R>, R> implements DBServi
 
     @Override
     public boolean exists(@NonNull @Nonnull T entity) {
-        return repository.existsByIndex(entity.getIndexField());
+        R indexField = entity.getIndexField();
+        if (Objects.isNull(indexField)) {
+            return false;
+        }
+        return repository.existsByIndex(indexField);
     }
 
     @Override

@@ -23,6 +23,6 @@ public class Color implements Serializable, GenericRecord<String> {
 
     @Override
     public String getIndexField() {
-        return colorName;
+        return getColorName();
     }
 }

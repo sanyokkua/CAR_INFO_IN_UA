@@ -23,6 +23,6 @@ public class Operation implements Serializable, GenericRecord<Long> {
 
     @Override
     public Long getIndexField() {
-        return operationCode;
+        return getOperationCode();
     }
 }

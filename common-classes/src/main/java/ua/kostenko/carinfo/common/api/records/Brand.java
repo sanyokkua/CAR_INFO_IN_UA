@@ -23,6 +23,6 @@ public class Brand implements Serializable, GenericRecord<String> {
 
     @Override
     public String getIndexField() {
-        return brandName;
+        return getBrandName();
     }
 }

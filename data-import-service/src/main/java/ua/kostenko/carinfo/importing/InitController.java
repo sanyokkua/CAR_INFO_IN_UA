@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import ua.kostenko.carinfo.importing.importing.Initializer;
 import ua.kostenko.carinfo.importing.importing.administrative.AdminObjImportInitializer;
@@ -33,6 +34,7 @@ public class InitController {
         initializers.add(registrationImportInitializer);
     }
 
+    @Scheduled(cron = "0 0 0,12 1,14 * *")//twice per month on 1st and 14th of month on 12 o'clock
     @EventListener(ApplicationReadyEvent.class)
     public void initDatabase() {
         initializers.forEach(InitController::initialize);

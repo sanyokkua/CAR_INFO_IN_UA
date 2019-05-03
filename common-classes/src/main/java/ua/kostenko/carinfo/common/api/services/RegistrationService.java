@@ -75,7 +75,8 @@ class RegistrationService extends CommonDbService<Registration, String> {
 
     @Override
     public boolean exists(@NonNull @Nonnull Registration entity) {
-        boolean existsByIndex = repository.existsByIndex(entity.getIndexField());
+        String indexField = entity.getIndexField();
+        boolean existsByIndex = Objects.nonNull(indexField) && repository.existsByIndex(indexField);
         if (existsByIndex) {
             boolean exist = repository.exist(entity);
             log.debug("exists: Entity {} exists: {}", entity, exist);

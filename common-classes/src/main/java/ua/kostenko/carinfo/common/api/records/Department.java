@@ -26,6 +26,6 @@ public class Department implements Serializable, GenericRecord<Long> {
 
     @Override
     public Long getIndexField() {
-        return departmentCode;
+        return getDepartmentCode();
     }
 }

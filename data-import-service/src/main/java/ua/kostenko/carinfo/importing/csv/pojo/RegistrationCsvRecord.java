@@ -11,6 +11,7 @@ import ua.kostenko.carinfo.common.api.records.*;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 @Slf4j
 @Data
@@ -45,19 +46,22 @@ public class RegistrationCsvRecord {
         return Operation.builder().operationCode(operationCode).operationName(operationName).build();
     }
 
-    public Model getModel() {
-        String vehicleModel = StringUtils.trim(this.getVehicleModel());
-        return Model.builder().modelName(vehicleModel).build();
-    }
-
     public Brand getBrand() {
-        String vehicleModel = StringUtils.trim(this.getVehicleModel());
         String vehicleBrand = StringUtils.trim(this.getVehicleBrand());
-        if (vehicleBrand.contains(vehicleModel)) {
+        String vehicleModel = StringUtils.trim(getModel().getModelName());
+        if (StringUtils.isNotBlank(vehicleBrand)
+                && StringUtils.isNotBlank(vehicleModel)
+                && !(vehicleBrand.equalsIgnoreCase(vehicleModel))
+                && vehicleBrand.contains(vehicleModel)) {
             vehicleBrand = StringUtils.remove(vehicleBrand, vehicleModel);
             vehicleBrand = StringUtils.trim(vehicleBrand);
         }
         return Brand.builder().brandName(vehicleBrand).build();
+    }
+
+    public Model getModel() {
+        String vehicleModel = StringUtils.trim(this.getVehicleModel());
+        return Model.builder().modelName(vehicleModel).build();
     }
 
     public Color getColor() {
@@ -82,7 +86,7 @@ public class RegistrationCsvRecord {
 
     public FuelType getFuelType() {
         String vehicleFuelType = this.getVehicleFuelType();
-        return FuelType.builder().fuelTypeName(vehicleFuelType).build();
+        return FuelType.builder().fuelTypeName(Objects.nonNull(vehicleFuelType) ? vehicleFuelType : "—").build();
     }
 
     public AdministrativeObject getAdminObject() {

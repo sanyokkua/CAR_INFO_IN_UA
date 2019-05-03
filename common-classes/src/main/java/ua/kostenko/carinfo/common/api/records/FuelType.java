@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 
@@ -14,7 +15,12 @@ import java.io.Serializable;
 public class FuelType implements Serializable, GenericRecord<String> {
     public static final String FUEL_NAME = "fuelName";
     private Long fuelTypeId;
-    private String fuelTypeName;
+    @Builder.Default
+    private String fuelTypeName = "—";
+
+    public String getFuelTypeName() {
+        return StringUtils.isBlank(fuelTypeName) ? "—" : fuelTypeName;
+    }
 
     @Override
     public Long getId() {
@@ -23,6 +29,6 @@ public class FuelType implements Serializable, GenericRecord<String> {
 
     @Override
     public String getIndexField() {
-        return fuelTypeName;
+        return getFuelTypeName();
     }
 }

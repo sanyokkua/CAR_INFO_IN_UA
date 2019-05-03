@@ -39,19 +39,19 @@ class FileProcessingTask implements Runnable {
     private final DBService<Purpose> purposeDBService;
     private final DBService<Vehicle> vehicleDBService;
 
-    public FileProcessingTask(@NonNull @Nonnull String link, @NonNull @Nonnull File tempDirectory,
-                              @NonNull @Nonnull DBService<Registration> registrationDBService,
-                              @NonNull @Nonnull DBService<AdministrativeObject> administrativeObjectDBService,
-                              @NonNull @Nonnull DBService<BodyType> bodyTypeDBService,
-                              @NonNull @Nonnull DBService<Brand> brandDBService,
-                              @NonNull @Nonnull DBService<Color> colorDBService,
-                              @NonNull @Nonnull DBService<Department> departmentDBService,
-                              @NonNull @Nonnull DBService<FuelType> fuelTypeDBService,
-                              @NonNull @Nonnull DBService<Kind> kindDBService,
-                              @NonNull @Nonnull DBService<Model> modelDBService,
-                              @NonNull @Nonnull DBService<Operation> operationDBService,
-                              @NonNull @Nonnull DBService<Purpose> purposeDBService,
-                              @NonNull @Nonnull DBService<Vehicle> vehicleDBService) {
+    FileProcessingTask(@NonNull @Nonnull String link, @NonNull @Nonnull File tempDirectory,
+                       @NonNull @Nonnull DBService<Registration> registrationDBService,
+                       @NonNull @Nonnull DBService<AdministrativeObject> administrativeObjectDBService,
+                       @NonNull @Nonnull DBService<BodyType> bodyTypeDBService,
+                       @NonNull @Nonnull DBService<Brand> brandDBService,
+                       @NonNull @Nonnull DBService<Color> colorDBService,
+                       @NonNull @Nonnull DBService<Department> departmentDBService,
+                       @NonNull @Nonnull DBService<FuelType> fuelTypeDBService,
+                       @NonNull @Nonnull DBService<Kind> kindDBService,
+                       @NonNull @Nonnull DBService<Model> modelDBService,
+                       @NonNull @Nonnull DBService<Operation> operationDBService,
+                       @NonNull @Nonnull DBService<Purpose> purposeDBService,
+                       @NonNull @Nonnull DBService<Vehicle> vehicleDBService) {
         this.link = link;
         this.tempDirectory = tempDirectory;
         this.registrationDBService = registrationDBService;
@@ -123,7 +123,9 @@ class FileProcessingTask implements Runnable {
                                                                                  modelDBService,
                                                                                  operationDBService,
                                                                                  purposeDBService,
-                                                                                 vehicleDBService);
+                                                                                 vehicleDBService,
+                                                                                 fileInDirectory.getName()
+                                                                                 );
                 CsvReader<RegistrationCsvRecord> csvReader = new CsvReader<>();
                 csvReader.readCsvFile(options.getReaderOptions(), mapper, persist);
             } else {

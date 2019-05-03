@@ -17,6 +17,9 @@ public class RegistrationCsvMapper implements CsvMapper<RegistrationCsvRecord> {
 
     @Override
     public RegistrationCsvRecord map(CSVRecord csvRecord) {
+        String model = getStringValueInUpperCaseOrDash(csvRecord, headers.getVehicleModel());
+        String fuel = getStringValueInUpperCaseOrDash(csvRecord, headers.getVehicleFuelType());
+        String brand = getStringValueInUpperCaseOrDash(csvRecord, headers.getVehicleBrand());
         return RegistrationCsvRecord.builder()
                                     .personType(getStringValueInUpperCase(csvRecord, headers.getPersonType()))
                                     .administrativeObject(getLong(csvRecord, headers.getAdministrativeObject()))
@@ -25,14 +28,14 @@ public class RegistrationCsvMapper implements CsvMapper<RegistrationCsvRecord> {
                                     .registrationDate(getStringValueInUpperCase(csvRecord, headers.getRegistrationDate()))
                                     .departmentCode(getLong(csvRecord, headers.getDepartmentCode()))
                                     .departmentName(getStringValueInUpperCase(csvRecord, headers.getDepartmentName()))
-                                    .vehicleBrand(getStringValueInUpperCase(csvRecord, headers.getVehicleBrand()))
-                                    .vehicleModel(getStringValueInUpperCase(csvRecord, headers.getVehicleModel()))
+                                    .vehicleBrand(brand)
+                                    .vehicleModel(model)
                                     .vehicleMakeYear(getLong(csvRecord, headers.getVehicleMakeYear()))
                                     .vehicleColor(getStringValueInUpperCase(csvRecord, headers.getVehicleColor()))
                                     .vehicleKind(getStringValueInUpperCase(csvRecord, headers.getVehicleKind()))
                                     .vehicleBodyType(getStringValueInUpperCase(csvRecord, headers.getVehicleBodyType()))
                                     .vehiclePurpose(getStringValueInUpperCase(csvRecord, headers.getVehiclePurpose()))
-                                    .vehicleFuelType(getStringValueInUpperCase(csvRecord, headers.getVehicleFuelType()))
+                                    .vehicleFuelType(fuel)
                                     .vehicleEngineCapacity(getLong(csvRecord, headers.getVehicleEngineCapacity()))
                                     .vehicleOwnWeight(getLong(csvRecord, headers.getVehicleOwnWeight()))
                                     .vehicleTotalWeight(getLong(csvRecord, headers.getVehicleTotalWeight()))

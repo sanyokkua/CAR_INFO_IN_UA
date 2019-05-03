@@ -56,7 +56,7 @@ public abstract class CsvUtils <T extends CsvHeaders> {
 
     private char getDelimiter(@NonNull @Nonnull String firstColumn, @NonNull @Nonnull String headerString) {
         log.info("getDelimiter: trying to figure out delimiter in this csv file");
-        String resultString = headerString.replaceFirst(firstColumn, "");
+        String resultString = headerString.replaceAll("\"", "").replaceFirst(firstColumn, "");
         char delimiter = resultString.charAt(0);
         log.info("getDelimiter: found next delimiter: {}", delimiter);
         return delimiter;

@@ -10,6 +10,11 @@ public interface CsvMapper<T> {
     T map(CSVRecord csvRecord);
 
     @Nullable
+    default Long getLong(CSVRecord csvRecord, String key) {
+        return getLong(csvRecord.get(key));
+    }
+
+    @Nullable
     default Long getLong(String number) {
         Long result = null;
         try {
@@ -21,12 +26,9 @@ public interface CsvMapper<T> {
     }
 
     @Nullable
-    default String getString(String value) {
-        if (StringUtils.isNotBlank(value)) {
-            String s = StringUtils.toEncodedString(value.getBytes(), Charset.forName("UTF-8"));
-            return s.trim();
-        }
-        return null;
+    default String getStringValueInUpperCase(CSVRecord csvRecord, String header) {
+        String value = getString(csvRecord, header);
+        return StringUtils.isNotBlank(value) ? value.toUpperCase() : null;
     }
 
     @Nullable
@@ -35,13 +37,16 @@ public interface CsvMapper<T> {
     }
 
     @Nullable
-    default Long getLong(CSVRecord csvRecord, String key) {
-        return getLong(csvRecord.get(key));
+    default String getString(String value) {
+        if (StringUtils.isNotBlank(value)) {
+            String s = StringUtils.toEncodedString(value.getBytes(), Charset.forName("UTF-8"));
+            return s.trim();
+        }
+        return null;
     }
 
-    @Nullable
-    default String getStringValueInUpperCase(CSVRecord csvRecord, String header){
+    default String getStringValueInUpperCaseOrDash(CSVRecord csvRecord, String header) {
         String value = getString(csvRecord, header);
-        return StringUtils.isNotBlank(value)? value.toUpperCase() : null;
+        return StringUtils.isNotBlank(value) ? value.toUpperCase() : "—";
     }
 }
