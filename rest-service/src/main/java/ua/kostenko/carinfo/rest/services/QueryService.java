@@ -5,20 +5,21 @@ import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
 import ua.kostenko.carinfo.common.api.records.*;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public interface QueryService {
-    Page<AdministrativeObject> getAllAdminObjects();
-    Page<BodyType> getAllBodyTypes();
-    Page<Brand> getAllBrands();
-    Page<Color> getAllColors();
-    Page<Department> getAllDepartments();
-    Page<FuelType> getAllFuelTypes();
-    Page<Kind> getAllKinds();
-    Page<Model> getAllModels();
-    Page<Operation> getAllOperations();
-    Page<Purpose> getAllPurposes();
-    Page<Registration> getAllRegistrations();
-    Page<Vehicle> getAllVehicles();
+    Page<AdministrativeObject> getAllAdminObjects(@Nullable Integer page);
+    Page<BodyType> getAllBodyTypes(@Nullable Integer page);
+    Page<Brand> getAllBrands(@Nullable Integer page);
+    Page<Color> getAllColors(@Nullable Integer page);
+    Page<Department> getAllDepartments(@Nullable Integer page);
+    Page<FuelType> getAllFuelTypes(@Nullable Integer page);
+    Page<Kind> getAllKinds(@Nullable Integer page);
+    Page<Model> getAllModels(@Nullable Integer page);
+    Page<Operation> getAllOperations(@Nullable Integer page);
+    Page<Purpose> getAllPurposes(@Nullable Integer page);
+    Page<Registration> getAllRegistrations(@Nullable Integer page);
+    Page<Vehicle> getAllVehicles(@Nullable Integer page);
 
     Page<Vehicle> findVehicleWithBrand(@Nonnull String brandName);
     Page<Vehicle> findVehicleWithModel(@Nonnull String modelName);
