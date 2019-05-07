@@ -13,6 +13,7 @@ import java.io.Serializable;
 @Builder
 public class Operation implements Serializable, GenericRecord<Long> {
     public static final String OPERATION_CODE = "operationCode";
+    public static final String OPERATION_NAME = "operationName";
     private Long operationCode;
     private String operationName;
 

@@ -35,11 +35,23 @@ class RegistrationBrandRepository extends CommonDBRepository<Brand, String> {
         return ROW_MAPPER;
     }
 
+    @Override
+    WhereBuilder.BuildResult getWhereFromParams(ParamsHolder params) {
+        return buildWhere()
+                .addFieldParam(Constants.RegistrationBrand.NAME, NAME_PARAM, params.getString(Brand.BRAND_NAME))
+                .build();
+    }
+
+    @Override
+    String getTableName() {
+        return Constants.RegistrationBrand.TABLE;
+    }
+
     @Nullable
     @Override
     public Brand create(@NonNull @Nonnull Brand entity) {
         String jdbcTemplateInsert = "insert into carinfo.brand (brand_name) values (:name);";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getBrandName()).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, entity.getBrandName()).build();
         return create(jdbcTemplateInsert, Constants.RegistrationBrand.ID, parameterSource);
     }
 
@@ -48,33 +60,25 @@ class RegistrationBrandRepository extends CommonDBRepository<Brand, String> {
     public Brand update(@NonNull @Nonnull Brand entity) {
         String jdbcTemplateUpdate = "update carinfo.brand set brand_name = :name where brand_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder()
-                .addParam("name", entity.getBrandName())
-                .addParam("id", entity.getId())
+                .addParam(NAME_PARAM, entity.getBrandName())
+                .addParam(ID_PARAM, entity.getId())
                 .build();
         jdbcTemplate.update(jdbcTemplateUpdate, parameterSource);
         ParamsHolder holder = getParamsHolderBuilder().param(Brand.BRAND_NAME, entity.getBrandName()).build();
         return findOne(holder);
     }
 
-    @Cacheable(cacheNames = "brandIndex", unless = "#result == false ", key = "#indexField")
-    @Override
-    public boolean existsByIndex(@Nonnull @NonNull String indexField) {
-        String jdbcTemplateSelectCount = "select count(brand_id) from carinfo.brand where brand_name = :name;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", indexField).build();
-        return exist(jdbcTemplateSelectCount, parameterSource);
-    }
-
     @Override
     public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.brand where brand_id = :id;";
-        SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
+        SqlParameterSource params = getSqlParamBuilder().addParam(ID_PARAM, id).build();
         return delete(jdbcTemplateDelete, params);
     }
 
     @Override
     public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(brand_id) from carinfo.brand where brand_id = :id;";
-        SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
+        SqlParameterSource params = getSqlParamBuilder().addParam(ID_PARAM, id).build();
         return exist(jdbcTemplateSelectCount, params);
     }
 
@@ -82,7 +86,7 @@ class RegistrationBrandRepository extends CommonDBRepository<Brand, String> {
     @Override
     public boolean exist(@NonNull @Nonnull Brand entity) {
         String jdbcTemplateSelectCount = "select count(brand_id) from carinfo.brand where brand_name = :name;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getBrandName()).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, entity.getBrandName()).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
     }
 
@@ -90,7 +94,7 @@ class RegistrationBrandRepository extends CommonDBRepository<Brand, String> {
     @Override
     public Brand findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.brand where brand_id = :id;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("id", id).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(ID_PARAM, id).build();
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
@@ -100,7 +104,7 @@ class RegistrationBrandRepository extends CommonDBRepository<Brand, String> {
     public Brand findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String param = searchParams.getString(Brand.BRAND_NAME);
         String jdbcTemplateSelect = "select * from carinfo.brand where brand_name = :name;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", param).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, param).build();
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
@@ -110,12 +114,20 @@ class RegistrationBrandRepository extends CommonDBRepository<Brand, String> {
         return find(jdbcTemplateSelect);
     }
 
+    @Cacheable(cacheNames = "brandIndex", unless = "#result == false ", key = "#indexField")
+    @Override
+    public boolean existsByIndex(@Nonnull @NonNull String indexField) {
+        String jdbcTemplateSelectCount = "select count(brand_id) from carinfo.brand where brand_name = :name;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, indexField).build();
+        return exist(jdbcTemplateSelectCount, parameterSource);
+    }
+
     @Override
     public Page<Brand> find(@NonNull @Nonnull ParamsHolder searchParams) {
         String select = "select * ";
         String from = "from carinfo.brand b ";
         String name = searchParams.getString(Brand.BRAND_NAME);
-        return findPage(searchParams, select, from, buildWhere().addFieldParam("b.brand_name", "name", name));
+        return findPage(searchParams, select, from, buildWhere().addFieldParam("b.brand_name", NAME_PARAM, name));
 
     }
 }

@@ -35,19 +35,23 @@ class RegistrationKindRepository extends CommonDBRepository<Kind, String> {
         return ROW_MAPPER;
     }
 
-    @Cacheable(cacheNames = "kindIndex", unless = "#result == false ", key = "#indexField")
     @Override
-    public boolean existsByIndex(@Nonnull @NonNull String indexField) {
-        String jdbcTemplateSelectCount = "select count(kind_id) from carinfo.kind where kind_name = :name;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", indexField).build();
-        return exist(jdbcTemplateSelectCount, parameterSource);
+    WhereBuilder.BuildResult getWhereFromParams(ParamsHolder params) {
+        return buildWhere()
+                .addFieldParam(Constants.RegistrationKind.NAME, NAME_PARAM, params.getString(Kind.KIND_NAME))
+                .build();
+    }
+
+    @Override
+    String getTableName() {
+        return Constants.RegistrationKind.TABLE;
     }
 
     @Nullable
     @Override
     public Kind create(@NonNull @Nonnull Kind entity) {
         String jdbcTemplateInsert = "insert into carinfo.kind (kind_name) values (:name);";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getKindName()).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, entity.getKindName()).build();
         return create(jdbcTemplateInsert, Constants.RegistrationKind.ID, parameterSource);
     }
 
@@ -55,8 +59,8 @@ class RegistrationKindRepository extends CommonDBRepository<Kind, String> {
     @Override
     public Kind update(@NonNull @Nonnull Kind entity) {
         String jdbcTemplateUpdate = "update carinfo.kind set kind_name = :name where kind_id = :id;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getKindName())
-                                                                 .addParam("id", entity.getKindId())
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, entity.getKindName())
+                                                                 .addParam(ID_PARAM, entity.getKindId())
                                                                  .build();
         jdbcTemplate.update(jdbcTemplateUpdate, parameterSource);
         ParamsHolder searchParams = getParamsHolderBuilder().param(Kind.KIND_NAME, entity.getKindName()).build();
@@ -66,14 +70,14 @@ class RegistrationKindRepository extends CommonDBRepository<Kind, String> {
     @Override
     public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.kind where kind_id = :id;";
-        SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
+        SqlParameterSource params = getSqlParamBuilder().addParam(ID_PARAM, id).build();
         return delete(jdbcTemplateDelete, params);
     }
 
     @Override
     public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(kind_id) from carinfo.kind where kind_id = :id;";
-        SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
+        SqlParameterSource params = getSqlParamBuilder().addParam(ID_PARAM, id).build();
         return exist(jdbcTemplateSelectCount, params);
     }
 
@@ -81,7 +85,7 @@ class RegistrationKindRepository extends CommonDBRepository<Kind, String> {
     @Override
     public boolean exist(@NonNull @Nonnull Kind entity) {
         String jdbcTemplateSelectCount = "select count(kind_id) from carinfo.kind where kind_name = :name;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getKindName()).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, entity.getKindName()).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
     }
 
@@ -89,7 +93,7 @@ class RegistrationKindRepository extends CommonDBRepository<Kind, String> {
     @Override
     public Kind findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.kind where kind_id = :id;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("id", id).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(ID_PARAM, id).build();
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
@@ -99,7 +103,7 @@ class RegistrationKindRepository extends CommonDBRepository<Kind, String> {
     public Kind findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String param = searchParams.getString(Kind.KIND_NAME);
         String jdbcTemplateSelect = "select * from carinfo.kind where kind_name = :name;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", param).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, param).build();
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
@@ -109,11 +113,19 @@ class RegistrationKindRepository extends CommonDBRepository<Kind, String> {
         return find(jdbcTemplateSelect);
     }
 
+    @Cacheable(cacheNames = "kindIndex", unless = "#result == false ", key = "#indexField")
+    @Override
+    public boolean existsByIndex(@Nonnull @NonNull String indexField) {
+        String jdbcTemplateSelectCount = "select count(kind_id) from carinfo.kind where kind_name = :name;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, indexField).build();
+        return exist(jdbcTemplateSelectCount, parameterSource);
+    }
+
     @Override
     public Page<Kind> find(@NonNull @Nonnull ParamsHolder searchParams) {
         String select = "select * ";
         String from = "from carinfo.kind k ";
         String name = searchParams.getString(Kind.KIND_NAME);
-        return findPage(searchParams, select, from, buildWhere().addFieldParam("k.kind_name", "name", name));
+        return findPage(searchParams, select, from, buildWhere().addFieldParam("k.kind_name", NAME_PARAM, name));
     }
 }

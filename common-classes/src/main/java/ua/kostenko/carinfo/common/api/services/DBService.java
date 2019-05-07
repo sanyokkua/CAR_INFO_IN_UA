@@ -19,5 +19,6 @@ public interface DBService<T> {
     Optional<T> get(@Nonnull @NonNull T entity);
     List<T> getAll();
     Page<T> getAll(@Nonnull @NonNull ParamsHolderBuilder builder);
-
+    int countAll();
+    int countAll(@Nonnull @NonNull ParamsHolderBuilder builder);
 }

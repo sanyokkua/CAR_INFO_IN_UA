@@ -2,6 +2,7 @@ package ua.kostenko.carinfo.common.database.repositories;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.bcel.Const;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -35,11 +36,23 @@ class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType, String
         return ROW_MAPPER;
     }
 
+    @Override
+    WhereBuilder.BuildResult getWhereFromParams(ParamsHolder params) {
+        return buildWhere()
+                .addFieldParam(Constants.RegistrationBodyType.NAME, NAME_PARAM, params.getString(BodyType.BODY_TYPE_NAME))
+                .build();
+    }
+
+    @Override
+    String getTableName() {
+        return Constants.RegistrationBodyType.TABLE;
+    }
+
     @Nullable
     @Override
     public BodyType create(@NonNull @Nonnull BodyType entity) {
         String jdbcTemplateInsert = "insert into carinfo.body_type (body_type_name) values (:name);";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getBodyTypeName()).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, entity.getBodyTypeName()).build();
         return create(jdbcTemplateInsert, Constants.RegistrationBodyType.ID, parameterSource);
     }
 
@@ -48,33 +61,25 @@ class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType, String
     public BodyType update(@NonNull @Nonnull BodyType entity) {
         String jdbcTemplateUpdate = "update carinfo.body_type set body_type_name = :name where body_type_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder()
-                .addParam("id", entity.getId())
-                .addParam("name", entity.getBodyTypeName())
+                .addParam(ID_PARAM, entity.getId())
+                .addParam(NAME_PARAM, entity.getBodyTypeName())
                 .build();
         jdbcTemplate.update(jdbcTemplateUpdate, parameterSource);
         ParamsHolder holder = getParamsHolderBuilder().param(BodyType.BODY_TYPE_NAME, entity.getBodyTypeName()).build();
         return findOne(holder);
     }
 
-    @Cacheable(cacheNames = "bodyIndex", unless = "#result == false ", key = "#indexField")
-    @Override
-    public boolean existsByIndex(@Nonnull @NonNull String indexField) {
-        String jdbcTemplateSelectCount = "select count(body_type_id) from carinfo.body_type where body_type_name = :name;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", indexField).build();
-        return exist(jdbcTemplateSelectCount, parameterSource);
-    }
-
     @Override
     public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.body_type where body_type_id = :id;";
-        SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
+        SqlParameterSource params = getSqlParamBuilder().addParam(ID_PARAM, id).build();
         return delete(jdbcTemplateDelete, params);
     }
 
     @Override
     public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(body_type_id) from carinfo.body_type where body_type_id = :id;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("id", id).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(ID_PARAM, id).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
     }
 
@@ -82,7 +87,7 @@ class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType, String
     @Override
     public boolean exist(@NonNull @Nonnull BodyType entity) {
         String jdbcTemplateSelectCount = "select count(body_type_id) from carinfo.body_type where body_type_name = :name;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getBodyTypeName()).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, entity.getBodyTypeName()).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
     }
 
@@ -90,7 +95,7 @@ class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType, String
     @Override
     public BodyType findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.body_type where body_type_id = :id;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("id", id).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(ID_PARAM, id).build();
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
@@ -100,7 +105,7 @@ class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType, String
     public BodyType findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String param = searchParams.getString(BodyType.BODY_TYPE_NAME);
         String jdbcTemplateSelect = "select * from carinfo.body_type where body_type_name = :name;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", param).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, param).build();
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
@@ -110,11 +115,19 @@ class RegistrationBodyTypeRepository extends CommonDBRepository<BodyType, String
         return find(jdbcTemplateSelect);
     }
 
+    @Cacheable(cacheNames = "bodyIndex", unless = "#result == false ", key = "#indexField")
+    @Override
+    public boolean existsByIndex(@Nonnull @NonNull String indexField) {
+        String jdbcTemplateSelectCount = "select count(body_type_id) from carinfo.body_type where body_type_name = :name;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, indexField).build();
+        return exist(jdbcTemplateSelectCount, parameterSource);
+    }
+
     @Override
     public Page<BodyType> find(@NonNull @Nonnull ParamsHolder searchParams) {
         String select = "select * ";
         String from = "from carinfo.body_type bt ";
         String name = searchParams.getString(BodyType.BODY_TYPE_NAME);
-        return findPage(searchParams, select, from, buildWhere().addFieldParam("bt.body_type_name", "name", name));
+        return findPage(searchParams, select, from, buildWhere().addFieldParam("bt.body_type_name", NAME_PARAM, name));
     }
 }

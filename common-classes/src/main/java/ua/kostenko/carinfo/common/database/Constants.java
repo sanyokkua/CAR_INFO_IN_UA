@@ -67,6 +67,7 @@ public interface Constants {
 
     interface RegistrationRecord {
         String TABLE = "record";
+        String TABLE_VIEW = "record_view";
         String ID = "id";
         String ADMIN_OBJ_ID = "admin_obj_id";
         String OPERATION_CODE = "op_code";
@@ -88,6 +89,7 @@ public interface Constants {
 
     interface RegistrationVehicle {
         String TABLE = "vehicle";
+        String TABLE_VIEW = "vehicle_view";
         String ID = "vehicle_id";
         String BRAND_ID = "brand_id";
         String MODEL_ID = "model_id";

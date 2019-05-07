@@ -35,11 +35,23 @@ class RegistrationColorRepository extends CommonDBRepository<Color, String> {
         return ROW_MAPPER;
     }
 
+    @Override
+    WhereBuilder.BuildResult getWhereFromParams(ParamsHolder params) {
+        return buildWhere()
+                .addFieldParam(Constants.RegistrationColor.NAME, NAME_PARAM, params.getString(Color.COLOR_NAME))
+                .build();
+    }
+
+    @Override
+    String getTableName() {
+        return Constants.RegistrationColor.TABLE;
+    }
+
     @Nullable
     @Override
     public Color create(@NonNull @Nonnull Color entity) {
         String jdbcTemplateInsert = "insert into carinfo.color (color_name) values (:name);";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getColorName()).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, entity.getColorName()).build();
         return create(jdbcTemplateInsert, Constants.RegistrationColor.ID, parameterSource);
     }
 
@@ -48,33 +60,25 @@ class RegistrationColorRepository extends CommonDBRepository<Color, String> {
     public Color update(@NonNull @Nonnull Color entity) {
         String jdbcTemplateUpdate = "update carinfo.color set color_name = :name where color_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder()
-                .addParam("name", entity.getColorName())
-                .addParam("id", entity.getId())
+                .addParam(NAME_PARAM, entity.getColorName())
+                .addParam(ID_PARAM, entity.getId())
                 .build();
         jdbcTemplate.update(jdbcTemplateUpdate, parameterSource);
         ParamsHolder holder = getParamsHolderBuilder().param(Color.COLOR_NAME, entity.getColorName()).build();
         return findOne(holder);
     }
 
-    @Cacheable(cacheNames = "colorIndex", unless = "#result == false ", key = "#indexField")
-    @Override
-    public boolean existsByIndex(@Nonnull @NonNull String indexField) {
-        String jdbcTemplateSelectCount = "select count(color_id) from carinfo.color where color_name = :name;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", indexField).build();
-        return exist(jdbcTemplateSelectCount, parameterSource);
-    }
-
     @Override
     public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.color where color_id = :id;";
-        SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
+        SqlParameterSource params = getSqlParamBuilder().addParam(ID_PARAM, id).build();
         return delete(jdbcTemplateDelete, params);
     }
 
     @Override
     public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(color_id) from carinfo.color where color_id = :id;";
-        SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
+        SqlParameterSource params = getSqlParamBuilder().addParam(ID_PARAM, id).build();
         return exist(jdbcTemplateSelectCount, params);
     }
 
@@ -82,7 +86,7 @@ class RegistrationColorRepository extends CommonDBRepository<Color, String> {
     @Override
     public boolean exist(@NonNull @Nonnull Color entity) {
         String jdbcTemplateSelectCount = "select count(color_id) from carinfo.color where color_name = :name;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getColorName()).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, entity.getColorName()).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
     }
 
@@ -90,7 +94,7 @@ class RegistrationColorRepository extends CommonDBRepository<Color, String> {
     @Override
     public Color findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.color where color_id = :id;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("id", id).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(ID_PARAM, id).build();
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
@@ -100,7 +104,7 @@ class RegistrationColorRepository extends CommonDBRepository<Color, String> {
     public Color findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String param = searchParams.getString(Color.COLOR_NAME);
         String jdbcTemplateSelect = "select * from carinfo.color where color_name = :name;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", param).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, param).build();
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
@@ -110,11 +114,19 @@ class RegistrationColorRepository extends CommonDBRepository<Color, String> {
         return find(jdbcTemplateSelect);
     }
 
+    @Cacheable(cacheNames = "colorIndex", unless = "#result == false ", key = "#indexField")
+    @Override
+    public boolean existsByIndex(@Nonnull @NonNull String indexField) {
+        String jdbcTemplateSelectCount = "select count(color_id) from carinfo.color where color_name = :name;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, indexField).build();
+        return exist(jdbcTemplateSelectCount, parameterSource);
+    }
+
     @Override
     public Page<Color> find(@NonNull @Nonnull ParamsHolder searchParams) {
         String select = "select * ";
         String from = "from carinfo.color c ";
         String name = searchParams.getString(Color.COLOR_NAME);
-        return findPage(searchParams, select, from, buildWhere().addFieldParam("c.color_name", "name", name));
+        return findPage(searchParams, select, from, buildWhere().addFieldParam("c.color_name", NAME_PARAM, name));
     }
 }

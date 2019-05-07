@@ -21,6 +21,9 @@ import java.util.Objects;
 @Repository
 @Slf4j
 class RegistrationDepartmentRepository extends CommonDBRepository<Department, Long> {
+    protected static final String CODE_PARAM = "code";
+    protected static final String ADDR_PARAM = "addr";
+    protected static final String EMAIL_PARAM = "email";
     private static final RowMapper<Department> ROW_MAPPER = (resultSet, i) -> Department.builder()
                                                                                         .departmentCode(resultSet.getLong(Constants.RegistrationDepartment.CODE))
                                                                                         .departmentAddress(resultSet.getString(Constants.RegistrationDepartment.ADDRESS))
@@ -37,12 +40,18 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department, Lo
         return ROW_MAPPER;
     }
 
-    @Cacheable(cacheNames = "departmentIndex", unless = "#result == false ", key = "#indexField")
     @Override
-    public boolean existsByIndex(@Nonnull @NonNull Long indexField) {
-        String jdbcTemplateSelectCount = "select count(dep_code) from carinfo.department where dep_code = :code;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("code", indexField).build();
-        return exist(jdbcTemplateSelectCount, parameterSource);
+    WhereBuilder.BuildResult getWhereFromParams(ParamsHolder params) {
+        return buildWhere()
+                .addFieldParam(Constants.RegistrationDepartment.CODE, NAME_PARAM, params.getLong(Department.DEPARTMENT_CODE))
+                .addFieldParam(Constants.RegistrationDepartment.ADDRESS, NAME_PARAM, params.getString(Department.DEPARTMENT_ADDRESS))
+                .addFieldParam(Constants.RegistrationDepartment.EMAIL, NAME_PARAM, params.getString(Department.DEPARTMENT_EMAIL))
+                .build();
+    }
+
+    @Override
+    String getTableName() {
+        return Constants.RegistrationDepartment.TABLE;
     }
 
     @Nullable
@@ -50,9 +59,9 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department, Lo
     public Department create(@NonNull @Nonnull Department entity) {
         String jdbcTemplateInsert = "insert into carinfo.department (dep_code, dep_addr, dep_email) values (:code, :addr, :email);";
         SqlParameterSource parameterSource = getSqlParamBuilder()
-                .addParam("code", entity.getDepartmentCode())
-                .addParam("addr", entity.getDepartmentAddress())
-                .addParam("email", entity.getDepartmentEmail())
+                .addParam(CODE_PARAM, entity.getDepartmentCode())
+                .addParam(ADDR_PARAM, entity.getDepartmentAddress())
+                .addParam(EMAIL_PARAM, entity.getDepartmentEmail())
                 .build();
         return create(jdbcTemplateInsert, Constants.RegistrationDepartment.CODE, parameterSource);
     }
@@ -62,9 +71,9 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department, Lo
     public Department update(@NonNull @Nonnull Department entity) {
         String jdbcTemplateUpdate = "update carinfo.department set dep_addr = :addr, dep_email = :email where dep_code = :code;";
         SqlParameterSource parameterSource = getSqlParamBuilder()
-                .addParam("code", entity.getDepartmentCode())
-                .addParam("addr", entity.getDepartmentAddress())
-                .addParam("email", entity.getDepartmentEmail())
+                .addParam(CODE_PARAM, entity.getDepartmentCode())
+                .addParam(ADDR_PARAM, entity.getDepartmentAddress())
+                .addParam(EMAIL_PARAM, entity.getDepartmentEmail())
                 .build();
         jdbcTemplate.update(jdbcTemplateUpdate, parameterSource);
         ParamsHolder holder = getParamsHolderBuilder().param(Department.DEPARTMENT_CODE, entity.getDepartmentCode()).build();
@@ -74,14 +83,14 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department, Lo
     @Override
     public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.department where dep_code = :code;";
-        SqlParameterSource params = getSqlParamBuilder().addParam("code", id).build();
+        SqlParameterSource params = getSqlParamBuilder().addParam(CODE_PARAM, id).build();
         return delete(jdbcTemplateDelete, params);
     }
 
     @Override
     public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(dep_code) from carinfo.department where dep_code = :code;";
-        SqlParameterSource params = getSqlParamBuilder().addParam("code", id).build();
+        SqlParameterSource params = getSqlParamBuilder().addParam(CODE_PARAM, id).build();
         return exist(jdbcTemplateSelectCount, params);
     }
 
@@ -89,7 +98,7 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department, Lo
     @Override
     public boolean exist(@NonNull @Nonnull Department entity) {
         String jdbcTemplateSelectCount = "select count(dep_code) from carinfo.department where dep_code = :code;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("code", entity.getDepartmentCode()).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(CODE_PARAM, entity.getDepartmentCode()).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
     }
 
@@ -97,7 +106,7 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department, Lo
     @Override
     public Department findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.department where dep_code = :code;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("code", id).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(CODE_PARAM, id).build();
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
@@ -118,6 +127,14 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department, Lo
         return find(jdbcTemplateSelect);
     }
 
+    @Cacheable(cacheNames = "departmentIndex", unless = "#result == false ", key = "#indexField")
+    @Override
+    public boolean existsByIndex(@Nonnull @NonNull Long indexField) {
+        String jdbcTemplateSelectCount = "select count(dep_code) from carinfo.department where dep_code = :code;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(CODE_PARAM, indexField).build();
+        return exist(jdbcTemplateSelectCount, parameterSource);
+    }
+
     @Override
     public Page<Department> find(@NonNull @Nonnull ParamsHolder searchParams) {
         String select = "select * ";
@@ -126,8 +143,8 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department, Lo
         String email = searchParams.getString(Department.DEPARTMENT_EMAIL);
         String address = searchParams.getString(Department.DEPARTMENT_ADDRESS);
         return findPage(searchParams, select, from, buildWhere()
-                .addFieldParam("d.dep_code", "code", code)
-                .addFieldParam("d.dep_email", "addr", address)
-                .addFieldParam("d.dep_addr", "email", email));
+                .addFieldParam("d.dep_code", CODE_PARAM, code)
+                .addFieldParam("d.dep_email", ADDR_PARAM, address)
+                .addFieldParam("d.dep_addr", EMAIL_PARAM, email));
     }
 }

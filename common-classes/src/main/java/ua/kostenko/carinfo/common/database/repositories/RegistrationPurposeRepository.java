@@ -35,19 +35,21 @@ class RegistrationPurposeRepository extends CommonDBRepository<Purpose, String> 
         return ROW_MAPPER;
     }
 
-    @Cacheable(cacheNames = "purposeIndex", unless = "#result == false ", key = "#indexField")
     @Override
-    public boolean existsByIndex(@Nonnull @NonNull String indexField) {
-        String jdbcTemplateSelectCount = "select count(purpose_id) from carinfo.purpose where purpose_name = :name;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", indexField).build();
-        return exist(jdbcTemplateSelectCount, parameterSource);
+    WhereBuilder.BuildResult getWhereFromParams(ParamsHolder params) {
+        return buildWhere().addFieldParam(Constants.RegistrationPurpose.NAME, NAME_PARAM, params.getString(Purpose.PURPOSE_NAME)).build();
+    }
+
+    @Override
+    String getTableName() {
+        return Constants.RegistrationPurpose.TABLE;
     }
 
     @Nullable
     @Override
     public Purpose create(@NonNull @Nonnull Purpose entity) {
         String jdbcTemplateInsert = "insert into carinfo.purpose (purpose_name) values (:name);";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getPurposeName()).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, entity.getPurposeName()).build();
         return create(jdbcTemplateInsert, Constants.RegistrationPurpose.ID, parameterSource);
     }
 
@@ -55,8 +57,8 @@ class RegistrationPurposeRepository extends CommonDBRepository<Purpose, String> 
     @Override
     public Purpose update(@NonNull @Nonnull Purpose entity) {
         String jdbcTemplateUpdate = "update carinfo.purpose set purpose_name = :name where purpose_id = :id;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getPurposeName())
-                                                                 .addParam("id", entity.getPurposeId())
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, entity.getPurposeName())
+                                                                 .addParam(ID_PARAM, entity.getPurposeId())
                                                                  .build();
         jdbcTemplate.update(jdbcTemplateUpdate, parameterSource);
         ParamsHolder searchParams = getParamsHolderBuilder().param(Purpose.PURPOSE_NAME, entity.getPurposeName()).build();
@@ -66,14 +68,14 @@ class RegistrationPurposeRepository extends CommonDBRepository<Purpose, String> 
     @Override
     public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.purpose where purpose_id = :id;";
-        SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
+        SqlParameterSource params = getSqlParamBuilder().addParam(ID_PARAM, id).build();
         return delete(jdbcTemplateDelete, params);
     }
 
     @Override
     public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(purpose_id) from carinfo.purpose where purpose_id = :id;";
-        SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
+        SqlParameterSource params = getSqlParamBuilder().addParam(ID_PARAM, id).build();
         return exist(jdbcTemplateSelectCount, params);
     }
 
@@ -81,7 +83,7 @@ class RegistrationPurposeRepository extends CommonDBRepository<Purpose, String> 
     @Override
     public boolean exist(@NonNull @Nonnull Purpose entity) {
         String jdbcTemplateSelectCount = "select count(purpose_id) from carinfo.purpose where purpose_name = :name;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getPurposeName()).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, entity.getPurposeName()).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
     }
 
@@ -89,7 +91,7 @@ class RegistrationPurposeRepository extends CommonDBRepository<Purpose, String> 
     @Override
     public Purpose findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.purpose where purpose_id = :id;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("id", id).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(ID_PARAM, id).build();
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
@@ -99,7 +101,7 @@ class RegistrationPurposeRepository extends CommonDBRepository<Purpose, String> 
     public Purpose findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String param = searchParams.getString(Purpose.PURPOSE_NAME);
         String jdbcTemplateSelect = "select * from carinfo.purpose where purpose_name = :name;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", param).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, param).build();
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
@@ -109,11 +111,19 @@ class RegistrationPurposeRepository extends CommonDBRepository<Purpose, String> 
         return find(jdbcTemplateSelect);
     }
 
+    @Cacheable(cacheNames = "purposeIndex", unless = "#result == false ", key = "#indexField")
+    @Override
+    public boolean existsByIndex(@Nonnull @NonNull String indexField) {
+        String jdbcTemplateSelectCount = "select count(purpose_id) from carinfo.purpose where purpose_name = :name;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, indexField).build();
+        return exist(jdbcTemplateSelectCount, parameterSource);
+    }
+
     @Override
     public Page<Purpose> find(@NonNull @Nonnull ParamsHolder searchParams) {
         String select = "select * ";
         String from = "from carinfo.purpose p ";
         String name = searchParams.getString(Purpose.PURPOSE_NAME);
-        return findPage(searchParams, select, from, buildWhere().addFieldParam("p.purpose_name", "name", name));
+        return findPage(searchParams, select, from, buildWhere().addFieldParam("p.purpose_name", NAME_PARAM, name));
     }
 }

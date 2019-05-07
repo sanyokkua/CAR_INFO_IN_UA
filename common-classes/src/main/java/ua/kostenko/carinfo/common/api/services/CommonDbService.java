@@ -136,4 +136,20 @@ abstract class CommonDbService<T extends GenericRecord<R>, R> implements DBServi
         log.debug("getAll: found 0 records for {}", paramsHolder);
         return Page.empty();
     }
+
+    @Override
+    public int countAll() {
+        log.debug("countAll: Counting all records");
+        int all = repository.countAll();
+        log.debug("countAll: count = {}", all);
+        return all;
+    }
+
+    @Override
+    public int countAll(@Nonnull @NonNull ParamsHolderBuilder builder) {
+        log.debug("countAll: Counting all records");
+        int all = repository.countAll(builder.build());
+        log.debug("countAll: count = {}", all);
+        return all;
+    }
 }

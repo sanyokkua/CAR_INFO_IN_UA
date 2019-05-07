@@ -35,11 +35,23 @@ class RegistrationFuelTypeRepository extends CommonDBRepository<FuelType, String
         return ROW_MAPPER;
     }
 
+    @Override
+    WhereBuilder.BuildResult getWhereFromParams(ParamsHolder params) {
+        return buildWhere()
+                .addFieldParam(Constants.RegistrationFuelType.NAME, NAME_PARAM, params.getString(FuelType.FUEL_NAME))
+                .build();
+    }
+
+    @Override
+    String getTableName() {
+        return Constants.RegistrationFuelType.TABLE;
+    }
+
     @Nullable
     @Override
     public FuelType create(@NonNull @Nonnull FuelType entity) {
         String jdbcTemplateInsert = "insert into carinfo.fuel_type (fuel_type_name) values (:name);";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getFuelTypeName()).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, entity.getFuelTypeName()).build();
         return create(jdbcTemplateInsert, Constants.RegistrationFuelType.ID, parameterSource);
     }
 
@@ -48,33 +60,25 @@ class RegistrationFuelTypeRepository extends CommonDBRepository<FuelType, String
     public FuelType update(@NonNull @Nonnull FuelType entity) {
         String jdbcTemplateUpdate = "update carinfo.fuel_type set fuel_type_name = :name where fuel_type_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder()
-                .addParam("name", entity.getFuelTypeName())
-                .addParam("id", entity.getId())
+                .addParam(NAME_PARAM, entity.getFuelTypeName())
+                .addParam(ID_PARAM, entity.getId())
                 .build();
         jdbcTemplate.update(jdbcTemplateUpdate, parameterSource);
         ParamsHolder searchParams = getParamsHolderBuilder().param(FuelType.FUEL_NAME, entity.getFuelTypeName()).build();
         return findOne(searchParams);
     }
 
-    @Cacheable(cacheNames = "fuelIndex", unless = "#result == false ", key = "#indexField")
-    @Override
-    public boolean existsByIndex(@Nonnull @NonNull String indexField) {
-        String jdbcTemplateSelectCount = "select count(fuel_type_id) from carinfo.fuel_type where fuel_type_name = :name;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", indexField).build();
-        return exist(jdbcTemplateSelectCount, parameterSource);
-    }
-
     @Override
     public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.fuel_type where fuel_type_id = :id;";
-        SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
+        SqlParameterSource params = getSqlParamBuilder().addParam(ID_PARAM, id).build();
         return delete(jdbcTemplateDelete, params);
     }
 
     @Override
     public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(fuel_type_id) from carinfo.fuel_type where fuel_type_id = :id;";
-        SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
+        SqlParameterSource params = getSqlParamBuilder().addParam(ID_PARAM, id).build();
         return exist(jdbcTemplateSelectCount, params);
     }
 
@@ -82,7 +86,7 @@ class RegistrationFuelTypeRepository extends CommonDBRepository<FuelType, String
     @Override
     public boolean exist(@NonNull @Nonnull FuelType entity) {
         String jdbcTemplateSelectCount = "select count(fuel_type_id) from carinfo.fuel_type where fuel_type_name = :name;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getFuelTypeName()).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, entity.getFuelTypeName()).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
     }
 
@@ -90,7 +94,7 @@ class RegistrationFuelTypeRepository extends CommonDBRepository<FuelType, String
     @Override
     public FuelType findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.fuel_type ft where fuel_type_id = :id;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("id", id).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(ID_PARAM, id).build();
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
@@ -100,7 +104,7 @@ class RegistrationFuelTypeRepository extends CommonDBRepository<FuelType, String
     public FuelType findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String param = searchParams.getString(FuelType.FUEL_NAME);
         String jdbcTemplateSelect = "select * from carinfo.fuel_type where fuel_type_name = :name;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", param).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, param).build();
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
@@ -110,11 +114,19 @@ class RegistrationFuelTypeRepository extends CommonDBRepository<FuelType, String
         return find(jdbcTemplateSelect);
     }
 
+    @Cacheable(cacheNames = "fuelIndex", unless = "#result == false ", key = "#indexField")
+    @Override
+    public boolean existsByIndex(@Nonnull @NonNull String indexField) {
+        String jdbcTemplateSelectCount = "select count(fuel_type_id) from carinfo.fuel_type where fuel_type_name = :name;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, indexField).build();
+        return exist(jdbcTemplateSelectCount, parameterSource);
+    }
+
     @Override
     public Page<FuelType> find(@NonNull @Nonnull ParamsHolder searchParams) {
         String select = "select * ";
         String from = "from carinfo.fuel_type ft ";
         String name = searchParams.getString(FuelType.FUEL_NAME);
-        return findPage(searchParams, select, from, buildWhere().addFieldParam("ft.fuel_type_name", "name", name));
+        return findPage(searchParams, select, from, buildWhere().addFieldParam("ft.fuel_type_name", NAME_PARAM, name));
     }
 }

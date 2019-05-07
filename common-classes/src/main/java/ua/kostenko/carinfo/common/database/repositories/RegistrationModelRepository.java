@@ -35,19 +35,23 @@ class RegistrationModelRepository extends CommonDBRepository<Model, String> {
         return ROW_MAPPER;
     }
 
-    @Cacheable(cacheNames = "modelIndex", unless = "#result == false ", key = "#indexField")
     @Override
-    public boolean existsByIndex(@Nonnull @NonNull String indexField) {
-        String jdbcTemplateSelectCount = "select count(model_id) from carinfo.model where model_name = :name;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", indexField).build();
-        return exist(jdbcTemplateSelectCount, parameterSource);
+    WhereBuilder.BuildResult getWhereFromParams(ParamsHolder params) {
+        return buildWhere()
+                .addFieldParam(Constants.RegistrationModel.NAME, NAME_PARAM, params.getString(Model.MODEL_NAME))
+                .build();
+    }
+
+    @Override
+    String getTableName() {
+        return Constants.RegistrationModel.TABLE;
     }
 
     @Nullable
     @Override
     public Model create(@NonNull @Nonnull Model entity) {
         String jdbcTemplateInsert = "insert into carinfo.model (model_name) values (:name);";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getModelName()).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, entity.getModelName()).build();
         return create(jdbcTemplateInsert, Constants.RegistrationModel.ID, parameterSource);
     }
 
@@ -55,8 +59,8 @@ class RegistrationModelRepository extends CommonDBRepository<Model, String> {
     @Override
     public Model update(@NonNull @Nonnull Model entity) {
         String jdbcTemplateUpdate = "update carinfo.model set model_name = :name where model_id = :id;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getModelName())
-                                                                 .addParam("id", entity.getModelId())
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, entity.getModelName())
+                                                                 .addParam(ID_PARAM, entity.getModelId())
                                                                  .build();
         jdbcTemplate.update(jdbcTemplateUpdate, parameterSource);
         ParamsHolder searchParams = getParamsHolderBuilder().param(Model.MODEL_NAME, entity.getModelName()).build();
@@ -66,14 +70,14 @@ class RegistrationModelRepository extends CommonDBRepository<Model, String> {
     @Override
     public boolean delete(long id) {
         String jdbcTemplateDelete = "delete from carinfo.model where model_id = :id;";
-        SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
+        SqlParameterSource params = getSqlParamBuilder().addParam(ID_PARAM, id).build();
         return delete(jdbcTemplateDelete, params);
     }
 
     @Override
     public boolean existId(long id) {
         String jdbcTemplateSelectCount = "select count(model_id) from carinfo.model where model_id = :id;";
-        SqlParameterSource params = getSqlParamBuilder().addParam("id", id).build();
+        SqlParameterSource params = getSqlParamBuilder().addParam(ID_PARAM, id).build();
         return exist(jdbcTemplateSelectCount, params);
     }
 
@@ -81,7 +85,7 @@ class RegistrationModelRepository extends CommonDBRepository<Model, String> {
     @Override
     public boolean exist(@NonNull @Nonnull Model entity) {
         String jdbcTemplateSelectCount = "select count(model_id) from carinfo.model where model_name = :name;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", entity.getModelName()).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, entity.getModelName()).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
     }
 
@@ -89,7 +93,7 @@ class RegistrationModelRepository extends CommonDBRepository<Model, String> {
     @Override
     public Model findOne(long id) {
         String jdbcTemplateSelect = "select * from carinfo.model where model_id = :id;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("id", id).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(ID_PARAM, id).build();
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
@@ -99,7 +103,7 @@ class RegistrationModelRepository extends CommonDBRepository<Model, String> {
     public Model findOne(@NonNull @Nonnull ParamsHolder searchParams) {
         String param = searchParams.getString(Model.MODEL_NAME);
         String jdbcTemplateSelect = "select * from carinfo.model where model_name = :name;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam("name", param).build();
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, param).build();
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
@@ -109,11 +113,19 @@ class RegistrationModelRepository extends CommonDBRepository<Model, String> {
         return find(jdbcTemplateSelect);
     }
 
+    @Cacheable(cacheNames = "modelIndex", unless = "#result == false ", key = "#indexField")
+    @Override
+    public boolean existsByIndex(@Nonnull @NonNull String indexField) {
+        String jdbcTemplateSelectCount = "select count(model_id) from carinfo.model where model_name = :name;";
+        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, indexField).build();
+        return exist(jdbcTemplateSelectCount, parameterSource);
+    }
+
     @Override
     public Page<Model> find(@NonNull @Nonnull ParamsHolder searchParams) {
         String select = "select * ";
         String from = "from carinfo.model m ";
         String name = searchParams.getString(Model.MODEL_NAME);
-        return findPage(searchParams, select, from, buildWhere().addFieldParam("m.model_name", "name", name));
+        return findPage(searchParams, select, from, buildWhere().addFieldParam("m.model_name", NAME_PARAM, name));
     }
 }

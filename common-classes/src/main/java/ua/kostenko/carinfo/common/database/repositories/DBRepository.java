@@ -24,4 +24,6 @@ public interface DBRepository<T extends GenericRecord<R>, R> extends PageableSea
     T findOne(@Nonnull @NonNull final ParamsHolder searchParams);
     List<T> find();
     boolean existsByIndex(@NonNull @Nonnull final R indexField);
+    int countAll();
+    int countAll(@Nonnull @NonNull final ParamsHolder searchParams);
 }
