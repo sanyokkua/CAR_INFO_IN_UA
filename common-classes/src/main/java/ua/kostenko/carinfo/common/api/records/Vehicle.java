@@ -1,5 +1,6 @@
 package ua.kostenko.carinfo.common.api.records;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.io.Serializable;
@@ -17,11 +18,13 @@ public class Vehicle implements Serializable, GenericRecord<String> {
     @NonNull
     private String modelName;
 
+    @JsonIgnore
     @Override
     public Long getId() {
         return vehicleId;
     }
 
+    @JsonIgnore
     @Override
     public String getIndexField() {
         return getBrandName();

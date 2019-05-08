@@ -1,5 +1,6 @@
 package ua.kostenko.carinfo.common.api.records;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.io.Serializable;
@@ -67,6 +68,7 @@ public class Registration implements Serializable, GenericRecord<String> {
     @NonNull
     private Date registrationDate;//non NULLABLE
 
+    @JsonIgnore
     @Override
     public String getIndexField() {
         return getRegistrationNumber();

@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.rest.services;
+package ua.kostenko.carinfo.rest.services.common;
 
 import lombok.NonNull;
 import org.springframework.data.domain.Page;

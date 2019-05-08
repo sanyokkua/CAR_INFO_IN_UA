@@ -1,5 +1,6 @@
 package ua.kostenko.carinfo.common.api.records;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,11 +17,13 @@ public class Kind implements Serializable, GenericRecord<String> {
     private Long kindId;
     private String kindName;
 
+    @JsonIgnore
     @Override
     public Long getId() {
         return kindId;
     }
 
+    @JsonIgnore
     @Override
     public String getIndexField() {
         return getKindName();

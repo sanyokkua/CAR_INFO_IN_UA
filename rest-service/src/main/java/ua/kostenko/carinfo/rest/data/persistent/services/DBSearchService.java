@@ -9,8 +9,8 @@ import ua.kostenko.carinfo.common.api.records.*;
 import ua.kostenko.carinfo.common.api.services.DBService;
 import ua.kostenko.carinfo.rest.data.presentation.Auto;
 import ua.kostenko.carinfo.rest.data.presentation.CombinedInformation;
-import ua.kostenko.carinfo.rest.data.presentation.VRegistration;
 import ua.kostenko.carinfo.rest.data.presentation.ServiceCenter;
+import ua.kostenko.carinfo.rest.data.presentation.VRegistration;
 
 import javax.transaction.Transactional;
 import java.util.Collections;
@@ -20,18 +20,13 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @Slf4j
+@Deprecated
 public class DBSearchService implements SearchService {
     private final DBService<Registration> registrationDBService;
-    private final DBService<AdministrativeObject> administrativeObjectDBService;
-    private final DBService<BodyType> bodyTypeDBService;
     private final DBService<Brand> brandDBService;
     private final DBService<Color> colorDBService;
-    private final DBService<Department> departmentDBService;
     private final DBService<FuelType> fuelTypeDBService;
     private final DBService<Kind> kindDBService;
-    private final DBService<Model> modelDBService;
-    private final DBService<Operation> operationDBService;
-    private final DBService<Purpose> purposeDBService;
     private final DBService<Vehicle> vehicleDBService;
 
     @Autowired
@@ -48,19 +43,12 @@ public class DBSearchService implements SearchService {
                            DBService<Purpose> purposeDBService,
                            DBService<Vehicle> vehicleDBService) {
         this.registrationDBService = registrationDBService;
-        this.administrativeObjectDBService = administrativeObjectDBService;
-        this.bodyTypeDBService = bodyTypeDBService;
         this.brandDBService = brandDBService;
         this.colorDBService = colorDBService;
-        this.departmentDBService = departmentDBService;
         this.fuelTypeDBService = fuelTypeDBService;
         this.kindDBService = kindDBService;
-        this.modelDBService = modelDBService;
-        this.operationDBService = operationDBService;
-        this.purposeDBService = purposeDBService;
         this.vehicleDBService = vehicleDBService;
     }
-
 
     @Override
     public List<CombinedInformation> searchAllByRegistrationNumber(String number) {
@@ -68,13 +56,12 @@ public class DBSearchService implements SearchService {
         Page<Registration> registration = registrationDBService.getAll(params);
 
         if (registration.getContent().size() > 0) {
-            List<CombinedInformation> collect = registration.getContent().stream().map(record -> {
+            return registration.getContent().stream().map(record -> {
                 Auto auto = Auto.map(record);
                 VRegistration vRegistration = VRegistration.map(record);
                 ServiceCenter serviceCenter = ServiceCenter.map(record);
                 return CombinedInformation.builder().auto(auto).registration(vRegistration).serviceCenter(serviceCenter).build();
             }).collect(Collectors.toList());
-            return collect;
         }
         return Collections.emptyList();
     }
@@ -118,10 +105,6 @@ public class DBSearchService implements SearchService {
         return 0;
     }
 
-    private long countForTableByField(String field, String value) {
-        return 0;
-    }
-
     @Override
     public long countAllByBrand(String brand) {
         return 0;
@@ -154,6 +137,10 @@ public class DBSearchService implements SearchService {
 
     @Override
     public long countAllCarsInRegion(String region) {
+        return 0;
+    }
+
+    private long countForTableByField(String field, String value) {
         return 0;
     }
 

@@ -1,5 +1,6 @@
 package ua.kostenko.carinfo.common.api.records;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,11 +17,13 @@ public class Color implements Serializable, GenericRecord<String> {
     private Long colorId;
     private String colorName;
 
+    @JsonIgnore
     @Override
     public Long getId() {
         return colorId;
     }
 
+    @JsonIgnore
     @Override
     public String getIndexField() {
         return getColorName();

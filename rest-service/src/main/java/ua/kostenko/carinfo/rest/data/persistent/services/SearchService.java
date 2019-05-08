@@ -4,6 +4,7 @@ import ua.kostenko.carinfo.rest.data.presentation.CombinedInformation;
 
 import java.util.List;
 
+@Deprecated
 public interface SearchService {
 
     List<CombinedInformation> searchAllByRegistrationNumber(String number);

@@ -1,5 +1,6 @@
 package ua.kostenko.carinfo.common.api.records;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,11 +18,13 @@ public class Operation implements Serializable, GenericRecord<Long> {
     private Long operationCode;
     private String operationName;
 
+    @JsonIgnore
     @Override
     public Long getId() {
         return operationCode;
     }
 
+    @JsonIgnore
     @Override
     public Long getIndexField() {
         return getOperationCode();

@@ -1,4 +1,4 @@
-package ua.kostenko.carinfo.rest.services;
+package ua.kostenko.carinfo.rest.services.common;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -14,10 +14,10 @@ import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
-abstract class CommonSearchService<T> implements SearchService<T> {
+public abstract class CommonSearchService<T> implements SearchService<T> {
     private final DBService<T> service;
 
-    CommonSearchService(DBService<T> service) {
+    public CommonSearchService(DBService<T> service) {
         this.service = service;
     }
 
@@ -34,7 +34,7 @@ abstract class CommonSearchService<T> implements SearchService<T> {
         return service.getAll(builder);
     }
 
-    abstract String getFindForFieldParam();
+    protected abstract String getFindForFieldParam();
 
     @Override
     public Page<T> findByParams(@Nonnull @NonNull Map<String, Object> params, Pageable pageable) {
@@ -43,7 +43,7 @@ abstract class CommonSearchService<T> implements SearchService<T> {
         return service.getAll(builder);
     }
 
-    void addParamsToBuilder(@NonNull @Nonnull Map<String, Object> params, @NonNull @Nonnull ParamsHolderBuilder builder){
+    private void addParamsToBuilder(@NonNull @Nonnull Map<String, Object> params, @NonNull @Nonnull ParamsHolderBuilder builder) {
         params.forEach((key, value) -> {
             if (value instanceof String) {
                 builder.param(key, (String) value);
@@ -83,7 +83,8 @@ abstract class CommonSearchService<T> implements SearchService<T> {
     private ParamsHolderBuilder getBuilder(@Nullable Pageable pageable) {
         ParamsHolderBuilder builder = new ParamsHolderBuilder();
         if (Objects.nonNull(pageable)) {
-            builder.page(pageable.getPageNumber());
+            int pageNumber = pageable.getPageNumber();
+            builder.page(pageNumber + 1);
         }
         return builder;
     }
