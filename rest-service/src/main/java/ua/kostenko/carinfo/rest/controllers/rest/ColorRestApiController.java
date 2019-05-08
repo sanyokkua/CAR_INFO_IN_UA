@@ -9,7 +9,6 @@ import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.*;
 import ua.kostenko.carinfo.common.api.records.Color;
-import ua.kostenko.carinfo.common.database.Constants;
 import ua.kostenko.carinfo.rest.controllers.rest.common.Param;
 import ua.kostenko.carinfo.rest.controllers.rest.common.RestApi;
 import ua.kostenko.carinfo.rest.controllers.rest.common.RestApiController;
@@ -49,7 +48,7 @@ public class ColorRestApiController extends RestApiController<Color> {
 
     @Override
     protected List<Param> getParams() {
-        return getParams(Constants.RegistrationColor.NAME);
+        return getParams(Color.COLOR_NAME);
     }
 
     @Override

@@ -9,7 +9,6 @@ import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.*;
 import ua.kostenko.carinfo.common.api.records.FuelType;
-import ua.kostenko.carinfo.common.database.Constants;
 import ua.kostenko.carinfo.rest.controllers.rest.common.Param;
 import ua.kostenko.carinfo.rest.controllers.rest.common.RestApi;
 import ua.kostenko.carinfo.rest.controllers.rest.common.RestApiController;
@@ -49,7 +48,7 @@ public class FuelTypeRestApiController extends RestApiController<FuelType> {
 
     @Override
     protected List<Param> getParams() {
-        return getParams(Constants.RegistrationFuelType.NAME);
+        return getParams(FuelType.FUEL_NAME);
     }
 
     @Override

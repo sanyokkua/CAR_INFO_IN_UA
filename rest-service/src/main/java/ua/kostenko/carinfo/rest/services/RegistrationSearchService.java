@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.kostenko.carinfo.common.api.records.Registration;
 import ua.kostenko.carinfo.common.api.services.DBService;
-import ua.kostenko.carinfo.common.database.Constants;
 import ua.kostenko.carinfo.rest.services.common.CommonSearchService;
 
 @Slf4j
@@ -19,6 +18,6 @@ public class RegistrationSearchService extends CommonSearchService<Registration>
 
     @Override
     public String getFindForFieldParam() {
-        return Constants.RegistrationRecord.REGISTRATION_NUMBER;
+        return Registration.REGISTRATION_NUMBER;
     }
 }

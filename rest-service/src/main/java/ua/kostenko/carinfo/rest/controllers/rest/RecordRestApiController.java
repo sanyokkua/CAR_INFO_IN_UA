@@ -9,7 +9,6 @@ import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.*;
 import ua.kostenko.carinfo.common.api.records.Registration;
-import ua.kostenko.carinfo.common.database.Constants;
 import ua.kostenko.carinfo.rest.controllers.rest.common.Param;
 import ua.kostenko.carinfo.rest.controllers.rest.common.RestApi;
 import ua.kostenko.carinfo.rest.controllers.rest.common.RestApiController;
@@ -50,24 +49,27 @@ public class RecordRestApiController extends RestApiController<Registration> {
     @Override
     protected List<Param> getParams() {
         return getParams(
-                Constants.RegistrationRecord.REGISTRATION_NUMBER,
-                Constants.AdminObject.NAME,
-                Constants.RegistrationOperation.CODE,
-                Constants.RegistrationColor.NAME,
-                Constants.RegistrationBodyType.NAME,
-                Constants.RegistrationPurpose.NAME,
-                Constants.RegistrationModel.NAME,
-                Constants.RegistrationBrand.NAME,
-                Constants.RegistrationFuelType.NAME,
-                Constants.RegistrationRecord.DEPARTMENT_CODE,
-                Constants.RegistrationRecord.ENGINE_CAPACITY,
-                Constants.RegistrationRecord.OWN_WEIGHT,
-                Constants.RegistrationRecord.TOTAL_WEIGHT,
-                Constants.RegistrationRecord.REGISTRATION_NUMBER,
-                Constants.RegistrationRecord.REGISTRATION_DATE,
-                Constants.RegistrationRecord.KIND,
-                Constants.RegistrationRecord.MAKE_YEAR,
-                Constants.RegistrationRecord.PERSON_TYPE
+                Registration.REGISTRATION_NUMBER,
+                Registration.ADMIN_OBJ_NAME,
+                Registration.ADMIN_OBJ_TYPE,
+                Registration.OPERATION_CODE,
+                Registration.OPERATION_NAME,
+                Registration.DEPARTMENT_CODE,
+                Registration.DEPARTMENT_ADDRESS,
+                Registration.DEPARTMENT_EMAIL,
+                Registration.KIND,
+                Registration.COLOR,
+                Registration.BODY_TYPE,
+                Registration.PURPOSE,
+                Registration.BRAND,
+                Registration.MODEL,
+                Registration.FUEL_TYPE,
+                Registration.ENGINE_CAPACITY,
+                Registration.MAKE_YEAR,
+                Registration.OWN_WEIGHT,
+                Registration.TOTAL_WEIGHT,
+                Registration.PERSON_TYPE,
+                Registration.REGISTRATION_DATE
         );
     }
 

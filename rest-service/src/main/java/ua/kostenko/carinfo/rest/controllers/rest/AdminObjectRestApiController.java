@@ -10,7 +10,6 @@ import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.*;
 import ua.kostenko.carinfo.common.api.records.AdministrativeObject;
-import ua.kostenko.carinfo.common.database.Constants;
 import ua.kostenko.carinfo.rest.controllers.rest.common.Param;
 import ua.kostenko.carinfo.rest.controllers.rest.common.RestApiController;
 import ua.kostenko.carinfo.rest.services.common.SearchService;
@@ -50,7 +49,7 @@ public class AdminObjectRestApiController extends RestApiController<Administrati
 
     @Override
     protected List<Param> getParams() {
-        return getParams(Constants.AdminObject.ID, Constants.AdminObject.TYPE, Constants.AdminObject.NAME);
+        return getParams(AdministrativeObject.ADMIN_OBJ_NAME, AdministrativeObject.ADMIN_OBJ_TYPE);
     }
 
     @Override

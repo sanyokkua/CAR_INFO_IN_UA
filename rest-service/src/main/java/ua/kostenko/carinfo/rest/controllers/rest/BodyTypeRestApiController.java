@@ -10,7 +10,6 @@ import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.*;
 import ua.kostenko.carinfo.common.api.records.BodyType;
-import ua.kostenko.carinfo.common.database.Constants;
 import ua.kostenko.carinfo.rest.controllers.rest.common.Param;
 import ua.kostenko.carinfo.rest.controllers.rest.common.RestApiController;
 import ua.kostenko.carinfo.rest.services.common.SearchService;
@@ -50,7 +49,7 @@ public class BodyTypeRestApiController extends RestApiController<BodyType> {
 
     @Override
     protected List<Param> getParams() {
-        return getParams(Constants.RegistrationBodyType.ID, Constants.RegistrationBodyType.NAME);
+        return getParams(BodyType.BODY_TYPE_NAME);
     }
 
     @Override

@@ -9,7 +9,6 @@ import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.*;
 import ua.kostenko.carinfo.common.api.records.Department;
-import ua.kostenko.carinfo.common.database.Constants;
 import ua.kostenko.carinfo.rest.controllers.rest.common.Param;
 import ua.kostenko.carinfo.rest.controllers.rest.common.RestApi;
 import ua.kostenko.carinfo.rest.controllers.rest.common.RestApiController;
@@ -49,7 +48,7 @@ public class DepartmentRestApiController extends RestApiController<Department> {
 
     @Override
     protected List<Param> getParams() {
-        return getParams(Constants.RegistrationDepartment.CODE, Constants.RegistrationDepartment.EMAIL, Constants.RegistrationDepartment.ADDRESS);
+        return getParams(Department.DEPARTMENT_CODE, Department.DEPARTMENT_ADDRESS, Department.DEPARTMENT_EMAIL);
     }
 
     @Override
