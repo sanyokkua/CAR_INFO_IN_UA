@@ -11,27 +11,27 @@ import java.sql.Date;
 @AllArgsConstructor
 @Builder
 public class Registration implements Serializable, GenericRecord<String> {
-    public static final String ADMIN_OBJ_NAME = "adminobjname";
-    public static final String ADMIN_OBJ_TYPE = "adminobjtype";
-    public static final String OPERATION_CODE = "operationcode";
-    public static final String OPERATION_NAME = "operationname";
-    public static final String DEPARTMENT_CODE = "departmentcode";
-    public static final String DEPARTMENT_ADDRESS = "departmentaddress";
-    public static final String DEPARTMENT_EMAIL = "departmentemail";
-    public static final String KIND = "kind";
-    public static final String COLOR = "color";
-    public static final String BODY_TYPE = "bodytype";
-    public static final String PURPOSE = "purpose";
-    public static final String BRAND = "brand";
-    public static final String MODEL = "model";
-    public static final String FUEL_TYPE = "fueltype";
-    public static final String ENGINE_CAPACITY = "enginecapacity";
-    public static final String MAKE_YEAR = "makeyear";
-    public static final String OWN_WEIGHT = "ownweight";
-    public static final String TOTAL_WEIGHT = "totalweight";
-    public static final String PERSON_TYPE = "persontype";
-    public static final String REGISTRATION_NUMBER = "registrationnumber";
-    public static final String REGISTRATION_DATE = "registrationdate";
+    public static final String ADMIN_OBJ_NAME = "adminObjName";
+    public static final String ADMIN_OBJ_TYPE = "adminObjType";
+    public static final String OPERATION_CODE = "operationCode";
+    public static final String OPERATION_NAME = "operationName";
+    public static final String DEPARTMENT_CODE = "departmentCode";
+    public static final String DEPARTMENT_ADDRESS = "departmentAddress";
+    public static final String DEPARTMENT_EMAIL = "departmentEmail";
+    public static final String KIND = "kindName";
+    public static final String COLOR = "colorName";
+    public static final String BODY_TYPE = "bodyTypeName";
+    public static final String PURPOSE = "purposeName";
+    public static final String BRAND = "brandName";
+    public static final String MODEL = "modelName";
+    public static final String FUEL_TYPE = "fuelName";
+    public static final String ENGINE_CAPACITY = "engineCapacity";
+    public static final String MAKE_YEAR = "makeYear";
+    public static final String OWN_WEIGHT = "ownWeight";
+    public static final String TOTAL_WEIGHT = "totalWeight";
+    public static final String PERSON_TYPE = "personType";
+    public static final String REGISTRATION_NUMBER = "registrationNumber";
+    public static final String REGISTRATION_DATE = "registrationDate";
 
     private Long id;
 

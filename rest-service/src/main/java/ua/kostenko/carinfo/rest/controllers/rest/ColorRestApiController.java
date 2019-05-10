@@ -42,7 +42,7 @@ public class ColorRestApiController extends RestApiController<Color> {
 
     @GetMapping("findByParams")
     @Override
-    public PagedResources<Resource<Color>> findByParams(@RequestParam Map<String, Object> params, PagedResourcesAssembler<Color> assembler, Pageable pageable) {
+    public PagedResources<Resource<Color>> findByParams(PagedResourcesAssembler<Color> assembler, Pageable pageable, @RequestParam Map<String, Object> params) {
         return findByParamsPages(params, assembler, pageable);
     }
 

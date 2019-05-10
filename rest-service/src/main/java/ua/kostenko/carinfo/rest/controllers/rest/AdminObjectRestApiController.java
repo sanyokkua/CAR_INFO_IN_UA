@@ -43,7 +43,7 @@ public class AdminObjectRestApiController extends RestApiController<Administrati
 
     @GetMapping("findByParams")
     @Override
-    public PagedResources<Resource<AdministrativeObject>> findByParams(@RequestParam Map<String, Object> params, PagedResourcesAssembler<AdministrativeObject> assembler, Pageable pageable) {
+    public PagedResources<Resource<AdministrativeObject>> findByParams(PagedResourcesAssembler<AdministrativeObject> assembler, Pageable pageable, @RequestParam Map<String, Object> params) {
         return findByParamsPages(params, assembler, pageable);
     }
 

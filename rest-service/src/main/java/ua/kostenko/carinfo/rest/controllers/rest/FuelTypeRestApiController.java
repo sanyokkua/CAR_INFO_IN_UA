@@ -42,7 +42,7 @@ public class FuelTypeRestApiController extends RestApiController<FuelType> {
 
     @GetMapping("findByParams")
     @Override
-    public PagedResources<Resource<FuelType>> findByParams(@RequestParam Map<String, Object> params, PagedResourcesAssembler<FuelType> assembler, Pageable pageable) {
+    public PagedResources<Resource<FuelType>> findByParams(PagedResourcesAssembler<FuelType> assembler, Pageable pageable, @RequestParam Map<String, Object> params) {
         return findByParamsPages(params, assembler, pageable);
     }
 

@@ -42,7 +42,7 @@ public class RecordRestApiController extends RestApiController<Registration> {
 
     @GetMapping("findByParams")
     @Override
-    public PagedResources<Resource<Registration>> findByParams(@RequestParam Map<String, Object> params, PagedResourcesAssembler<Registration> assembler, Pageable pageable) {
+    public PagedResources<Resource<Registration>> findByParams(PagedResourcesAssembler<Registration> assembler, Pageable pageable, @RequestParam Map<String, Object> params) {
         return findByParamsPages(params, assembler, pageable);
     }
 

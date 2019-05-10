@@ -15,7 +15,7 @@ public interface RestApi<T> {
     Resources<Param> getAllParams();
     PagedResources<Resource<T>> getAll(PagedResourcesAssembler<T> assembler, Pageable pageable);
     PagedResources<Resource<T>> findForField(@PathVariable String field, PagedResourcesAssembler<T> assembler, Pageable pageable);
-    PagedResources<Resource<T>> findByParams(@RequestParam Map<String, Object> params, PagedResourcesAssembler<T> assembler, Pageable pageable);
+    PagedResources<Resource<T>> findByParams(PagedResourcesAssembler<T> assembler, Pageable pageable, @RequestParam Map<String, Object> params);
 
     Resource<Integer> countAll();
     Resource<Integer> countForField(String field);

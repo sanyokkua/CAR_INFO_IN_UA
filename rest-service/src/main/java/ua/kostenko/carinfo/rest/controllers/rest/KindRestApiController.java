@@ -42,7 +42,7 @@ public class KindRestApiController extends RestApiController<Kind> {
 
     @GetMapping("findByParams")
     @Override
-    public PagedResources<Resource<Kind>> findByParams(@RequestParam Map<String, Object> params, PagedResourcesAssembler<Kind> assembler, Pageable pageable) {
+    public PagedResources<Resource<Kind>> findByParams(PagedResourcesAssembler<Kind> assembler, Pageable pageable, @RequestParam Map<String, Object> params) {
         return findByParamsPages(params, assembler, pageable);
     }
 

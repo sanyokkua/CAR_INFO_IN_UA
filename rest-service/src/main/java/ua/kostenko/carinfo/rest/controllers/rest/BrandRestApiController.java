@@ -42,7 +42,7 @@ public class BrandRestApiController extends RestApiController<Brand> {
 
     @GetMapping("findByParams")
     @Override
-    public PagedResources<Resource<Brand>> findByParams(@RequestParam Map<String, Object> params, PagedResourcesAssembler<Brand> assembler, Pageable pageable) {
+    public PagedResources<Resource<Brand>> findByParams(PagedResourcesAssembler<Brand> assembler, Pageable pageable, @RequestParam Map<String, Object> params) {
         return findByParamsPages(params, assembler, pageable);
     }
 

@@ -42,7 +42,7 @@ public class ModelRestApiController extends RestApiController<Model> {
 
     @GetMapping("findByParams")
     @Override
-    public PagedResources<Resource<Model>> findByParams(@RequestParam Map<String, Object> params, PagedResourcesAssembler<Model> assembler, Pageable pageable) {
+    public PagedResources<Resource<Model>> findByParams(PagedResourcesAssembler<Model> assembler, Pageable pageable, @RequestParam Map<String, Object> params) {
         return findByParamsPages(params, assembler, pageable);
     }
 
