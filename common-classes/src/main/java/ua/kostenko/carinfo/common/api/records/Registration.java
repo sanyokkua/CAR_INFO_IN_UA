@@ -24,7 +24,7 @@ public class Registration implements Serializable, GenericRecord<String> {
     public static final String PURPOSE = "purposeName";
     public static final String BRAND = "brandName";
     public static final String MODEL = "modelName";
-    public static final String FUEL_TYPE = "fuelName";
+    public static final String FUEL_TYPE = "fuelTypeName";
     public static final String ENGINE_CAPACITY = "engineCapacity";
     public static final String MAKE_YEAR = "makeYear";
     public static final String OWN_WEIGHT = "ownWeight";
@@ -46,17 +46,17 @@ public class Registration implements Serializable, GenericRecord<String> {
     private String departmentAddress;//non NULLABLE
     private String departmentEmail;//non NULLABLE
     @NonNull
-    private String kind;//non NULLABLE
+    private String kindName;//non NULLABLE
     @NonNull
-    private String color;//non NULLABLE
-    private String bodyType;//NULLABLE
+    private String colorName;//non NULLABLE
+    private String bodyTypeName;//NULLABLE
     @NonNull
-    private String purpose;//non NULLABLE
+    private String purposeName;//non NULLABLE
     @NonNull
-    private String brand;//non NULLABLE
+    private String brandName;//non NULLABLE
     @NonNull
-    private String model;//non NULLABLE
-    private String fuelType;//NULLABLE
+    private String modelName;//non NULLABLE
+    private String fuelTypeName;//NULLABLE
     private Long engineCapacity;//NULLABLE
     @NonNull
     private Long makeYear;//non NULLABLE

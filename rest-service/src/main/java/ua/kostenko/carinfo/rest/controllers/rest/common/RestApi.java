@@ -7,18 +7,14 @@ import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Resources;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import ua.kostenko.carinfo.common.api.records.GenericRecord;
 
-import java.util.Map;
-
-public interface RestApi<T> {
-    Resources<Param> getAllParams();
-    PagedResources<Resource<T>> getAll(PagedResourcesAssembler<T> assembler, Pageable pageable);
-    PagedResources<Resource<T>> findForField(@PathVariable String field, PagedResourcesAssembler<T> assembler, Pageable pageable);
-    PagedResources<Resource<T>> findByParams(PagedResourcesAssembler<T> assembler, Pageable pageable, @RequestParam Map<String, Object> params);
-
-    Resource<Integer> countAll();
-    Resource<Integer> countForField(String field);
-    Resource<Integer> countByParams(Map<String, Object> params);
+public interface RestApi<T extends GenericRecord<I>, I, D extends ResourceSupport> {
     ResourceSupport index();
+    D getById(@PathVariable(required = false) Long id);
+    Resources<Param> params();
+    PagedResources<D> find(PagedResourcesAssembler<T> assembler, Pageable pageable, @PathVariable(required = false) String indexField);
+    Resource<Integer> count(@PathVariable(required = false) String indexField);
+    PagedResources<D> findByParams(PagedResourcesAssembler<T> assembler, Pageable pageable, T params);
+    Resource<Integer> countByParams(T params);
 }

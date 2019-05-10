@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
+import ua.kostenko.carinfo.common.api.records.GenericRecord;
 import ua.kostenko.carinfo.common.api.services.DBService;
 
 import javax.annotation.Nonnull;
@@ -14,11 +15,16 @@ import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
-public abstract class CommonSearchService<T> implements SearchService<T> {
+public abstract class CommonSearchService<T extends GenericRecord<I>, I> implements SearchService<T, I> {
     private final DBService<T> service;
 
     public CommonSearchService(DBService<T> service) {
         this.service = service;
+    }
+
+    @Override
+    public T getById(@NonNull @Nonnull Long id) {
+        return service.get(id).orElseGet(null);
     }
 
     @Override

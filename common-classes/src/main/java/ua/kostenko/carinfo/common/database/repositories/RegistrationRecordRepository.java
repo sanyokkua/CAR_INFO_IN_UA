@@ -53,13 +53,13 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration, Stri
                                                                                             .departmentCode(resultSet.getLong(Constants.RegistrationDepartment.CODE))
                                                                                             .departmentAddress(resultSet.getString(Constants.RegistrationDepartment.ADDRESS))
                                                                                             .departmentEmail(resultSet.getString(Constants.RegistrationDepartment.EMAIL))
-                                                                                            .kind(resultSet.getString(Constants.RegistrationKind.NAME))
-                                                                                            .color(resultSet.getString(Constants.RegistrationColor.NAME))
-                                                                                            .bodyType(resultSet.getString(Constants.RegistrationBodyType.NAME))
-                                                                                            .purpose(resultSet.getString(Constants.RegistrationPurpose.NAME))
-                                                                                            .brand(resultSet.getString(Constants.RegistrationBrand.NAME))
-                                                                                            .model(resultSet.getString(Constants.RegistrationModel.NAME))
-                                                                                            .fuelType(resultSet.getString(Constants.RegistrationFuelType.NAME))
+                                                                                            .kindName(resultSet.getString(Constants.RegistrationKind.NAME))
+                                                                                            .colorName(resultSet.getString(Constants.RegistrationColor.NAME))
+                                                                                            .bodyTypeName(resultSet.getString(Constants.RegistrationBodyType.NAME))
+                                                                                            .purposeName(resultSet.getString(Constants.RegistrationPurpose.NAME))
+                                                                                            .brandName(resultSet.getString(Constants.RegistrationBrand.NAME))
+                                                                                            .modelName(resultSet.getString(Constants.RegistrationModel.NAME))
+                                                                                            .fuelTypeName(resultSet.getString(Constants.RegistrationFuelType.NAME))
                                                                                             .engineCapacity(resultSet.getLong(Constants.RegistrationRecord.ENGINE_CAPACITY))
                                                                                             .makeYear(resultSet.getLong(Constants.RegistrationRecord.MAKE_YEAR))
                                                                                             .ownWeight(resultSet.getLong(Constants.RegistrationRecord.OWN_WEIGHT))
@@ -135,14 +135,14 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration, Stri
 
     private void setParamsToBuilder(@Nonnull @NonNull Registration entity, @NonNull @Nonnull SqlParameterMap builder) {
         AdministrativeObject administrativeObject = administrativeObjectDBRepository.findOne(getParamsHolderBuilder().param(AdministrativeObject.ADMIN_OBJ_NAME, entity.getAdminObjName()).build());
-        BodyType bodyType = bodyTypeDBRepository.findOne(getParamsHolderBuilder().param(BodyType.BODY_TYPE_NAME, entity.getBodyType()).build());
-        Color color = colorDBRepository.findOne(getParamsHolderBuilder().param(Color.COLOR_NAME, entity.getColor()).build());
+        BodyType bodyType = bodyTypeDBRepository.findOne(getParamsHolderBuilder().param(BodyType.BODY_TYPE_NAME, entity.getBodyTypeName()).build());
+        Color color = colorDBRepository.findOne(getParamsHolderBuilder().param(Color.COLOR_NAME, entity.getColorName()).build());
         Department department = departmentDBRepository.findOne(getParamsHolderBuilder().param(Department.DEPARTMENT_CODE, entity.getDepartmentCode()).build());
-        FuelType fuelType = fuelTypeDBRepository.findOne(getParamsHolderBuilder().param(FuelType.FUEL_NAME, entity.getFuelType()).build());
-        Kind kind = kindDBRepository.findOne(getParamsHolderBuilder().param(Kind.KIND_NAME, entity.getKind()).build());
+        FuelType fuelType = fuelTypeDBRepository.findOne(getParamsHolderBuilder().param(FuelType.FUEL_NAME, entity.getFuelTypeName()).build());
+        Kind kind = kindDBRepository.findOne(getParamsHolderBuilder().param(Kind.KIND_NAME, entity.getKindName()).build());
         Operation operation = operationDBRepository.findOne(getParamsHolderBuilder().param(Operation.OPERATION_CODE, entity.getOperationCode()).build());
-        Purpose purpose = purposeDBRepository.findOne(getParamsHolderBuilder().param(Purpose.PURPOSE_NAME, entity.getPurpose()).build());
-        Vehicle vehicle = vehicleDBRepository.findOne(getParamsHolderBuilder().param(Vehicle.BRAND_NAME, entity.getBrand()).param(Vehicle.MODEL_NAME, entity.getModel()).build());
+        Purpose purpose = purposeDBRepository.findOne(getParamsHolderBuilder().param(Purpose.PURPOSE_NAME, entity.getPurposeName()).build());
+        Vehicle vehicle = vehicleDBRepository.findOne(getParamsHolderBuilder().param(Vehicle.BRAND_NAME, entity.getBrandName()).param(Vehicle.MODEL_NAME, entity.getModelName()).build());
         Long adminObjId = Objects.nonNull(administrativeObject) ? administrativeObject.getAdminObjId() : null;
         Long operationCode = Objects.nonNull(operation) ? operation.getOperationCode() : null;
         Long departmentCode = Objects.nonNull(department) ? department.getDepartmentCode() : null;
@@ -214,13 +214,13 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration, Stri
                 .addFieldParam(DEP_CODE_PARAM, DEPARTMENT_CODE, entity.getDepartmentCode())
                 .addFieldParam(DEP_ADDR_PARAM, DEPARTMENT_ADDRESS, entity.getDepartmentAddress())
                 .addFieldParam(DEP_EMAIL_PARAM, DEPARTMENT_EMAIL, entity.getDepartmentEmail())
-                .addFieldParam(KIND_NAME_PARAM, KIND, entity.getKind())
-                .addFieldParam(COLOR_NAME_PARAM, COLOR, entity.getColor())
-                .addFieldParam(BODY_TYPE_NAME_PARAM, BODY_TYPE, entity.getBodyType())
-                .addFieldParam(PURPOSE_NAME_PARAM, PURPOSE, entity.getPurpose())
-                .addFieldParam(BRAND_NAME_PARAM, BRAND, entity.getBrand())
-                .addFieldParam(MODEL_NAME_PARAM, MODEL, entity.getModel())
-                .addFieldParam(FUEL_TYPE_NAME_PARAM, FUEL_TYPE, entity.getFuelType())
+                .addFieldParam(KIND_NAME_PARAM, KIND, entity.getKindName())
+                .addFieldParam(COLOR_NAME_PARAM, COLOR, entity.getColorName())
+                .addFieldParam(BODY_TYPE_NAME_PARAM, BODY_TYPE, entity.getBodyTypeName())
+                .addFieldParam(PURPOSE_NAME_PARAM, PURPOSE, entity.getPurposeName())
+                .addFieldParam(BRAND_NAME_PARAM, BRAND, entity.getBrandName())
+                .addFieldParam(MODEL_NAME_PARAM, MODEL, entity.getModelName())
+                .addFieldParam(FUEL_TYPE_NAME_PARAM, FUEL_TYPE, entity.getFuelTypeName())
                 .addFieldParam(ENGINE_CAPACITY_PARAM, ENGINE_CAPACITY, entity.getEngineCapacity())
                 .addFieldParam(MAKE_YEAR_PARAM, MAKE_YEAR, entity.getMakeYear())
                 .addFieldParam(OWN_WEIGHT_PARAM, OWN_WEIGHT, entity.getOwnWeight())

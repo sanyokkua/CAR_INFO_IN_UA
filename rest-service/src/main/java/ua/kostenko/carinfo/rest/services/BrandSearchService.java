@@ -9,7 +9,7 @@ import ua.kostenko.carinfo.rest.services.common.CommonSearchService;
 
 @Slf4j
 @Service
-public class BrandSearchService extends CommonSearchService<Brand> {
+public class BrandSearchService extends CommonSearchService<Brand, String> {
 
     @Autowired
     public BrandSearchService(DBService<Brand> service) {

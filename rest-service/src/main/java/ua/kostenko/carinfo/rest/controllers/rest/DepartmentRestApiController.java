@@ -2,16 +2,21 @@ package ua.kostenko.carinfo.rest.controllers.rest;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedResources;
-import org.springframework.hateoas.Resource;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.hateoas.ResourceAssembler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ua.kostenko.carinfo.common.api.records.Department;
+import ua.kostenko.carinfo.rest.controllers.rest.common.DefaultApiController;
 import ua.kostenko.carinfo.rest.controllers.rest.common.Param;
-import ua.kostenko.carinfo.rest.controllers.rest.common.RestApi;
-import ua.kostenko.carinfo.rest.controllers.rest.common.RestApiController;
+import ua.kostenko.carinfo.rest.resources.assemblers.DepartmentAssembler;
+import ua.kostenko.carinfo.rest.resources.resources.DepartmentResource;
 import ua.kostenko.carinfo.rest.services.common.SearchService;
 import ua.kostenko.carinfo.rest.utils.Translation;
 
@@ -22,37 +27,46 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping(value = "/api/departments", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
-public class DepartmentRestApiController extends RestApiController<Department> {
+public class DepartmentRestApiController extends DefaultApiController<Department, Long, DepartmentResource> {
 
-    protected DepartmentRestApiController(@Nonnull @NonNull SearchService<Department> searchService, @Nonnull @NonNull Translation translation) {
+    @Autowired
+    protected DepartmentRestApiController(@Nonnull @NonNull SearchService<Department, Long> searchService, @Nonnull @NonNull Translation translation) {
         super(searchService, translation);
     }
 
-    @GetMapping("getAll")
     @Override
-    public PagedResources<Resource<Department>> getAll(PagedResourcesAssembler<Department> assembler, Pageable pageable) {
-        return getAllPages(assembler, pageable);
-    }
-
-    @GetMapping("findForField/{field}")
-    @Override
-    public PagedResources<Resource<Department>> findForField(@PathVariable String field, PagedResourcesAssembler<Department> assembler, Pageable pageable) {
-        return findForFieldPages(field, assembler, pageable);
-    }
-
-    @GetMapping("findByParams")
-    @Override
-    public PagedResources<Resource<Department>> findByParams(PagedResourcesAssembler<Department> assembler, Pageable pageable, @RequestParam Map<String, Object> params) {
-        return findByParamsPages(params, assembler, pageable);
+    protected Map<String, Object> convertParamToMap(Department params) {
+        return mapBuilder()
+                .put(Department.DEPARTMENT_CODE, params.getDepartmentCode())
+                .put(Department.DEPARTMENT_ADDRESS, params.getDepartmentAddress())
+                .put(Department.DEPARTMENT_EMAIL, params.getDepartmentEmail())
+                .build();
     }
 
     @Override
     protected List<Param> getParams() {
-        return getParams(Department.DEPARTMENT_CODE, Department.DEPARTMENT_ADDRESS, Department.DEPARTMENT_EMAIL);
+        return buildParamsList(Department.DEPARTMENT_CODE, Department.DEPARTMENT_ADDRESS, Department.DEPARTMENT_EMAIL);
     }
 
     @Override
-    protected Class<? extends RestApi<Department>> getControllerClass() {
+    protected Class<DepartmentRestApiController> getClassInstance() {
         return DepartmentRestApiController.class;
+    }
+
+    @Override
+    protected ResourceAssembler<Department, DepartmentResource> getResourceAssembler() {
+        return new DepartmentAssembler();
+    }
+
+    @GetMapping(path = {"find", "find/{indexField}"})
+    @Override
+    public PagedResources<DepartmentResource> find(PagedResourcesAssembler<Department> assembler, Pageable pageable, @PathVariable(required = false) String indexField) {
+        return getFindResult(assembler, pageable, indexField);
+    }
+
+    @GetMapping("findByParams")
+    @Override
+    public PagedResources<DepartmentResource> findByParams(PagedResourcesAssembler<Department> assembler, Pageable pageable, Department params) {
+        return getFindByParamsResult(assembler, pageable, params);
     }
 }

@@ -128,8 +128,7 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
             final Optional<Purpose> purpose = getPurpose(record);
             final Optional<FuelType> fuelType = getFuelType(record);
             final Optional<Department> department = getDepartment(record);
-            @SuppressWarnings("ConstantConditions")
-            final Optional<Vehicle> createdVehicle = getVehicle(model.orElseGet(null), brand.orElseGet(null));
+            @SuppressWarnings("ConstantConditions") final Optional<Vehicle> createdVehicle = getVehicle(model.orElseGet(null), brand.orElseGet(null));
 
             final Date registrationDate = record.getDate();
 
@@ -155,13 +154,13 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
                                                         .departmentCode(department.get().getDepartmentCode())//non NULLABLE
                                                         .departmentAddress(department.get().getDepartmentAddress())//non NULLABLE
                                                         .departmentEmail(department.get().getDepartmentEmail())//non NULLABLE
-                                                        .kind(kind.get().getKindName())//non NULLABLE
-                                                        .color(color.get().getColorName())//non NULLABLE
-                                                        .bodyType(bodyType.map(BodyType::getBodyTypeName).orElse(null))//NULLABLE
-                                                        .purpose(purpose.get().getPurposeName())//non NULLABLE
-                                                        .brand(brand.get().getBrandName())//non NULLABLE
-                                                        .model(model.get().getModelName())//non NULLABLE
-                                                        .fuelType(fuelType.map(FuelType::getFuelTypeName).orElse(null))//NULLABLE
+                                                        .kindName(kind.get().getKindName())//non NULLABLE
+                                                        .colorName(color.get().getColorName())//non NULLABLE
+                                                        .bodyTypeName(bodyType.map(BodyType::getBodyTypeName).orElse(null))//NULLABLE
+                                                        .purposeName(purpose.get().getPurposeName())//non NULLABLE
+                                                        .brandName(brand.get().getBrandName())//non NULLABLE
+                                                        .modelName(model.get().getModelName())//non NULLABLE
+                                                        .fuelTypeName(fuelType.map(FuelType::getFuelTypeName).orElse(null))//NULLABLE
                                                         .engineCapacity(vehicleEngineCapacity)//NULLABLE
                                                         .makeYear(vehicleMakeYear)//non NULLABLE
                                                         .ownWeight(vehicleOwnWeight)//NULLABLE

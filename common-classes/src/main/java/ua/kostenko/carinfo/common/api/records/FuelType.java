@@ -14,14 +14,10 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Builder
 public class FuelType implements Serializable, GenericRecord<String> {
-    public static final String FUEL_NAME = "fuelName";
+    public static final String FUEL_NAME = "fuelTypeName";
     private Long fuelTypeId;
     @Builder.Default
     private String fuelTypeName = "—";
-
-    public String getFuelTypeName() {
-        return StringUtils.isBlank(fuelTypeName) ? "—" : fuelTypeName;
-    }
 
     @JsonIgnore
     @Override
@@ -33,5 +29,9 @@ public class FuelType implements Serializable, GenericRecord<String> {
     @Override
     public String getIndexField() {
         return getFuelTypeName();
+    }
+
+    public String getFuelTypeName() {
+        return StringUtils.isBlank(fuelTypeName) ? "—" : fuelTypeName;
     }
 }
