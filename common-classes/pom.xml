@@ -15,7 +15,6 @@
         <groupId>ua.kostenko.carinfo</groupId>
         <artifactId>car-info</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath/>
     </parent>
 
 </project>

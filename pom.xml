@@ -25,8 +25,6 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <carinfo-common-classes.version>0.0.1-SNAPSHOT</carinfo-common-classes.version>
-
         <commons-codec.version>1.12</commons-codec.version>
         <commons-csv.version>1.6</commons-csv.version>
         <commons-io.version>2.6</commons-io.version>
