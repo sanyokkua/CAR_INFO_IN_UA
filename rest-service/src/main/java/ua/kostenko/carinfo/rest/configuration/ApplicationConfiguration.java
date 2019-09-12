@@ -2,6 +2,7 @@ package ua.kostenko.carinfo.rest.configuration;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.io.FileUtils;
@@ -24,7 +25,7 @@ public class ApplicationConfiguration {
             log.info("Loading translations");
             File file = new ClassPathResource("eng.json").getFile();
             log.info("File with translations: {}", file.getAbsolutePath());
-            String json = FileUtils.readFileToString(file, "UTF-8");
+            String json = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
             log.info("Content of translations json file: {}", json);
             loadedTranslation = (Map<String, String>) new ObjectMapper().readValue(json, HashMap.class);
         } catch (IOException e) {

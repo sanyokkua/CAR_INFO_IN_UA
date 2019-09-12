@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.time.Duration;
 import java.time.LocalTime;
-import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -25,7 +24,7 @@ public class CsvReader<T> {
             @NonNull @Nonnull Persist<T> persist) {
         log.info("readCsvFile: Going to parse csv file with options: {}", options.toString());
         File csvFile = options.getFile();
-        if (Objects.nonNull(csvFile) && csvFile.exists()) {
+        if (csvFile.exists()) {
             LocalTime before = LocalTime.now();
             log.info("readCsvFile: Starting mapping of csv records to objects, time: {}", before.toString());
             log.info("readCsvFile: Csv file path: {}", csvFile.getAbsolutePath());

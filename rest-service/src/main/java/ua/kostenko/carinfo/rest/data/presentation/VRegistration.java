@@ -37,12 +37,7 @@ public class VRegistration {
         PERSON, JURIDICAL;
 
         static PersonKind getPersonKind(String person) {
-            switch (person) {
-                case "J" :
-                    return JURIDICAL;
-                default:
-                    return PERSON;
-            }
+            return "J".equals(person) ? JURIDICAL : PERSON;
         }
     }
 }

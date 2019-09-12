@@ -9,19 +9,19 @@ import org.springframework.stereotype.Component;
 public class ApplicationProperties {
 
     @Value("${app.data.set.json.url}")
-    public String APP_STRUCTURE_DATA_PACKAGE_JSON_URL;
+    public String appStructureDataPackageJsonUrl;
     @Value("${app.archive.name}")
-    public String APP_ARCHIVE_NAME;
+    public String appArchiveName;
     @Value("${app.archive.dir}")
-    public String APP_ARCHIVE_DIR;
+    public String appArchiveDirectory;
     @Value("${app.administrative.objects.file.path}")
-    public String APP_ADMINISTRATIVE_OBJECTS_FILE_PATH;
+    public String appAdministrativeObjectsFilePath;
     @Value("${app.data.service.center.url}")
-    public String APP_DATA_SERVICE_CENTER_URL;
+    public String appDataServiceCenterUrl;
     @Value("${app.data.service.center.css.selector}")
-    public String APP_DATA_SERVICE_CENTER_CSS_SELECTOR;
+    public String appDataServiceCenterCssSelector;
     @Value("${app.region.codes.file.path}")
-    public String APP_REGION_CODES_FILE_PATH;
+    public String appRegionCodesFilePath;
     @Value("${app.region.codes.absent}")
-    public String APP_REGION_CODES_ABSENT;
+    public String appRegionCodesAbsent;
 }

@@ -19,6 +19,7 @@ import ua.kostenko.carinfo.common.database.Constants;
 @Repository
 class RegistrationDepartmentRepository extends CommonDBRepository<Department, Long> {
 
+    private static final String SELECT_COUNT_DEP_CODE_FROM_CARINFO_DEPARTMENT_WHERE_DEP_CODE_CODE = "select count(dep_code) from carinfo.department where dep_code = :code;";
     protected static final String CODE_PARAM = "code";
     protected static final String ADDR_PARAM = "addr";
     protected static final String EMAIL_PARAM = "email";
@@ -93,7 +94,7 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department, Lo
 
     @Override
     public boolean existId(long id) {
-        String jdbcTemplateSelectCount = "select count(dep_code) from carinfo.department where dep_code = :code;";
+        String jdbcTemplateSelectCount = SELECT_COUNT_DEP_CODE_FROM_CARINFO_DEPARTMENT_WHERE_DEP_CODE_CODE;
         SqlParameterSource params = getSqlParamBuilder().addParam(CODE_PARAM, id).build();
         return exist(jdbcTemplateSelectCount, params);
     }
@@ -101,7 +102,7 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department, Lo
     @Cacheable(cacheNames = "departmentCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
     public boolean exist(@NonNull @Nonnull Department entity) {
-        String jdbcTemplateSelectCount = "select count(dep_code) from carinfo.department where dep_code = :code;";
+        String jdbcTemplateSelectCount = SELECT_COUNT_DEP_CODE_FROM_CARINFO_DEPARTMENT_WHERE_DEP_CODE_CODE;
         SqlParameterSource parameterSource =
                 getSqlParamBuilder().addParam(CODE_PARAM, entity.getDepartmentCode()).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
@@ -135,7 +136,7 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department, Lo
     @Cacheable(cacheNames = "departmentIndex", unless = "#result == false ", key = "#indexField")
     @Override
     public boolean existsByIndex(@Nonnull @NonNull Long indexField) {
-        String jdbcTemplateSelectCount = "select count(dep_code) from carinfo.department where dep_code = :code;";
+        String jdbcTemplateSelectCount = SELECT_COUNT_DEP_CODE_FROM_CARINFO_DEPARTMENT_WHERE_DEP_CODE_CODE;
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam(CODE_PARAM, indexField).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
     }

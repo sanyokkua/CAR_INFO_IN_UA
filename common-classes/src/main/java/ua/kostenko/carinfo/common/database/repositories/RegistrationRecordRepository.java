@@ -50,6 +50,7 @@ import ua.kostenko.carinfo.common.database.Constants;
 @Repository
 class RegistrationRecordRepository extends CommonDBRepository<Registration, String> {
 
+    private static final String FROM_CARINFO_RECORD_VIEW = "from carinfo.record_view  ";
     protected static final String ADMIN_OBJ_NAME_PARAM = "admin_obj_name";
     protected static final String ADMIN_OBJ_TYPE_PARAM = "admin_obj_type";
     protected static final String OP_CODE_PARAM = "op_code";
@@ -244,7 +245,7 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration, Stri
     @Override
     public boolean exist(@NonNull @Nonnull Registration entity) {
         String select = "select count(id) ";
-        String from = "from carinfo.record_view  ";
+        String from = FROM_CARINFO_RECORD_VIEW;
         WhereBuilder.BuildResult buildResult = buildWhere()
                 .addFieldParam(ADMIN_OBJ_NAME_PARAM, ADMIN_OBJ_NAME, entity.getAdminObjName())
                 .addFieldParam(ADMIN_OBJ_TYPE_PARAM, ADMIN_OBJ_TYPE, entity.getAdminObjType())
@@ -301,7 +302,7 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration, Stri
     @Override
     public boolean existsByIndex(@Nonnull @NonNull String indexField) {
         String select = "select count(id) ";
-        String from = "from carinfo.record_view  ";
+        String from = FROM_CARINFO_RECORD_VIEW;
         WhereBuilder.BuildResult buildResult = buildWhere()
                 .addFieldParam(REGISTRATION_NUMBER_PARAM, REGISTRATION_NUMBER, indexField)
                 .build();
@@ -359,7 +360,7 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration, Stri
     @Override
     public Page<Registration> find(@NonNull @Nonnull ParamsHolder searchParams) {
         String select = "select * ";
-        String from = "from carinfo.record_view  ";
+        String from = FROM_CARINFO_RECORD_VIEW;
         WhereBuilder buildWhere = buildWhereForFind(searchParams);
         return findPage(searchParams, select, from, buildWhere);
     }

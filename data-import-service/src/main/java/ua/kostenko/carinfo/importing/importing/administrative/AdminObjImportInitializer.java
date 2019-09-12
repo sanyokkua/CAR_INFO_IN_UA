@@ -44,7 +44,7 @@ public class AdminObjImportInitializer implements Initializer {
         Path administrativeObjectsFilePath = null;
         try {
             administrativeObjectsFilePath = Paths.get(
-                    new ClassPathResource(properties.APP_ADMINISTRATIVE_OBJECTS_FILE_PATH).getFile().getAbsolutePath());
+                    new ClassPathResource(properties.appAdministrativeObjectsFilePath).getFile().getAbsolutePath());
         } catch (IOException e) {
             log.error("init:  Error  with opening file", e);
         }
@@ -69,7 +69,7 @@ public class AdminObjImportInitializer implements Initializer {
                     after.toString(), Duration
                             .between(before, after).toMillis());
         } else {
-            log.warn("init: Problem with getting path to file: {}", properties.APP_ADMINISTRATIVE_OBJECTS_FILE_PATH);
+            log.warn("init: Problem with getting path to file: {}", properties.appAdministrativeObjectsFilePath);
         }
     }
 }

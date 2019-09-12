@@ -89,7 +89,7 @@ public class RegistrationImportInitializer implements Initializer {
 
     @Override
     public void init() {
-        File metadataJson = Objects.requireNonNull(downloadMetadataJson(properties.APP_STRUCTURE_DATA_PACKAGE_JSON_URL),
+        File metadataJson = Objects.requireNonNull(downloadMetadataJson(properties.appStructureDataPackageJsonUrl),
                 "metadataJson can't be null");
         String metadataJsonText =
                 Objects.requireNonNull(FileUtil.getTextFromFile(metadataJson), "metadataJsonText can't be null");

@@ -51,52 +51,52 @@ public class RegistrationCsvRecord {
     private String vehicleRegistrationNumber;
 
     public Operation getOperation() {
-        Long operationCode = this.getOperationCode();
-        String operationName = this.getOperationName();
-        return Operation.builder().operationCode(operationCode).operationName(operationName).build();
+        Long code = this.getOperationCode();
+        String name = this.getOperationName();
+        return Operation.builder().operationCode(code).operationName(name).build();
     }
 
     public Brand getBrand() {
-        String vehicleBrand = StringUtils.trim(this.getVehicleBrand());
-        String vehicleModel = StringUtils.trim(getModel().getModelName());
-        if (StringUtils.isNotBlank(vehicleBrand)
-                && StringUtils.isNotBlank(vehicleModel)
-                && !(vehicleBrand.equalsIgnoreCase(vehicleModel))
-                && vehicleBrand.contains(vehicleModel)) {
-            vehicleBrand = StringUtils.remove(vehicleBrand, vehicleModel);
-            vehicleBrand = StringUtils.trim(vehicleBrand);
+        String brand = StringUtils.trim(this.getVehicleBrand());
+        String model = StringUtils.trim(getModel().getModelName());
+        if (StringUtils.isNotBlank(brand)
+                && StringUtils.isNotBlank(model)
+                && !(brand.equalsIgnoreCase(model))
+                && brand.contains(model)) {
+            brand = StringUtils.remove(brand, model);
+            brand = StringUtils.trim(brand);
         }
-        return Brand.builder().brandName(vehicleBrand).build();
+        return Brand.builder().brandName(brand).build();
     }
 
     public Model getModel() {
-        String vehicleModel = StringUtils.trim(this.getVehicleModel());
-        return Model.builder().modelName(vehicleModel).build();
+        String model = StringUtils.trim(this.getVehicleModel());
+        return Model.builder().modelName(model).build();
     }
 
     public Color getColor() {
-        String vehicleColor = this.getVehicleColor();
-        return Color.builder().colorName(vehicleColor).build();
+        String color = this.getVehicleColor();
+        return Color.builder().colorName(color).build();
     }
 
     public Kind getKind() {
-        String vehicleKind = this.getVehicleKind();
-        return Kind.builder().kindName(vehicleKind).build();
+        String kind = this.getVehicleKind();
+        return Kind.builder().kindName(kind).build();
     }
 
     public BodyType getBodyType() {
-        String vehicleBodyType = this.getVehicleBodyType();
-        return BodyType.builder().bodyTypeName(vehicleBodyType).build();
+        String bodyType = this.getVehicleBodyType();
+        return BodyType.builder().bodyTypeName(bodyType).build();
     }
 
     public Purpose getPurpose() {
-        String vehiclePurpose = this.getVehiclePurpose();
-        return Purpose.builder().purposeName(vehiclePurpose).build();
+        String purpose = this.getVehiclePurpose();
+        return Purpose.builder().purposeName(purpose).build();
     }
 
     public FuelType getFuelType() {
-        String vehicleFuelType = this.getVehicleFuelType();
-        return FuelType.builder().fuelTypeName(Objects.nonNull(vehicleFuelType) ? vehicleFuelType : "—").build();
+        String fuelType = this.getVehicleFuelType();
+        return FuelType.builder().fuelTypeName(Objects.nonNull(fuelType) ? fuelType : "—").build();
     }
 
     public AdministrativeObject getAdminObject() {
@@ -105,18 +105,18 @@ public class RegistrationCsvRecord {
     }
 
     public Department getDepartment() {
-        Long departmentCode = this.getDepartmentCode();
-        return Department.builder().departmentCode(departmentCode).build();
+        Long depCode = this.getDepartmentCode();
+        return Department.builder().departmentCode(depCode).build();
     }
 
     public Date getDate() {
-        String registrationDate = this.getRegistrationDate();
+        String regDate = this.getRegistrationDate();
         Date resultDate = null;
         try {
-            LocalDate parse = LocalDate.parse(registrationDate, DATE_TIME_FORMATTER);
+            LocalDate parse = LocalDate.parse(regDate, DATE_TIME_FORMATTER);
             resultDate = Date.valueOf(parse);
         } catch (Exception ex) {
-            log.warn("Problem with parsing date with formatter: {}", registrationDate);
+            log.warn("Problem with parsing date with formatter: {}", regDate);
         }
         return resultDate;
     }

@@ -75,8 +75,8 @@ public final class ParamsHolderBuilder {
     }
 
     private int getPage(@Nullable Integer uiPageNumber) {
-        int page = Objects.nonNull(uiPageNumber) && uiPageNumber >= 0 ? uiPageNumber : 0;
-        return page > 0 ? page - 1 : page;
+        int currentPage = Objects.nonNull(uiPageNumber) && uiPageNumber >= 0 ? uiPageNumber : 0;
+        return currentPage > 0 ? currentPage - 1 : currentPage;
     }
 
     private int getAmount(@Nullable Integer recordsPerPage) {

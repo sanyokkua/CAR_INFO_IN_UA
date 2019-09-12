@@ -1,6 +1,6 @@
 package ua.kostenko.carinfo.importing.csv.mappers;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import javax.annotation.Nullable;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
@@ -39,7 +39,7 @@ public interface CsvMapper<T> {
     @Nullable
     default String getString(String value) {
         if (StringUtils.isNotBlank(value)) {
-            String s = StringUtils.toEncodedString(value.getBytes(), Charset.forName("UTF-8"));
+            String s = StringUtils.toEncodedString(value.getBytes(), StandardCharsets.UTF_8);
             return s.trim();
         }
         return null;

@@ -64,7 +64,7 @@ public class DBSearchService implements SearchService {
         ParamsHolderBuilder params = new ParamsHolderBuilder().param(Registration.REGISTRATION_NUMBER, number);
         Page<Registration> registration = registrationDBService.getAll(params);
 
-        if (registration.getContent().size() > 0) {
+        if (!registration.getContent().isEmpty()) {
             return registration.getContent().stream().map(record -> {
                 Auto auto = Auto.map(record);
                 VRegistration vRegistration = VRegistration.map(record);

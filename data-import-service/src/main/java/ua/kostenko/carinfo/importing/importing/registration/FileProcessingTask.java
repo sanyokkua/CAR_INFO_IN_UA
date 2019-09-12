@@ -96,15 +96,15 @@ class FileProcessingTask implements Runnable {
     }
 
     private String getFileName(@NonNull @Nonnull String link) {
-        return link.substring(link.lastIndexOf("/"));
+        return link.substring(link.lastIndexOf('/'));
     }
 
     private void extractArchive(@NonNull @Nonnull File file, @NonNull @Nonnull String fileName) {
-        File tempDirectory = FileUtil.getTempDirectory();
-        if (Objects.nonNull(tempDirectory)) {
-            String name = fileName.substring(0, fileName.lastIndexOf("."));
+        File tmpDirectory = FileUtil.getTempDirectory();
+        if (Objects.nonNull(tmpDirectory)) {
+            String name = fileName.substring(0, fileName.lastIndexOf('.'));
             File destinationDirectory = ArchiveUtils.extractZipArchive(file,
-                    Paths.get(tempDirectory.getAbsolutePath() + File.separator + name).toFile());
+                    Paths.get(tmpDirectory.getAbsolutePath() + File.separator + name).toFile());
             if (Objects.isNull(destinationDirectory)) {
                 throw new NullPointerException("destinationDirectory is null. Problem with extracting zip archive");
             }

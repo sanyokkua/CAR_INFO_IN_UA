@@ -38,7 +38,7 @@ public class FileUtil {
     }
 
     @Nullable
-    private synchronized static File createDirectory(@NonNull @Nonnull String filePath) {
+    private static synchronized File createDirectory(@NonNull @Nonnull String filePath) {
         log.info("createDirectory: Creating directory by path: " + filePath);
         File directory = new File(filePath);
         if (directory.exists()) {
@@ -53,7 +53,7 @@ public class FileUtil {
         }
     }
 
-    public synchronized static void deleteFiles(File... files) {
+    public static synchronized void deleteFiles(File... files) {
         for (File file : files) {
             try {
                 String fileForDeletion = file.getAbsolutePath();
@@ -67,7 +67,7 @@ public class FileUtil {
     }
 
     @Nullable
-    public synchronized static String getTextFromFile(@NonNull @Nonnull File file) {
+    public static synchronized String getTextFromFile(@NonNull @Nonnull File file) {
         if (file.exists()) {
             String encoding = EncodingUtils.getEncoding(file);
             String resultString = null;

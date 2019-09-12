@@ -40,13 +40,13 @@ public class ServiceCenterInitializer implements Initializer {
     public void init() {
         log.info("init: Starting initialization of ServiceCenters data.");
         try {
-            log.info("Opening page by url {}", applicationProperties.APP_DATA_SERVICE_CENTER_URL);
-            Document htmlPageDocument = Jsoup.connect(applicationProperties.APP_DATA_SERVICE_CENTER_URL).get();
+            log.info("Opening page by url {}", applicationProperties.appDataServiceCenterUrl);
+            Document htmlPageDocument = Jsoup.connect(applicationProperties.appDataServiceCenterUrl).get();
             if (Objects.nonNull(htmlPageDocument)) {
                 log.info("init: Parsing  all information from page {}",
-                        applicationProperties.APP_DATA_SERVICE_CENTER_URL);
+                        applicationProperties.appDataServiceCenterUrl);
                 List<ServiceCenter> resultList = new ArrayList<>();
-                Elements tbody = htmlPageDocument.select(applicationProperties.APP_DATA_SERVICE_CENTER_CSS_SELECTOR);
+                Elements tbody = htmlPageDocument.select(applicationProperties.appDataServiceCenterCssSelector);
                 for (Element tr : tbody) {
                     List<Element> childTd = tr.childNodes()
                             .stream()
@@ -75,7 +75,7 @@ public class ServiceCenterInitializer implements Initializer {
             log.info("init: Finished initialization of ServiceCenters data.");
         } catch (IOException e) {
             log.error(String.format("init: Error with parsing or connecting to url: %s",
-                    applicationProperties.APP_DATA_SERVICE_CENTER_URL), e);
+                    applicationProperties.appDataServiceCenterUrl), e);
         }
     }
 }
