@@ -12,8 +12,8 @@ public class BrandAssembler extends ResourceAssemblerSupport<Brand, BrandResourc
     }
 
     @Override
-    public BrandResource toResource(Brand entity) {
-        BrandResource resource = super.createResourceWithId(entity.getId(), entity);
+    public BrandResource toResource(final Brand entity) {
+        final BrandResource resource = super.createResourceWithId(entity.getId(), entity);
         resource.setBrandName(entity.getBrandName());
         return resource;
     }

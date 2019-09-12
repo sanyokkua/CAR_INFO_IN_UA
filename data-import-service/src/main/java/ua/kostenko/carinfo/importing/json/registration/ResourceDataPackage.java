@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResourceDataPackage {
+
     private String mimetype;
     private String profile;
     private String name;

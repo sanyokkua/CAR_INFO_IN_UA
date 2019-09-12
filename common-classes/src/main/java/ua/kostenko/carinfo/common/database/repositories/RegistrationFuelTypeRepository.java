@@ -1,7 +1,8 @@
 package ua.kostenko.carinfo.common.database.repositories;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -9,21 +10,18 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
+import lombok.NonNull;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.records.FuelType;
 import ua.kostenko.carinfo.common.database.Constants;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.List;
-
 @Repository
-@Slf4j
 class RegistrationFuelTypeRepository extends CommonDBRepository<FuelType, String> {
+
     private static final RowMapper<FuelType> ROW_MAPPER = (resultSet, i) -> FuelType.builder()
-                                                                                    .fuelTypeId(resultSet.getLong(Constants.RegistrationFuelType.ID))
-                                                                                    .fuelTypeName(resultSet.getString(Constants.RegistrationFuelType.NAME))
-                                                                                    .build();
+            .fuelTypeId(resultSet.getLong(Constants.RegistrationFuelType.ID))
+            .fuelTypeName(resultSet.getString(Constants.RegistrationFuelType.NAME))
+            .build();
 
     @Autowired
     public RegistrationFuelTypeRepository(@NonNull @Nonnull NamedParameterJdbcTemplate jdbcTemplate) {
@@ -51,7 +49,8 @@ class RegistrationFuelTypeRepository extends CommonDBRepository<FuelType, String
     @Override
     public FuelType create(@NonNull @Nonnull FuelType entity) {
         String jdbcTemplateInsert = "insert into carinfo.fuel_type (fuel_type_name) values (:name);";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, entity.getFuelTypeName()).build();
+        SqlParameterSource parameterSource =
+                getSqlParamBuilder().addParam(NAME_PARAM, entity.getFuelTypeName()).build();
         return create(jdbcTemplateInsert, Constants.RegistrationFuelType.ID, parameterSource);
     }
 
@@ -64,7 +63,8 @@ class RegistrationFuelTypeRepository extends CommonDBRepository<FuelType, String
                 .addParam(ID_PARAM, entity.getId())
                 .build();
         jdbcTemplate.update(jdbcTemplateUpdate, parameterSource);
-        ParamsHolder searchParams = getParamsHolderBuilder().param(FuelType.FUEL_NAME, entity.getFuelTypeName()).build();
+        ParamsHolder searchParams =
+                getParamsHolderBuilder().param(FuelType.FUEL_NAME, entity.getFuelTypeName()).build();
         return findOne(searchParams);
     }
 
@@ -85,8 +85,10 @@ class RegistrationFuelTypeRepository extends CommonDBRepository<FuelType, String
     @Cacheable(cacheNames = "fuelCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
     public boolean exist(@NonNull @Nonnull FuelType entity) {
-        String jdbcTemplateSelectCount = "select count(fuel_type_id) from carinfo.fuel_type where fuel_type_name = :name;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, entity.getFuelTypeName()).build();
+        String jdbcTemplateSelectCount =
+                "select count(fuel_type_id) from carinfo.fuel_type where fuel_type_name = :name;";
+        SqlParameterSource parameterSource =
+                getSqlParamBuilder().addParam(NAME_PARAM, entity.getFuelTypeName()).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
     }
 
@@ -117,7 +119,8 @@ class RegistrationFuelTypeRepository extends CommonDBRepository<FuelType, String
     @Cacheable(cacheNames = "fuelIndex", unless = "#result == false ", key = "#indexField")
     @Override
     public boolean existsByIndex(@Nonnull @NonNull String indexField) {
-        String jdbcTemplateSelectCount = "select count(fuel_type_id) from carinfo.fuel_type where fuel_type_name = :name;";
+        String jdbcTemplateSelectCount =
+                "select count(fuel_type_id) from carinfo.fuel_type where fuel_type_name = :name;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, indexField).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
     }

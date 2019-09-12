@@ -1,19 +1,21 @@
 package ua.kostenko.carinfo.importing.io;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-import org.mozilla.universalchardet.UniversalDetector;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import org.mozilla.universalchardet.UniversalDetector;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EncodingUtils {
 
     @Nullable
-    public synchronized static String getEncoding(@NonNull @Nonnull File textFile) {
+    public static synchronized String getEncoding(@NonNull @Nonnull File textFile) {
         String encoding = null;
         try {
             log.debug("getEncoding: Trying to distinguish encoding of file: {}", textFile.getAbsolutePath());

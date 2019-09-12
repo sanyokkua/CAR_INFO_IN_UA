@@ -1,8 +1,7 @@
 package ua.kostenko.carinfo.importing.csv.structure.enums;
 
-import lombok.NonNull;
-
 import javax.annotation.Nonnull;
+import lombok.NonNull;
 
 public enum RegistrationCsvRecord {
     PERSON("person", "PERSON"),

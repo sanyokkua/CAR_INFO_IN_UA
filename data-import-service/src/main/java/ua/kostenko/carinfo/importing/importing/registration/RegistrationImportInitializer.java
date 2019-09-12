@@ -1,13 +1,33 @@
 package ua.kostenko.carinfo.importing.importing.registration;
 
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import ua.kostenko.carinfo.common.api.records.*;
+import ua.kostenko.carinfo.common.api.records.AdministrativeObject;
+import ua.kostenko.carinfo.common.api.records.BodyType;
+import ua.kostenko.carinfo.common.api.records.Brand;
+import ua.kostenko.carinfo.common.api.records.Color;
+import ua.kostenko.carinfo.common.api.records.Department;
+import ua.kostenko.carinfo.common.api.records.FuelType;
+import ua.kostenko.carinfo.common.api.records.Kind;
+import ua.kostenko.carinfo.common.api.records.Model;
+import ua.kostenko.carinfo.common.api.records.Operation;
+import ua.kostenko.carinfo.common.api.records.Purpose;
+import ua.kostenko.carinfo.common.api.records.Registration;
+import ua.kostenko.carinfo.common.api.records.Vehicle;
 import ua.kostenko.carinfo.common.api.services.DBService;
 import ua.kostenko.carinfo.importing.configuration.ApplicationProperties;
 import ua.kostenko.carinfo.importing.importing.Initializer;
@@ -16,19 +36,10 @@ import ua.kostenko.carinfo.importing.io.FileUtil;
 import ua.kostenko.carinfo.importing.json.registration.RegistrationDataPackage;
 import ua.kostenko.carinfo.importing.json.registration.ResourceDataPackage;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.File;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
-
 @Slf4j
 @Component
 public class RegistrationImportInitializer implements Initializer {
+
     private static final String METADATA_JSON_FILE_NAME = "metadata.json";
     private final ExecutorService executorService;
     private final ApplicationProperties properties;
@@ -47,18 +58,18 @@ public class RegistrationImportInitializer implements Initializer {
 
     @Autowired
     public RegistrationImportInitializer(@NonNull @Nonnull ApplicationProperties properties,
-                                         @NonNull @Nonnull DBService<Registration> service,
-                                         @NonNull @Nonnull DBService<AdministrativeObject> administrativeObjectDBService,
-                                         @NonNull @Nonnull DBService<BodyType> bodyTypeDBService,
-                                         @NonNull @Nonnull DBService<Brand> brandDBService,
-                                         @NonNull @Nonnull DBService<Color> colorDBService,
-                                         @NonNull @Nonnull DBService<Department> departmentDBService,
-                                         @NonNull @Nonnull DBService<FuelType> fuelTypeDBService,
-                                         @NonNull @Nonnull DBService<Kind> kindDBService,
-                                         @NonNull @Nonnull DBService<Model> modelDBService,
-                                         @NonNull @Nonnull DBService<Operation> operationDBService,
-                                         @NonNull @Nonnull DBService<Purpose> purposeDBService,
-                                         @NonNull @Nonnull DBService<Vehicle> vehicleDBService) {
+            @NonNull @Nonnull DBService<Registration> service,
+            @NonNull @Nonnull DBService<AdministrativeObject> administrativeObjectDBService,
+            @NonNull @Nonnull DBService<BodyType> bodyTypeDBService,
+            @NonNull @Nonnull DBService<Brand> brandDBService,
+            @NonNull @Nonnull DBService<Color> colorDBService,
+            @NonNull @Nonnull DBService<Department> departmentDBService,
+            @NonNull @Nonnull DBService<FuelType> fuelTypeDBService,
+            @NonNull @Nonnull DBService<Kind> kindDBService,
+            @NonNull @Nonnull DBService<Model> modelDBService,
+            @NonNull @Nonnull DBService<Operation> operationDBService,
+            @NonNull @Nonnull DBService<Purpose> purposeDBService,
+            @NonNull @Nonnull DBService<Vehicle> vehicleDBService) {
         this.properties = properties;
         this.service = service;
         this.administrativeObjectDBService = administrativeObjectDBService;
@@ -78,23 +89,25 @@ public class RegistrationImportInitializer implements Initializer {
 
     @Override
     public void init() {
-        File metadataJson = Objects.requireNonNull(downloadMetadataJson(properties.APP_STRUCTURE_DATA_PACKAGE_JSON_URL), "metadataJson can't be null");
-        String metadataJsonText = Objects.requireNonNull(FileUtil.getTextFromFile(metadataJson), "metadataJsonText can't be null");
+        File metadataJson = Objects.requireNonNull(downloadMetadataJson(properties.APP_STRUCTURE_DATA_PACKAGE_JSON_URL),
+                "metadataJson can't be null");
+        String metadataJsonText =
+                Objects.requireNonNull(FileUtil.getTextFromFile(metadataJson), "metadataJsonText can't be null");
         List<String> downloadLinks = getDownloadLinks(metadataJsonText);
         File tempDirectory = FileUtil.getTempDirectory();
         if (Objects.nonNull(tempDirectory)) {
             downloadLinks.forEach(link -> executorService.execute(new FileProcessingTask(link, tempDirectory, service,
-                                                                                         administrativeObjectDBService,
-                                                                                         bodyTypeDBService,
-                                                                                         brandDBService,
-                                                                                         colorDBService,
-                                                                                         departmentDBService,
-                                                                                         fuelTypeDBService,
-                                                                                         kindDBService,
-                                                                                         modelDBService,
-                                                                                         operationDBService,
-                                                                                         purposeDBService,
-                                                                                         vehicleDBService)));
+                    administrativeObjectDBService,
+                    bodyTypeDBService,
+                    brandDBService,
+                    colorDBService,
+                    departmentDBService,
+                    fuelTypeDBService,
+                    kindDBService,
+                    modelDBService,
+                    operationDBService,
+                    purposeDBService,
+                    vehicleDBService)));
         } else {
             throw new RuntimeException("importRegistrations: Temp directory is null. Download can't be performed");
         }
@@ -105,7 +118,8 @@ public class RegistrationImportInitializer implements Initializer {
     private File downloadMetadataJson(@NonNull @Nonnull String metadataJsonUrl) {
         File tempDirectory = FileUtil.getTempDirectory();
         if (Objects.nonNull(tempDirectory)) {
-            File metadataJsonFile = new File(tempDirectory.getAbsoluteFile() + File.pathSeparator + METADATA_JSON_FILE_NAME);
+            File metadataJsonFile =
+                    new File(tempDirectory.getAbsoluteFile() + File.pathSeparator + METADATA_JSON_FILE_NAME);
             return FileDownloader.downloadFile(metadataJsonUrl, metadataJsonFile.getAbsolutePath());
         }
         return null;
@@ -115,10 +129,13 @@ public class RegistrationImportInitializer implements Initializer {
         Gson gson = new Gson();
         RegistrationDataPackage pojo = gson.fromJson(metadataJson, RegistrationDataPackage.class);
         try {
-            log.info("getDownloadLinks: StructureDataPackage JSON content:\n{}", new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(pojo));
+            log.info("getDownloadLinks: StructureDataPackage JSON content:\n{}",
+                    new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(pojo));
         } catch (JsonProcessingException e) {
             log.warn("getDownloadLinks: Problem with writing StructureDataPackage JSON for logging", e);
         }
-        return Objects.nonNull(pojo) ? pojo.getResources().stream().map(ResourceDataPackage::getPath).collect(Collectors.toList()) : Collections.emptyList();
+        return Objects.nonNull(pojo)
+                ? pojo.getResources().stream().map(ResourceDataPackage::getPath).collect(Collectors.toList())
+                : Collections.emptyList();
     }
 }

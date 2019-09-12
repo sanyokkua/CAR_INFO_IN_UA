@@ -1,25 +1,25 @@
 package ua.kostenko.carinfo.rest.controllers;
 
-import com.google.common.base.Preconditions;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import ua.kostenko.carinfo.rest.data.persistent.services.SearchService;
-import ua.kostenko.carinfo.rest.data.presentation.CombinedInformation;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import com.google.common.base.Preconditions;
+import lombok.extern.slf4j.Slf4j;
+import ua.kostenko.carinfo.rest.data.persistent.services.SearchService;
+import ua.kostenko.carinfo.rest.data.presentation.CombinedInformation;
 
 @RestController
 @Slf4j
 @Deprecated
 public class MainRestController {
+
     private final SearchService searchService;
 
     @Autowired
@@ -34,8 +34,10 @@ public class MainRestController {
         number = number.toUpperCase();
         log.info("Processing request by url /search/{}", number);
         LocalDateTime before = LocalDateTime.now();
-        List<CombinedInformation> combinedInformation = searchService.searchAllByRegistrationNumber(number.toUpperCase());
-        log.info("Processing of request by url /search/{} finished, time: {} ms", number, Duration.between(before, LocalDateTime.now()).toMillis());
+        List<CombinedInformation> combinedInformation =
+                searchService.searchAllByRegistrationNumber(number.toUpperCase());
+        log.info("Processing of request by url /search/{} finished, time: {} ms", number,
+                Duration.between(before, LocalDateTime.now()).toMillis());
         return combinedInformation;
     }
 
@@ -89,7 +91,8 @@ public class MainRestController {
     }
 
     @GetMapping(value = "/countAllForBrandAndModel")
-    public Map<String, Object> countAllByCarBrandAndModel(@RequestParam(value = "brand") String brand, @RequestParam(value = "model") String model) {
+    public Map<String, Object> countAllByCarBrandAndModel(@RequestParam(value = "brand") String brand,
+            @RequestParam(value = "model") String model) {
         return buildResponseMap("countAllForBrandAndModel", searchService.countAllByCarBrandAndModel(brand, model));
     }
 

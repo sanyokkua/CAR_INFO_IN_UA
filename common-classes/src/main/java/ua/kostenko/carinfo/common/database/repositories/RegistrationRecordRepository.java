@@ -1,7 +1,31 @@
 package ua.kostenko.carinfo.common.database.repositories;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import static ua.kostenko.carinfo.common.api.records.Registration.ADMIN_OBJ_NAME;
+import static ua.kostenko.carinfo.common.api.records.Registration.ADMIN_OBJ_TYPE;
+import static ua.kostenko.carinfo.common.api.records.Registration.BODY_TYPE;
+import static ua.kostenko.carinfo.common.api.records.Registration.BRAND;
+import static ua.kostenko.carinfo.common.api.records.Registration.COLOR;
+import static ua.kostenko.carinfo.common.api.records.Registration.DEPARTMENT_ADDRESS;
+import static ua.kostenko.carinfo.common.api.records.Registration.DEPARTMENT_CODE;
+import static ua.kostenko.carinfo.common.api.records.Registration.DEPARTMENT_EMAIL;
+import static ua.kostenko.carinfo.common.api.records.Registration.ENGINE_CAPACITY;
+import static ua.kostenko.carinfo.common.api.records.Registration.FUEL_TYPE;
+import static ua.kostenko.carinfo.common.api.records.Registration.KIND;
+import static ua.kostenko.carinfo.common.api.records.Registration.MAKE_YEAR;
+import static ua.kostenko.carinfo.common.api.records.Registration.MODEL;
+import static ua.kostenko.carinfo.common.api.records.Registration.OPERATION_CODE;
+import static ua.kostenko.carinfo.common.api.records.Registration.OPERATION_NAME;
+import static ua.kostenko.carinfo.common.api.records.Registration.OWN_WEIGHT;
+import static ua.kostenko.carinfo.common.api.records.Registration.PERSON_TYPE;
+import static ua.kostenko.carinfo.common.api.records.Registration.PURPOSE;
+import static ua.kostenko.carinfo.common.api.records.Registration.REGISTRATION_DATE;
+import static ua.kostenko.carinfo.common.api.records.Registration.REGISTRATION_NUMBER;
+import static ua.kostenko.carinfo.common.api.records.Registration.TOTAL_WEIGHT;
+import java.sql.Date;
+import java.util.List;
+import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -9,21 +33,23 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
+import lombok.NonNull;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
-import ua.kostenko.carinfo.common.api.records.*;
+import ua.kostenko.carinfo.common.api.records.AdministrativeObject;
+import ua.kostenko.carinfo.common.api.records.BodyType;
+import ua.kostenko.carinfo.common.api.records.Color;
+import ua.kostenko.carinfo.common.api.records.Department;
+import ua.kostenko.carinfo.common.api.records.FuelType;
+import ua.kostenko.carinfo.common.api.records.Kind;
+import ua.kostenko.carinfo.common.api.records.Operation;
+import ua.kostenko.carinfo.common.api.records.Purpose;
+import ua.kostenko.carinfo.common.api.records.Registration;
+import ua.kostenko.carinfo.common.api.records.Vehicle;
 import ua.kostenko.carinfo.common.database.Constants;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.sql.Date;
-import java.util.List;
-import java.util.Objects;
-
-import static ua.kostenko.carinfo.common.api.records.Registration.*;
-
 @Repository
-@Slf4j
 class RegistrationRecordRepository extends CommonDBRepository<Registration, String> {
+
     protected static final String ADMIN_OBJ_NAME_PARAM = "admin_obj_name";
     protected static final String ADMIN_OBJ_TYPE_PARAM = "admin_obj_type";
     protected static final String OP_CODE_PARAM = "op_code";
@@ -46,29 +72,29 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration, Stri
     protected static final String REGISTRATION_NUMBER_PARAM = "registration_number";
     protected static final String REGISTRATION_DATE_PARAM = "registration_date";
     private static final RowMapper<Registration> ROW_MAPPER = (resultSet, i) -> Registration.builder()
-                                                                                            .adminObjName(resultSet.getString(Constants.AdminObject.NAME))
-                                                                                            .adminObjType(resultSet.getString(Constants.AdminObject.TYPE))
-                                                                                            .operationCode(resultSet.getLong(Constants.RegistrationOperation.CODE))
-                                                                                            .operationName(resultSet.getString(Constants.RegistrationOperation.NAME))
-                                                                                            .departmentCode(resultSet.getLong(Constants.RegistrationDepartment.CODE))
-                                                                                            .departmentAddress(resultSet.getString(Constants.RegistrationDepartment.ADDRESS))
-                                                                                            .departmentEmail(resultSet.getString(Constants.RegistrationDepartment.EMAIL))
-                                                                                            .kindName(resultSet.getString(Constants.RegistrationKind.NAME))
-                                                                                            .colorName(resultSet.getString(Constants.RegistrationColor.NAME))
-                                                                                            .bodyTypeName(resultSet.getString(Constants.RegistrationBodyType.NAME))
-                                                                                            .purposeName(resultSet.getString(Constants.RegistrationPurpose.NAME))
-                                                                                            .brandName(resultSet.getString(Constants.RegistrationBrand.NAME))
-                                                                                            .modelName(resultSet.getString(Constants.RegistrationModel.NAME))
-                                                                                            .fuelTypeName(resultSet.getString(Constants.RegistrationFuelType.NAME))
-                                                                                            .engineCapacity(resultSet.getLong(Constants.RegistrationRecord.ENGINE_CAPACITY))
-                                                                                            .makeYear(resultSet.getLong(Constants.RegistrationRecord.MAKE_YEAR))
-                                                                                            .ownWeight(resultSet.getLong(Constants.RegistrationRecord.OWN_WEIGHT))
-                                                                                            .totalWeight(resultSet.getLong(Constants.RegistrationRecord.TOTAL_WEIGHT))
-                                                                                            .personType(resultSet.getString(Constants.RegistrationRecord.PERSON_TYPE))
-                                                                                            .registrationNumber(resultSet.getString(Constants.RegistrationRecord.REGISTRATION_NUMBER))
-                                                                                            .registrationDate(resultSet.getDate(Constants.RegistrationRecord.REGISTRATION_DATE))
-                                                                                            .id(resultSet.getLong(Constants.RegistrationRecord.ID))
-                                                                                            .build();
+            .adminObjName(resultSet.getString(Constants.AdminObject.NAME))
+            .adminObjType(resultSet.getString(Constants.AdminObject.TYPE))
+            .operationCode(resultSet.getLong(Constants.RegistrationOperation.CODE))
+            .operationName(resultSet.getString(Constants.RegistrationOperation.NAME))
+            .departmentCode(resultSet.getLong(Constants.RegistrationDepartment.CODE))
+            .departmentAddress(resultSet.getString(Constants.RegistrationDepartment.ADDRESS))
+            .departmentEmail(resultSet.getString(Constants.RegistrationDepartment.EMAIL))
+            .kindName(resultSet.getString(Constants.RegistrationKind.NAME))
+            .colorName(resultSet.getString(Constants.RegistrationColor.NAME))
+            .bodyTypeName(resultSet.getString(Constants.RegistrationBodyType.NAME))
+            .purposeName(resultSet.getString(Constants.RegistrationPurpose.NAME))
+            .brandName(resultSet.getString(Constants.RegistrationBrand.NAME))
+            .modelName(resultSet.getString(Constants.RegistrationModel.NAME))
+            .fuelTypeName(resultSet.getString(Constants.RegistrationFuelType.NAME))
+            .engineCapacity(resultSet.getLong(Constants.RegistrationRecord.ENGINE_CAPACITY))
+            .makeYear(resultSet.getLong(Constants.RegistrationRecord.MAKE_YEAR))
+            .ownWeight(resultSet.getLong(Constants.RegistrationRecord.OWN_WEIGHT))
+            .totalWeight(resultSet.getLong(Constants.RegistrationRecord.TOTAL_WEIGHT))
+            .personType(resultSet.getString(Constants.RegistrationRecord.PERSON_TYPE))
+            .registrationNumber(resultSet.getString(Constants.RegistrationRecord.REGISTRATION_NUMBER))
+            .registrationDate(resultSet.getDate(Constants.RegistrationRecord.REGISTRATION_DATE))
+            .id(resultSet.getLong(Constants.RegistrationRecord.ID))
+            .build();
     private final DBRepository<AdministrativeObject, String> administrativeObjectDBRepository;
     private final DBRepository<BodyType, String> bodyTypeDBRepository;
     private final DBRepository<Color, String> colorDBRepository;
@@ -81,15 +107,15 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration, Stri
 
     @Autowired
     public RegistrationRecordRepository(@NonNull @Nonnull NamedParameterJdbcTemplate jdbcTemplate,
-                                        @NonNull @Nonnull DBRepository<AdministrativeObject, String> administrativeObjectDBRepository,
-                                        @NonNull @Nonnull DBRepository<BodyType, String> bodyTypeDBRepository,
-                                        @NonNull @Nonnull DBRepository<Color, String> colorDBRepository,
-                                        @NonNull @Nonnull DBRepository<Department, Long> departmentDBRepository,
-                                        @NonNull @Nonnull DBRepository<FuelType, String> fuelTypeDBRepository,
-                                        @NonNull @Nonnull DBRepository<Kind, String> kindDBRepository,
-                                        @NonNull @Nonnull DBRepository<Operation, Long> operationDBRepository,
-                                        @NonNull @Nonnull DBRepository<Purpose, String> purposeDBRepository,
-                                        @NonNull @Nonnull DBRepository<Vehicle, String> vehicleDBRepository) {
+            @NonNull @Nonnull DBRepository<AdministrativeObject, String> administrativeObjectDBRepository,
+            @NonNull @Nonnull DBRepository<BodyType, String> bodyTypeDBRepository,
+            @NonNull @Nonnull DBRepository<Color, String> colorDBRepository,
+            @NonNull @Nonnull DBRepository<Department, Long> departmentDBRepository,
+            @NonNull @Nonnull DBRepository<FuelType, String> fuelTypeDBRepository,
+            @NonNull @Nonnull DBRepository<Kind, String> kindDBRepository,
+            @NonNull @Nonnull DBRepository<Operation, Long> operationDBRepository,
+            @NonNull @Nonnull DBRepository<Purpose, String> purposeDBRepository,
+            @NonNull @Nonnull DBRepository<Vehicle, String> vehicleDBRepository) {
         super(jdbcTemplate);
         this.administrativeObjectDBRepository = administrativeObjectDBRepository;
         this.bodyTypeDBRepository = bodyTypeDBRepository;
@@ -134,15 +160,25 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration, Stri
     }
 
     private void setParamsToBuilder(@Nonnull @NonNull Registration entity, @NonNull @Nonnull SqlParameterMap builder) {
-        AdministrativeObject administrativeObject = administrativeObjectDBRepository.findOne(getParamsHolderBuilder().param(AdministrativeObject.ADMIN_OBJ_NAME, entity.getAdminObjName()).build());
-        BodyType bodyType = bodyTypeDBRepository.findOne(getParamsHolderBuilder().param(BodyType.BODY_TYPE_NAME, entity.getBodyTypeName()).build());
-        Color color = colorDBRepository.findOne(getParamsHolderBuilder().param(Color.COLOR_NAME, entity.getColorName()).build());
-        Department department = departmentDBRepository.findOne(getParamsHolderBuilder().param(Department.DEPARTMENT_CODE, entity.getDepartmentCode()).build());
-        FuelType fuelType = fuelTypeDBRepository.findOne(getParamsHolderBuilder().param(FuelType.FUEL_NAME, entity.getFuelTypeName()).build());
-        Kind kind = kindDBRepository.findOne(getParamsHolderBuilder().param(Kind.KIND_NAME, entity.getKindName()).build());
-        Operation operation = operationDBRepository.findOne(getParamsHolderBuilder().param(Operation.OPERATION_CODE, entity.getOperationCode()).build());
-        Purpose purpose = purposeDBRepository.findOne(getParamsHolderBuilder().param(Purpose.PURPOSE_NAME, entity.getPurposeName()).build());
-        Vehicle vehicle = vehicleDBRepository.findOne(getParamsHolderBuilder().param(Vehicle.BRAND_NAME, entity.getBrandName()).param(Vehicle.MODEL_NAME, entity.getModelName()).build());
+        AdministrativeObject administrativeObject = administrativeObjectDBRepository.findOne(
+                getParamsHolderBuilder().param(AdministrativeObject.ADMIN_OBJ_NAME, entity.getAdminObjName()).build());
+        BodyType bodyType = bodyTypeDBRepository
+                .findOne(getParamsHolderBuilder().param(BodyType.BODY_TYPE_NAME, entity.getBodyTypeName()).build());
+        Color color = colorDBRepository
+                .findOne(getParamsHolderBuilder().param(Color.COLOR_NAME, entity.getColorName()).build());
+        Department department = departmentDBRepository.findOne(
+                getParamsHolderBuilder().param(Department.DEPARTMENT_CODE, entity.getDepartmentCode()).build());
+        FuelType fuelType = fuelTypeDBRepository
+                .findOne(getParamsHolderBuilder().param(FuelType.FUEL_NAME, entity.getFuelTypeName()).build());
+        Kind kind =
+                kindDBRepository.findOne(getParamsHolderBuilder().param(Kind.KIND_NAME, entity.getKindName()).build());
+        Operation operation = operationDBRepository
+                .findOne(getParamsHolderBuilder().param(Operation.OPERATION_CODE, entity.getOperationCode()).build());
+        Purpose purpose = purposeDBRepository
+                .findOne(getParamsHolderBuilder().param(Purpose.PURPOSE_NAME, entity.getPurposeName()).build());
+        Vehicle vehicle =
+                vehicleDBRepository.findOne(getParamsHolderBuilder().param(Vehicle.BRAND_NAME, entity.getBrandName())
+                        .param(Vehicle.MODEL_NAME, entity.getModelName()).build());
         Long adminObjId = Objects.nonNull(administrativeObject) ? administrativeObject.getAdminObjId() : null;
         Long operationCode = Objects.nonNull(operation) ? operation.getOperationCode() : null;
         Long departmentCode = Objects.nonNull(department) ? department.getDepartmentCode() : null;
@@ -154,21 +190,21 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration, Stri
         Long fuelTypeId = Objects.nonNull(fuelType) ? fuelType.getFuelTypeId() : null;
 
         builder.addParam("adminObjId", adminObjId)
-               .addParam("operationCode", operationCode)
-               .addParam("departmentCode", departmentCode)
-               .addParam("kindId", kindId)
-               .addParam("vehicleId", vehicleId)
-               .addParam("colorId", colorId)
-               .addParam("bodyTypeId", bodyTypeId)
-               .addParam("purposeId", purposeId)
-               .addParam("fuelTypeId", fuelTypeId)
-               .addParam("ownWeight", entity.getOwnWeight())
-               .addParam("totalWeight", entity.getTotalWeight())
-               .addParam("engineCapacity", entity.getEngineCapacity())
-               .addParam("makeYear", entity.getMakeYear())
-               .addParam("registrationDate", entity.getRegistrationDate())
-               .addParam("registrationNumber", entity.getRegistrationNumber())
-               .addParam("personType", entity.getPersonType());
+                .addParam("operationCode", operationCode)
+                .addParam("departmentCode", departmentCode)
+                .addParam("kindId", kindId)
+                .addParam("vehicleId", vehicleId)
+                .addParam("colorId", colorId)
+                .addParam("bodyTypeId", bodyTypeId)
+                .addParam("purposeId", purposeId)
+                .addParam("fuelTypeId", fuelTypeId)
+                .addParam("ownWeight", entity.getOwnWeight())
+                .addParam("totalWeight", entity.getTotalWeight())
+                .addParam("engineCapacity", entity.getEngineCapacity())
+                .addParam("makeYear", entity.getMakeYear())
+                .addParam("registrationDate", entity.getRegistrationDate())
+                .addParam("registrationNumber", entity.getRegistrationNumber())
+                .addParam("personType", entity.getPersonType());
     }
 
     @Nullable
@@ -176,9 +212,12 @@ class RegistrationRecordRepository extends CommonDBRepository<Registration, Stri
     public Registration update(@NonNull @Nonnull Registration entity) {
         String jdbcTemplateUpdate = "update carinfo.record set admin_obj_id = :adminObjId," +
                 " op_code = :operationCode, dep_code = :departmentCode, kind_id = :kindId, vehicle_id = :vehicleId," +
-                " color_id = :colorId, body_type_id = :bodyTypeId, purpose_id = :purposeId, fuel_type_id = :fuelTypeId," +
-                " own_weight = :ownWeight, total_weight = :totalWeight, engine_capacity = :engineCapacity, make_year = :makeYear," +
-                " registration_date = :registrationDate, registration_number = :registrationNumber, person_type = :personType " +
+                " color_id = :colorId, body_type_id = :bodyTypeId, purpose_id = :purposeId, fuel_type_id = :fuelTypeId,"
+                +
+                " own_weight = :ownWeight, total_weight = :totalWeight, engine_capacity = :engineCapacity, make_year = :makeYear,"
+                +
+                " registration_date = :registrationDate, registration_number = :registrationNumber, person_type = :personType "
+                +
                 "where id = :id;";
         SqlParameterMap builder = getSqlParamBuilder();
         setParamsToBuilder(entity, builder);

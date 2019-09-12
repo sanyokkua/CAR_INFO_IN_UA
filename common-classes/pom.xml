@@ -1,20 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>ua.kostenko.carinfo.common</groupId>
     <artifactId>carinfo-common-classes</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-
     <name>carinfo-common-classes</name>
     <description>Common classes for car info project</description>
-
     <parent>
         <groupId>ua.kostenko.carinfo</groupId>
         <artifactId>car-info</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-
 </project>

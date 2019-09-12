@@ -1,20 +1,18 @@
 package ua.kostenko.carinfo.common.api.services;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
-import ua.kostenko.carinfo.common.api.records.Registration;
-import ua.kostenko.carinfo.common.database.repositories.DBRepository;
-
-import javax.annotation.Nonnull;
+import static java.util.Objects.nonNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
-import static java.util.Objects.nonNull;
+import javax.annotation.Nonnull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
+import ua.kostenko.carinfo.common.api.records.Registration;
+import ua.kostenko.carinfo.common.database.repositories.DBRepository;
 
 @Slf4j
 @Service
@@ -27,17 +25,17 @@ class RegistrationService extends CommonDbService<Registration, String> {
 
     @Override
     public boolean isValid(@NonNull @Nonnull Registration entity) {
-        boolean isValid = nonNull(entity.getOperationCode()) && //non NULLABLE
-                nonNull(entity.getOperationName()) && //non NULLABLE
-                nonNull(entity.getDepartmentCode()) && //non NULLABLE
-                nonNull(entity.getKindName()) && //non NULLABLE
-                nonNull(entity.getColorName()) && //non NULLABLE
-                nonNull(entity.getPurposeName()) && //non NULLABLE
-                nonNull(entity.getBrandName()) && //non NULLABLE
-                nonNull(entity.getModelName()) && //non NULLABLE
-                nonNull(entity.getMakeYear()) && //non NULLABLE
-                nonNull(entity.getPersonType()) && //non NULLABLE
-                nonNull(entity.getRegistrationDate()); //non NULLABLE
+        boolean isValid = nonNull(entity.getOperationCode()) && // non NULLABLE
+                nonNull(entity.getOperationName()) && // non NULLABLE
+                nonNull(entity.getDepartmentCode()) && // non NULLABLE
+                nonNull(entity.getKindName()) && // non NULLABLE
+                nonNull(entity.getColorName()) && // non NULLABLE
+                nonNull(entity.getPurposeName()) && // non NULLABLE
+                nonNull(entity.getBrandName()) && // non NULLABLE
+                nonNull(entity.getModelName()) && // non NULLABLE
+                nonNull(entity.getMakeYear()) && // non NULLABLE
+                nonNull(entity.getPersonType()) && // non NULLABLE
+                nonNull(entity.getRegistrationDate()); // non NULLABLE
         if (!isValid) {
             Map<String, Object> fields = new HashMap<>();
             fields.put("OperationCode", entity.getOperationCode());
@@ -54,8 +52,8 @@ class RegistrationService extends CommonDbService<Registration, String> {
             String result = "Entity: " + entity.toString() + " has next invalid fields: ";
             StringBuilder builder = new StringBuilder();
             fields.entrySet().stream()
-                  .filter(stringObjectEntry -> Objects.isNull(stringObjectEntry.getValue()))
-                  .forEach(stringObjectEntry -> builder.append(stringObjectEntry.getKey()).append("\n"));
+                    .filter(stringObjectEntry -> Objects.isNull(stringObjectEntry.getValue()))
+                    .forEach(stringObjectEntry -> builder.append(stringObjectEntry.getKey()).append("\n"));
             result += builder.toString();
             log.warn(result);
         }

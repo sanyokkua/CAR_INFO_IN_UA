@@ -12,17 +12,17 @@ public class IndexController {
     }
 
     @GetMapping("/search")
-    public String search(){
+    public String search() {
         return "html/search";
     }
 
     @GetMapping("/statistics")
-    public String statistics(){
+    public String statistics() {
         return "html/statistics";
     }
 
     @GetMapping("/login")
-    public String login(){
+    public String login() {
         return "html/login";
     }
 }

@@ -1,22 +1,25 @@
 package ua.kostenko.carinfo.importing.io;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import org.apache.commons.io.FileUtils;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FileUtil {
+
     private static final String SYSTEM_TMP_FOLDER_PROPERTY = "java.io.tmpdir";
     private static final String SUB_DIRECTORY = "/registration";
 
     @Nullable
-    public synchronized static File getTempDirectory() {
+    public static synchronized File getTempDirectory() {
         String tempDirPath = System.getProperty(SYSTEM_TMP_FOLDER_PROPERTY);
         File tempDirectory = new File(tempDirPath);
         if (tempDirectory.exists()) {
@@ -72,7 +75,8 @@ public class FileUtil {
                 resultString = FileUtils.readFileToString(file, encoding);
                 log.info("getTextFromFile: File: " + file.getAbsolutePath() + " contains next text: \n" + resultString);
             } catch (IOException e) {
-                log.error("getTextFromFile: Problem with reading file: " + file.getAbsolutePath() + " with encoding: " + encoding);
+                log.error("getTextFromFile: Problem with reading file: " + file.getAbsolutePath() + " with encoding: "
+                        + encoding);
             }
             return resultString;
         } else {

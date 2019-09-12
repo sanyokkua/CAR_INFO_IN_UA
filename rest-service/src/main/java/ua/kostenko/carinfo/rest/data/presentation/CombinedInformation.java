@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class CombinedInformation {
+
     private Auto auto;
     private VRegistration registration;
     private ServiceCenter serviceCenter;

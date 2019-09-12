@@ -1,21 +1,21 @@
 package ua.kostenko.carinfo.common.api.services;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nonnull;
+import org.springframework.data.domain.Page;
 import com.google.common.collect.Lists;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
 import ua.kostenko.carinfo.common.api.records.GenericRecord;
 import ua.kostenko.carinfo.common.database.repositories.DBRepository;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
 @Slf4j
 abstract class CommonDbService<T extends GenericRecord<R>, R> implements DBService<T> {
+
     final DBRepository<T, R> repository;
 
     protected CommonDbService(@NonNull @Nonnull DBRepository<T, R> repository) {
@@ -37,10 +37,12 @@ abstract class CommonDbService<T extends GenericRecord<R>, R> implements DBServi
                         log.error("create: Entity was created but not found by query, retrying to get it once again");
                         Optional<T> entityOptional = get(entity);
                         if (entityOptional.isPresent()) {
-                            log.debug("create: Entity was created and found by query after retrying to get it once again");
+                            log.debug(
+                                    "create: Entity was created and found by query after retrying to get it once again");
                             created = entityOptional.get();
                         } else {
-                            log.error("create: Entity was created but not found by query even after retrying it to get once again");
+                            log.error(
+                                    "create: Entity was created but not found by query even after retrying it to get once again");
                         }
                     }
                     if (Objects.nonNull(created)) {

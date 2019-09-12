@@ -1,7 +1,8 @@
 package ua.kostenko.carinfo.rest.controllers.rest;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Nonnull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import lombok.NonNull;
 import ua.kostenko.carinfo.common.api.records.Registration;
 import ua.kostenko.carinfo.rest.controllers.rest.common.DefaultApiController;
 import ua.kostenko.carinfo.rest.controllers.rest.common.Param;
@@ -20,17 +22,13 @@ import ua.kostenko.carinfo.rest.resources.resources.RegistrationResource;
 import ua.kostenko.carinfo.rest.services.common.SearchService;
 import ua.kostenko.carinfo.rest.utils.Translation;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.Map;
-
-@Slf4j
 @RestController
 @RequestMapping(value = "/api/registrations", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
 public class RecordRestApiController extends DefaultApiController<Registration, String, RegistrationResource> {
 
     @Autowired
-    protected RecordRestApiController(@Nonnull @NonNull SearchService<Registration, String> searchService, @Nonnull @NonNull Translation translation) {
+    protected RecordRestApiController(@Nonnull @NonNull SearchService<Registration, String> searchService,
+            @Nonnull @NonNull Translation translation) {
         super(searchService, translation);
     }
 
@@ -84,8 +82,7 @@ public class RecordRestApiController extends DefaultApiController<Registration, 
                 Registration.OWN_WEIGHT,
                 Registration.TOTAL_WEIGHT,
                 Registration.PERSON_TYPE,
-                Registration.REGISTRATION_DATE
-        );
+                Registration.REGISTRATION_DATE);
     }
 
     @Override
@@ -100,13 +97,15 @@ public class RecordRestApiController extends DefaultApiController<Registration, 
 
     @GetMapping(path = {"find", "find/{indexField}"})
     @Override
-    public PagedResources<RegistrationResource> find(PagedResourcesAssembler<Registration> assembler, Pageable pageable, @PathVariable(required = false) String indexField) {
+    public PagedResources<RegistrationResource> find(PagedResourcesAssembler<Registration> assembler, Pageable pageable,
+            @PathVariable(required = false) String indexField) {
         return getFindResult(assembler, pageable, indexField);
     }
 
     @GetMapping("findByParams")
     @Override
-    public PagedResources<RegistrationResource> findByParams(PagedResourcesAssembler<Registration> assembler, Pageable pageable, Registration params) {
+    public PagedResources<RegistrationResource> findByParams(PagedResourcesAssembler<Registration> assembler,
+            Pageable pageable, Registration params) {
         return getFindByParamsResult(assembler, pageable, params);
     }
 }

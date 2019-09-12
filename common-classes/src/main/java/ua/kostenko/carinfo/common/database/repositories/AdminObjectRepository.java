@@ -1,7 +1,8 @@
 package ua.kostenko.carinfo.common.database.repositories;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -9,23 +10,20 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
+import lombok.NonNull;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.records.AdministrativeObject;
 import ua.kostenko.carinfo.common.database.Constants;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.List;
-
 @Repository
-@Slf4j
 class AdminObjectRepository extends CommonDBRepository<AdministrativeObject, String> {
+
     protected static final String TYPE_PARAM = "type";
     private static final RowMapper<AdministrativeObject> ROW_MAPPER = (resultSet, i) -> AdministrativeObject.builder()
-                                                                                                            .adminObjId(resultSet.getLong(Constants.AdminObject.ID))
-                                                                                                            .adminObjType(resultSet.getString(Constants.AdminObject.TYPE))
-                                                                                                            .adminObjName(resultSet.getString(Constants.AdminObject.NAME))
-                                                                                                            .build();
+            .adminObjId(resultSet.getLong(Constants.AdminObject.ID))
+            .adminObjType(resultSet.getString(Constants.AdminObject.TYPE))
+            .adminObjName(resultSet.getString(Constants.AdminObject.NAME))
+            .build();
 
     @Autowired
     public AdminObjectRepository(@NonNull @Nonnull NamedParameterJdbcTemplate jdbcTemplate) {
@@ -40,8 +38,10 @@ class AdminObjectRepository extends CommonDBRepository<AdministrativeObject, Str
     @Override
     WhereBuilder.BuildResult getWhereFromParams(ParamsHolder params) {
         return buildWhere()
-                .addFieldParam(Constants.AdminObject.NAME, NAME_PARAM, params.getString(AdministrativeObject.ADMIN_OBJ_NAME))
-                .addFieldParam(Constants.AdminObject.TYPE, TYPE_PARAM, params.getString(AdministrativeObject.ADMIN_OBJ_TYPE))
+                .addFieldParam(Constants.AdminObject.NAME, NAME_PARAM,
+                        params.getString(AdministrativeObject.ADMIN_OBJ_NAME))
+                .addFieldParam(Constants.AdminObject.TYPE, TYPE_PARAM,
+                        params.getString(AdministrativeObject.ADMIN_OBJ_TYPE))
                 .build();
     }
 
@@ -53,7 +53,8 @@ class AdminObjectRepository extends CommonDBRepository<AdministrativeObject, Str
     @Nullable
     @Override
     public AdministrativeObject create(@NonNull @Nonnull AdministrativeObject entity) {
-        String jdbcTemplateInsert = "insert into carinfo.admin_object (admin_obj_id, admin_obj_type, admin_obj_name) values (:id, :type, :name);";
+        String jdbcTemplateInsert =
+                "insert into carinfo.admin_object (admin_obj_id, admin_obj_type, admin_obj_name) values (:id, :type, :name);";
         SqlParameterSource params = getSqlParamBuilder()
                 .addParam(ID_PARAM, entity.getId())
                 .addParam(TYPE_PARAM, entity.getAdminObjType())
@@ -65,14 +66,16 @@ class AdminObjectRepository extends CommonDBRepository<AdministrativeObject, Str
     @Nullable
     @Override
     public AdministrativeObject update(@NonNull @Nonnull AdministrativeObject entity) {
-        String jdbcTemplateUpdate = "update carinfo.admin_object set admin_obj_type = :type, admin_obj_name = :name where admin_obj_id = :id;";
+        String jdbcTemplateUpdate =
+                "update carinfo.admin_object set admin_obj_type = :type, admin_obj_name = :name where admin_obj_id = :id;";
         SqlParameterSource params = getSqlParamBuilder()
                 .addParam(ID_PARAM, entity.getId())
                 .addParam(TYPE_PARAM, entity.getAdminObjType())
                 .addParam(NAME_PARAM, entity.getAdminObjName())
                 .build();
         jdbcTemplate.update(jdbcTemplateUpdate, params);
-        ParamsHolder searchParams = getParamsHolderBuilder().param(AdministrativeObject.ADMIN_OBJ_NAME, entity.getAdminObjName()).build();
+        ParamsHolder searchParams =
+                getParamsHolderBuilder().param(AdministrativeObject.ADMIN_OBJ_NAME, entity.getAdminObjName()).build();
         return findOne(searchParams);
     }
 
@@ -85,7 +88,8 @@ class AdminObjectRepository extends CommonDBRepository<AdministrativeObject, Str
 
     @Override
     public boolean existId(long id) {
-        String jdbcTemplateSelectCount = "select count(admin_obj_id) from carinfo.admin_object where admin_obj_id = :id;";
+        String jdbcTemplateSelectCount =
+                "select count(admin_obj_id) from carinfo.admin_object where admin_obj_id = :id;";
         SqlParameterSource params = getSqlParamBuilder().addParam(ID_PARAM, id).build();
         return exist(jdbcTemplateSelectCount, params);
     }
@@ -93,7 +97,8 @@ class AdminObjectRepository extends CommonDBRepository<AdministrativeObject, Str
     @Cacheable(cacheNames = "adminObjCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
     public boolean exist(@NonNull @Nonnull AdministrativeObject entity) {
-        String jdbcTemplateSelectCount = "select count(admin_obj_id) from carinfo.admin_object where admin_obj_name = :name;";
+        String jdbcTemplateSelectCount =
+                "select count(admin_obj_id) from carinfo.admin_object where admin_obj_name = :name;";
         SqlParameterSource params = getSqlParamBuilder().addParam(NAME_PARAM, entity.getAdminObjName()).build();
         return exist(jdbcTemplateSelectCount, params);
     }
@@ -125,7 +130,8 @@ class AdminObjectRepository extends CommonDBRepository<AdministrativeObject, Str
     @Cacheable(cacheNames = "adminObjIndex", unless = "#result == false ", key = "#indexField")
     @Override
     public boolean existsByIndex(@Nonnull @NonNull String indexField) {
-        String jdbcTemplateSelectCount = "select count(admin_obj_id) from carinfo.admin_object where admin_obj_name = :name;";
+        String jdbcTemplateSelectCount =
+                "select count(admin_obj_id) from carinfo.admin_object where admin_obj_name = :name;";
         SqlParameterSource params = getSqlParamBuilder().addParam(NAME_PARAM, indexField).build();
         return exist(jdbcTemplateSelectCount, params);
     }

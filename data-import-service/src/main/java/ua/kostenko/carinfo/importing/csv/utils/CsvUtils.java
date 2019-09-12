@@ -1,22 +1,22 @@
 package ua.kostenko.carinfo.importing.csv.utils;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import ua.kostenko.carinfo.importing.csv.reader.options.ReaderOptions;
-import ua.kostenko.carinfo.importing.csv.reader.options.Options;
-import ua.kostenko.carinfo.importing.csv.structure.headers.CsvHeaders;
-import ua.kostenko.carinfo.importing.io.EncodingUtils;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import org.apache.commons.io.FileUtils;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import ua.kostenko.carinfo.importing.csv.reader.options.Options;
+import ua.kostenko.carinfo.importing.csv.reader.options.ReaderOptions;
+import ua.kostenko.carinfo.importing.csv.structure.headers.CsvHeaders;
+import ua.kostenko.carinfo.importing.io.EncodingUtils;
 
 @Slf4j
-public abstract class CsvUtils <T extends CsvHeaders> {
+public abstract class CsvUtils<T extends CsvHeaders> {
+
     private final File file;
 
     protected CsvUtils(@NonNull @Nonnull File file) {

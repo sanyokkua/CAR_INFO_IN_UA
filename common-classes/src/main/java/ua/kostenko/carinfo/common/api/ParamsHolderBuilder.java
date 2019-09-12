@@ -1,21 +1,21 @@
 package ua.kostenko.carinfo.common.api;
 
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
-import lombok.ToString;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.domain.PageRequest;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.PageRequest;
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
+import lombok.ToString;
 
 @EqualsAndHashCode
 @ToString
 public final class ParamsHolderBuilder {
+
     private static final int DEFAULT_RECORDS_NUMBER = 10;
     private int records;
     private int page;
@@ -66,12 +66,12 @@ public final class ParamsHolderBuilder {
         int pageNumber = getPage(page);
         int recordsPerPage = getAmount(records);
         return ParamsHolder.builder()
-                           .page(PageRequest.of(pageNumber, recordsPerPage))
-                           .longValues(longValues)
-                           .integerValues(integerValues)
-                           .stringValues(stringValues)
-                           .dateValues(dateValues)
-                           .build();
+                .page(PageRequest.of(pageNumber, recordsPerPage))
+                .longValues(longValues)
+                .integerValues(integerValues)
+                .stringValues(stringValues)
+                .dateValues(dateValues)
+                .build();
     }
 
     private int getPage(@Nullable Integer uiPageNumber) {

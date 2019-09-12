@@ -1,19 +1,22 @@
 package ua.kostenko.carinfo.importing.io;
 
+import java.io.File;
+import java.util.Objects;
+import java.util.stream.Stream;
+import javax.annotation.Nonnull;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
-import javax.annotation.Nonnull;
-import java.io.File;
-import java.util.Objects;
-import java.util.stream.Stream;
-
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ArchiveUtils {
 
-    public synchronized static File extractZipArchive(@NonNull @Nonnull File archiveFile, @NonNull @Nonnull File destinationDirectory) {
+    public static synchronized File extractZipArchive(@NonNull @Nonnull File archiveFile,
+            @NonNull @Nonnull File destinationDirectory) {
         try {
             log.info("extractZipArchive: Extracting zip archive...");
             log.info("extractZipArchive: Archive file: {}", archiveFile.getAbsolutePath());

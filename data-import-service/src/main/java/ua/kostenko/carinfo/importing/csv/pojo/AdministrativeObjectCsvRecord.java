@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AdministrativeObjectCsvRecord {
+
     private Long id;
     private String type;
     private String name;

@@ -1,13 +1,18 @@
 package ua.kostenko.carinfo.common.api;
 
-import lombok.*;
-import org.springframework.data.domain.Pageable;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.sql.Date;
 import java.util.Map;
 import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import org.springframework.data.domain.Pageable;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.ToString;
 
 @Builder
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -15,6 +20,7 @@ import java.util.Objects;
 @EqualsAndHashCode
 @ToString
 public class ParamsHolder {
+
     private Pageable page;
     private Map<String, Long> longValues;
     private Map<String, Integer> integerValues;

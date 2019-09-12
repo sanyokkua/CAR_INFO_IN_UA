@@ -1,14 +1,14 @@
 package ua.kostenko.carinfo.rest.utils;
 
-import lombok.NonNull;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import lombok.NonNull;
 
 public class MapBuilder<K, V> {
+
     private final Map<K, V> map;
 
     private MapBuilder() {

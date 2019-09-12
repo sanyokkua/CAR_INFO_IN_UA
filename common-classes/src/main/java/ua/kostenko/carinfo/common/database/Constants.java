@@ -1,9 +1,11 @@
 package ua.kostenko.carinfo.common.database;
 
 public interface Constants {
+
     String SCHEMA = "carinfo";
 
     interface AdminObject {
+
         String TABLE = "admin_object";
         String ID = "admin_obj_id";
         String TYPE = "admin_obj_type";
@@ -11,24 +13,28 @@ public interface Constants {
     }
 
     interface RegistrationBodyType {
+
         String TABLE = "body_type";
         String ID = "body_type_id";
         String NAME = "body_type_name";
     }
 
     interface RegistrationBrand {
+
         String TABLE = "brand";
         String ID = "brand_id";
         String NAME = "brand_name";
     }
 
     interface RegistrationColor {
+
         String TABLE = "color";
         String ID = "color_id";
         String NAME = "color_name";
     }
 
     interface RegistrationDepartment {
+
         String TABLE = "department";
         String CODE = "dep_code";
         String ADDRESS = "dep_addr";
@@ -36,36 +42,42 @@ public interface Constants {
     }
 
     interface RegistrationFuelType {
+
         String TABLE = "fuel_type";
         String ID = "fuel_type_id";
         String NAME = "fuel_type_name";
     }
 
     interface RegistrationKind {
+
         String TABLE = "kind";
         String ID = "kind_id";
         String NAME = "kind_name";
     }
 
     interface RegistrationModel {
+
         String TABLE = "model";
         String ID = "model_id";
         String NAME = "model_name";
     }
 
     interface RegistrationOperation {
+
         String TABLE = "operation";
         String CODE = "op_code";
         String NAME = "op_name";
     }
 
     interface RegistrationPurpose {
+
         String TABLE = "purpose";
         String ID = "purpose_id";
         String NAME = "purpose_name";
     }
 
     interface RegistrationRecord {
+
         String TABLE = "record";
         String TABLE_VIEW = "record_view";
         String ID = "id";
@@ -88,6 +100,7 @@ public interface Constants {
     }
 
     interface RegistrationVehicle {
+
         String TABLE = "vehicle";
         String TABLE_VIEW = "vehicle_view";
         String ID = "vehicle_id";

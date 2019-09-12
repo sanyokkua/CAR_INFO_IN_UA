@@ -12,8 +12,8 @@ public class OperationAssembler extends ResourceAssemblerSupport<Operation, Oper
     }
 
     @Override
-    public OperationResource toResource(Operation entity) {
-        OperationResource resource = super.createResourceWithId(entity.getId(), entity);
+    public OperationResource toResource(final Operation entity) {
+        final OperationResource resource = super.createResourceWithId(entity.getId(), entity);
         resource.setOperationCode(entity.getOperationCode());
         resource.setOperationName(entity.getOperationName());
         return resource;

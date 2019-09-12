@@ -1,7 +1,9 @@
 package ua.kostenko.carinfo.common.database.repositories;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -10,34 +12,32 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.records.Brand;
 import ua.kostenko.carinfo.common.api.records.Model;
 import ua.kostenko.carinfo.common.api.records.Vehicle;
 import ua.kostenko.carinfo.common.database.Constants;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Objects;
-
 @Repository
 @Slf4j
 class RegistrationVehicleRepository extends CommonDBRepository<Vehicle, String> {
+
     protected static final String BRAND_PARAM = "brand";
     protected static final String MODEL_PARAM = "model";
     private static final RowMapper<Vehicle> ROW_MAPPER = (resultSet, i) -> Vehicle.builder()
-                                                                                  .vehicleId(resultSet.getLong(Constants.RegistrationVehicle.ID))
-                                                                                  .modelName(resultSet.getString(Constants.RegistrationModel.NAME))
-                                                                                  .brandName(resultSet.getString(Constants.RegistrationBrand.NAME))
-                                                                                  .build();
+            .vehicleId(resultSet.getLong(Constants.RegistrationVehicle.ID))
+            .modelName(resultSet.getString(Constants.RegistrationModel.NAME))
+            .brandName(resultSet.getString(Constants.RegistrationBrand.NAME))
+            .build();
     private final DBRepository<Brand, String> brandCommonDBRepository;
     private final DBRepository<Model, String> modelCommonDBRepository;
 
     @Autowired
     public RegistrationVehicleRepository(@NonNull @Nonnull NamedParameterJdbcTemplate jdbcTemplate,
-                                         @NonNull @Nonnull DBRepository<Brand, String> brandCommonDBRepository,
-                                         @NonNull @Nonnull DBRepository<Model, String> modelCommonDBRepository) {
+            @NonNull @Nonnull DBRepository<Brand, String> brandCommonDBRepository,
+            @NonNull @Nonnull DBRepository<Model, String> modelCommonDBRepository) {
         super(jdbcTemplate);
         this.brandCommonDBRepository = brandCommonDBRepository;
         this.modelCommonDBRepository = modelCommonDBRepository;
@@ -81,7 +81,8 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle, String> 
             log.warn("update: model is null. Return null instead of update");
             return null;
         }
-        String jdbcTemplateUpdate = "update carinfo.vehicle set brand_id = :brand, model_id = :model where vehicle_id = :id;";
+        String jdbcTemplateUpdate =
+                "update carinfo.vehicle set brand_id = :brand, model_id = :model where vehicle_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder()
                 .addParam(BRAND_PARAM, brand.getBrandId())
                 .addParam(MODEL_PARAM, model.getModelId())
@@ -108,7 +109,8 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle, String> 
     @Cacheable(cacheNames = "vehicleCheck", unless = "#result == false ", key = "#entity.hashCode()")
     @Override
     public boolean exist(@NonNull @Nonnull Vehicle entity) {
-        String jdbcTemplateSelectCount = "select count(vehicle_id) from carinfo.vehicle_view where model_name = :model and brand_name = :brand;";
+        String jdbcTemplateSelectCount =
+                "select count(vehicle_id) from carinfo.vehicle_view where model_name = :model and brand_name = :brand;";
         SqlParameterSource parameterSource = getSqlParamBuilder()
                 .addParam(MODEL_PARAM, entity.getModelName())
                 .addParam(BRAND_PARAM, entity.getBrandName())
@@ -134,10 +136,11 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle, String> 
             log.warn("Brand ({}) or Model ({}) is null", brandName, modelName);
             return null;
         }
-        String jdbcTemplateSelect = "select * from carinfo.vehicle_view where brand_name = :brand and model_name = :model;";
+        String jdbcTemplateSelect =
+                "select * from carinfo.vehicle_view where brand_name = :brand and model_name = :model;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam(MODEL_PARAM, modelName)
-                                                                 .addParam(BRAND_PARAM, brandName)
-                                                                 .build();
+                .addParam(BRAND_PARAM, brandName)
+                .build();
         return findOne(jdbcTemplateSelect, parameterSource);
     }
 
@@ -150,7 +153,8 @@ class RegistrationVehicleRepository extends CommonDBRepository<Vehicle, String> 
     @Cacheable(cacheNames = "vehicleIndex", unless = "#result == false ", key = "#indexField")
     @Override
     public boolean existsByIndex(@Nonnull @NonNull String indexField) {
-        String jdbcTemplateSelectCount = "select count(vehicle_id) from carinfo.vehicle_view where model_name = :model;";
+        String jdbcTemplateSelectCount =
+                "select count(vehicle_id) from carinfo.vehicle_view where model_name = :model;";
         SqlParameterSource parameterSource = getSqlParamBuilder()
                 .addParam(MODEL_PARAM, indexField)
                 .build();

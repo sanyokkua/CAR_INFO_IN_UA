@@ -12,8 +12,8 @@ public class ColorAssembler extends ResourceAssemblerSupport<Color, ColorResourc
     }
 
     @Override
-    public ColorResource toResource(Color entity) {
-        ColorResource resource = super.createResourceWithId(entity.getId(), entity);
+    public ColorResource toResource(final Color entity) {
+        final ColorResource resource = super.createResourceWithId(entity.getId(), entity);
         resource.setColorName(entity.getColorName());
         return resource;
     }

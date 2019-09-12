@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 @PropertySource(value = "classpath:additional.properties")
 public class ApplicationProperties {
+
     @Value("${app.data.set.json.url}")
     public String APP_STRUCTURE_DATA_PACKAGE_JSON_URL;
     @Value("${app.archive.name}")

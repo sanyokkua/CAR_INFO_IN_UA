@@ -1,14 +1,13 @@
 package ua.kostenko.carinfo.common;
 
-import org.junit.Assert;
-import org.junit.Test;
-import ua.kostenko.carinfo.common.api.ParamsHolder;
-import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
+import org.junit.Assert;
+import org.junit.Test;
+import ua.kostenko.carinfo.common.api.ParamsHolder;
+import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
 
 public class StringTest {
 
@@ -25,9 +24,9 @@ public class StringTest {
         params.put("d.dep_addr", null);
 
         params.entrySet().stream()
-              .filter(stringObjectEntry -> Objects.nonNull(stringObjectEntry.getValue()))
-              .map(entry -> entry.getKey() + " = " + entry.getValue())
-              .forEach(stringJoiner::add);
+                .filter(stringObjectEntry -> Objects.nonNull(stringObjectEntry.getValue()))
+                .map(entry -> entry.getKey() + " = " + entry.getValue())
+                .forEach(stringJoiner::add);
         System.out.println(stringJoiner.toString());
     }
 
@@ -41,7 +40,7 @@ public class StringTest {
     }
 
     @Test
-    public void testParamsHolder(){
+    public void testParamsHolder() {
         ParamsHolder build1 = new ParamsHolderBuilder().param("hello", 1).param("world", "2").build();
         ParamsHolder build2 = new ParamsHolderBuilder().param("world", "2").param("hello", 1).build();
         ParamsHolder build3 = new ParamsHolderBuilder().param("hello", 1).param("world", 2).build();

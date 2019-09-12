@@ -1,17 +1,14 @@
 package ua.kostenko.carinfo.common.api.services;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Optional;
+import javax.annotation.Nonnull;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import lombok.NonNull;
 import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
 import ua.kostenko.carinfo.common.api.records.Brand;
 import ua.kostenko.carinfo.common.database.repositories.DBRepository;
 
-import javax.annotation.Nonnull;
-import java.util.Optional;
-
-@Slf4j
 @Service
 class BrandService extends CommonDbService<Brand, String> {
 

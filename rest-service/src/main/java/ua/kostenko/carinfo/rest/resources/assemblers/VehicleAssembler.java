@@ -12,8 +12,8 @@ public class VehicleAssembler extends ResourceAssemblerSupport<Vehicle, VehicleR
     }
 
     @Override
-    public VehicleResource toResource(Vehicle entity) {
-        VehicleResource resource = super.createResourceWithId(entity.getId(), entity);
+    public VehicleResource toResource(final Vehicle entity) {
+        final VehicleResource resource = super.createResourceWithId(entity.getId(), entity);
         resource.setBrandName(entity.getBrandName());
         resource.setModelName(entity.getModelName());
         return resource;

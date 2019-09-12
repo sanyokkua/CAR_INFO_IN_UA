@@ -1,19 +1,19 @@
 package ua.kostenko.carinfo.importing.importing.centers;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Optional;
+import javax.annotation.Nonnull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import ua.kostenko.carinfo.common.api.records.Department;
 import ua.kostenko.carinfo.common.api.services.DBService;
 import ua.kostenko.carinfo.importing.importing.Persist;
 
-import javax.annotation.Nonnull;
-import java.util.Optional;
-
 @Slf4j
 @Component
 public class ServiceCenterPersist implements Persist<ServiceCenter> {
+
     private final DBService<Department> service;
 
     @Autowired
@@ -25,10 +25,10 @@ public class ServiceCenterPersist implements Persist<ServiceCenter> {
     public void persist(@NonNull @Nonnull ServiceCenter record) {
         log.debug(record.toString());
         Department dep = Department.builder()
-                                   .departmentCode(record.getDepId())
-                                   .departmentAddress(record.getAddress())
-                                   .departmentEmail(record.getEmail())
-                                   .build();
+                .departmentCode(record.getDepId())
+                .departmentAddress(record.getAddress())
+                .departmentEmail(record.getEmail())
+                .build();
         if (!service.exists(dep)) {
             Optional<Department> department = service.create(dep);
             if (department.isPresent()) {

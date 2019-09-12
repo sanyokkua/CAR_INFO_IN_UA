@@ -1,8 +1,7 @@
 package ua.kostenko.carinfo.rest.data.persistent.services;
 
-import ua.kostenko.carinfo.rest.data.presentation.CombinedInformation;
-
 import java.util.List;
+import ua.kostenko.carinfo.rest.data.presentation.CombinedInformation;
 
 @Deprecated
 public interface SearchService {

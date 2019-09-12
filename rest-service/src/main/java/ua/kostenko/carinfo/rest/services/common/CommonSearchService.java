@@ -1,21 +1,19 @@
 package ua.kostenko.carinfo.rest.services.common;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import java.sql.Date;
+import java.util.Map;
+import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import lombok.NonNull;
 import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
 import ua.kostenko.carinfo.common.api.records.GenericRecord;
 import ua.kostenko.carinfo.common.api.services.DBService;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.sql.Date;
-import java.util.Map;
-import java.util.Objects;
-
-@Slf4j
 public abstract class CommonSearchService<T extends GenericRecord<I>, I> implements SearchService<T, I> {
+
     private final DBService<T> service;
 
     public CommonSearchService(DBService<T> service) {
@@ -49,7 +47,8 @@ public abstract class CommonSearchService<T extends GenericRecord<I>, I> impleme
         return service.getAll(builder);
     }
 
-    private void addParamsToBuilder(@NonNull @Nonnull Map<String, Object> params, @NonNull @Nonnull ParamsHolderBuilder builder) {
+    private void addParamsToBuilder(@NonNull @Nonnull Map<String, Object> params,
+            @NonNull @Nonnull ParamsHolderBuilder builder) {
         params.forEach((key, value) -> {
             if (value instanceof String) {
                 builder.param(key, (String) value);
@@ -60,7 +59,8 @@ public abstract class CommonSearchService<T extends GenericRecord<I>, I> impleme
             } else if (value instanceof Date) {
                 builder.param(key, (Date) value);
             } else {
-                throw new IllegalArgumentException("Type of this value is not supported. Type = " + value.getClass().getSimpleName());
+                throw new IllegalArgumentException(
+                        "Type of this value is not supported. Type = " + value.getClass().getSimpleName());
             }
         });
     }

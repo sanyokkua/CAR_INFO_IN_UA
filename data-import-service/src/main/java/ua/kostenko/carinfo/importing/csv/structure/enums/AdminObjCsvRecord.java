@@ -1,13 +1,10 @@
 package ua.kostenko.carinfo.importing.csv.structure.enums;
 
+import javax.annotation.Nonnull;
 import lombok.NonNull;
 
-import javax.annotation.Nonnull;
-
 public enum AdminObjCsvRecord {
-    TE("TE"),
-    NP("NP"),
-    NU("NU");
+    TE("TE"), NP("NP"), NU("NU");
 
     private final String fieldName;
 

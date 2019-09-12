@@ -1,7 +1,8 @@
 package ua.kostenko.carinfo.common.database.repositories;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -9,21 +10,18 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
+import lombok.NonNull;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.records.Model;
 import ua.kostenko.carinfo.common.database.Constants;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.List;
-
 @Repository
-@Slf4j
 class RegistrationModelRepository extends CommonDBRepository<Model, String> {
+
     private static final RowMapper<Model> ROW_MAPPER = (resultSet, i) -> Model.builder()
-                                                                              .modelId(resultSet.getLong(Constants.RegistrationModel.ID))
-                                                                              .modelName(resultSet.getString(Constants.RegistrationModel.NAME))
-                                                                              .build();
+            .modelId(resultSet.getLong(Constants.RegistrationModel.ID))
+            .modelName(resultSet.getString(Constants.RegistrationModel.NAME))
+            .build();
 
     @Autowired
     public RegistrationModelRepository(@NonNull @Nonnull NamedParameterJdbcTemplate jdbcTemplate) {
@@ -60,8 +58,8 @@ class RegistrationModelRepository extends CommonDBRepository<Model, String> {
     public Model update(@NonNull @Nonnull Model entity) {
         String jdbcTemplateUpdate = "update carinfo.model set model_name = :name where model_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, entity.getModelName())
-                                                                 .addParam(ID_PARAM, entity.getModelId())
-                                                                 .build();
+                .addParam(ID_PARAM, entity.getModelId())
+                .build();
         jdbcTemplate.update(jdbcTemplateUpdate, parameterSource);
         ParamsHolder searchParams = getParamsHolderBuilder().param(Model.MODEL_NAME, entity.getModelName()).build();
         return findOne(searchParams);

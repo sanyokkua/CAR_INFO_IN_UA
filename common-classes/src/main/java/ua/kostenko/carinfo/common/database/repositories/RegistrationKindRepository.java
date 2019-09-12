@@ -1,7 +1,8 @@
 package ua.kostenko.carinfo.common.database.repositories;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -9,21 +10,18 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
+import lombok.NonNull;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.records.Kind;
 import ua.kostenko.carinfo.common.database.Constants;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.List;
-
 @Repository
-@Slf4j
 class RegistrationKindRepository extends CommonDBRepository<Kind, String> {
+
     private static final RowMapper<Kind> ROW_MAPPER = (resultSet, i) -> Kind.builder()
-                                                                            .kindId(resultSet.getLong(Constants.RegistrationKind.ID))
-                                                                            .kindName(resultSet.getString(Constants.RegistrationKind.NAME))
-                                                                            .build();
+            .kindId(resultSet.getLong(Constants.RegistrationKind.ID))
+            .kindName(resultSet.getString(Constants.RegistrationKind.NAME))
+            .build();
 
     @Autowired
     public RegistrationKindRepository(@NonNull @Nonnull NamedParameterJdbcTemplate jdbcTemplate) {
@@ -60,8 +58,8 @@ class RegistrationKindRepository extends CommonDBRepository<Kind, String> {
     public Kind update(@NonNull @Nonnull Kind entity) {
         String jdbcTemplateUpdate = "update carinfo.kind set kind_name = :name where kind_id = :id;";
         SqlParameterSource parameterSource = getSqlParamBuilder().addParam(NAME_PARAM, entity.getKindName())
-                                                                 .addParam(ID_PARAM, entity.getKindId())
-                                                                 .build();
+                .addParam(ID_PARAM, entity.getKindId())
+                .build();
         jdbcTemplate.update(jdbcTemplateUpdate, parameterSource);
         ParamsHolder searchParams = getParamsHolderBuilder().param(Kind.KIND_NAME, entity.getKindName()).build();
         return findOne(searchParams);

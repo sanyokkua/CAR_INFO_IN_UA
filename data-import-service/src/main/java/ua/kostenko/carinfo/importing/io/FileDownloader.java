@@ -1,21 +1,24 @@
 package ua.kostenko.carinfo.importing.io;
 
-import com.google.common.base.Preconditions;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import javax.annotation.Nonnull;
+import com.google.common.base.Preconditions;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FileDownloader {
 
-    public synchronized static File downloadFile(@NonNull @Nonnull String downloadUrl, @NonNull @Nonnull String pathToFileForSave) {
+    public static synchronized File downloadFile(@NonNull @Nonnull String downloadUrl,
+            @NonNull @Nonnull String pathToFileForSave) {
         Path targetPath = null;
         try {
             log.info("downloadFile: Downloading archive from URL: {}", downloadUrl);
@@ -29,8 +32,10 @@ public class FileDownloader {
         } catch (IOException e) {
             log.error(String.format("Error occurred with downloading archive from: %s", downloadUrl), e);
         }
-        Preconditions.checkNotNull(targetPath, String.format("Error occurred in downloading archive from: %s, path to archive is null", downloadUrl));
-        log.info("downloadFile: Archive downloaded from: {}, path to archive: {}", downloadUrl, targetPath.toAbsolutePath().toString());
+        Preconditions.checkNotNull(targetPath,
+                String.format("Error occurred in downloading archive from: %s, path to archive is null", downloadUrl));
+        log.info("downloadFile: Archive downloaded from: {}, path to archive: {}", downloadUrl,
+                targetPath.toAbsolutePath().toString());
         return targetPath.toFile();
     }
 }

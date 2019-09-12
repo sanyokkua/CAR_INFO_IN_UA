@@ -1,8 +1,12 @@
 package ua.kostenko.carinfo.rest.resources.resources;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.*;
 import org.springframework.hateoas.ResourceSupport;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -11,6 +15,7 @@ import org.springframework.hateoas.ResourceSupport;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class FuelTypeResource extends ResourceSupport {
+
     private String fuelTypeName;
 
 }

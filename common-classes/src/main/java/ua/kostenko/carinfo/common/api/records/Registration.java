@@ -1,16 +1,21 @@
 package ua.kostenko.carinfo.common.api.records;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
-
 import java.io.Serializable;
 import java.sql.Date;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Registration implements Serializable, GenericRecord<String> {
+
+    private static final long serialVersionUID = -6398041379070093599L;
     public static final String ADMIN_OBJ_NAME = "adminObjName";
     public static final String ADMIN_OBJ_TYPE = "adminObjType";
     public static final String OPERATION_CODE = "operationCode";
@@ -35,38 +40,38 @@ public class Registration implements Serializable, GenericRecord<String> {
 
     private Long id;
 
-    private String adminObjName;//NULLABLE
-    private String adminObjType;//NULLABLE
+    private String adminObjName;// NULLABLE
+    private String adminObjType;// NULLABLE
     @NonNull
-    private Long operationCode;//non NULLABLE opName
+    private Long operationCode;// non NULLABLE opName
     @NonNull
-    private String operationName;//non NULLABLE opName
+    private String operationName;// non NULLABLE opName
     @NonNull
-    private Long departmentCode;//non NULLABLE
-    private String departmentAddress;//non NULLABLE
-    private String departmentEmail;//non NULLABLE
+    private Long departmentCode;// non NULLABLE
+    private String departmentAddress;// non NULLABLE
+    private String departmentEmail;// non NULLABLE
     @NonNull
-    private String kindName;//non NULLABLE
+    private String kindName;// non NULLABLE
     @NonNull
-    private String colorName;//non NULLABLE
-    private String bodyTypeName;//NULLABLE
+    private String colorName;// non NULLABLE
+    private String bodyTypeName;// NULLABLE
     @NonNull
-    private String purposeName;//non NULLABLE
+    private String purposeName;// non NULLABLE
     @NonNull
-    private String brandName;//non NULLABLE
+    private String brandName;// non NULLABLE
     @NonNull
-    private String modelName;//non NULLABLE
-    private String fuelTypeName;//NULLABLE
-    private Long engineCapacity;//NULLABLE
+    private String modelName;// non NULLABLE
+    private String fuelTypeName;// NULLABLE
+    private Long engineCapacity;// NULLABLE
     @NonNull
-    private Long makeYear;//non NULLABLE
-    private Long ownWeight;//NULLABLE
-    private Long totalWeight;//NULLABLE
+    private Long makeYear;// non NULLABLE
+    private Long ownWeight;// NULLABLE
+    private Long totalWeight;// NULLABLE
     @NonNull
-    private String personType;//non NULLABLE
-    private String registrationNumber;//NULLABLE
+    private String personType;// non NULLABLE
+    private String registrationNumber;// NULLABLE
     @NonNull
-    private Date registrationDate;//non NULLABLE
+    private Date registrationDate;// non NULLABLE
 
     @JsonIgnore
     @Override

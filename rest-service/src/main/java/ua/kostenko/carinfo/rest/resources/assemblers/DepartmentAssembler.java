@@ -12,8 +12,8 @@ public class DepartmentAssembler extends ResourceAssemblerSupport<Department, De
     }
 
     @Override
-    public DepartmentResource toResource(Department entity) {
-        DepartmentResource resource = super.createResourceWithId(entity.getId(), entity);
+    public DepartmentResource toResource(final Department entity) {
+        final DepartmentResource resource = super.createResourceWithId(entity.getId(), entity);
         resource.setDepartmentCode(entity.getDepartmentCode());
         resource.setDepartmentAddress(entity.getDepartmentAddress());
         resource.setDepartmentEmail(entity.getDepartmentEmail());

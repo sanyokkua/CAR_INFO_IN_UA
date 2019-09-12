@@ -12,8 +12,8 @@ public class ModelAssembler extends ResourceAssemblerSupport<Model, ModelResourc
     }
 
     @Override
-    public ModelResource toResource(Model entity) {
-        ModelResource resource = super.createResourceWithId(entity.getId(), entity);
+    public ModelResource toResource(final Model entity) {
+        final ModelResource resource = super.createResourceWithId(entity.getId(), entity);
         resource.setModelName(entity.getModelName());
         return resource;
     }

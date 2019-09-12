@@ -1,12 +1,12 @@
 package ua.kostenko.carinfo.importing.csv.mappers;
 
+import java.nio.charset.Charset;
+import javax.annotation.Nullable;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.annotation.Nullable;
-import java.nio.charset.Charset;
-
 public interface CsvMapper<T> {
+
     T map(CSVRecord csvRecord);
 
     @Nullable
@@ -20,7 +20,7 @@ public interface CsvMapper<T> {
         try {
             result = Long.valueOf(StringUtils.trim(number));
         } catch (Exception ex) {
-            //ignore
+            // ignore
         }
         return result;
     }

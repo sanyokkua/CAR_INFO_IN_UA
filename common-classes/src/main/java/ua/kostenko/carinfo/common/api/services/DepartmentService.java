@@ -1,18 +1,15 @@
 package ua.kostenko.carinfo.common.api.services;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nonnull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import lombok.NonNull;
 import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
 import ua.kostenko.carinfo.common.api.records.Department;
 import ua.kostenko.carinfo.common.database.repositories.DBRepository;
 
-import javax.annotation.Nonnull;
-import java.util.Objects;
-import java.util.Optional;
-
-@Slf4j
 @Service
 class DepartmentService extends CommonDbService<Department, Long> {
 

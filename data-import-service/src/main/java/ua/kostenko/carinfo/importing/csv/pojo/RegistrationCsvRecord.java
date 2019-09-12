@@ -1,17 +1,25 @@
 package ua.kostenko.carinfo.importing.csv.pojo;
 
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import ua.kostenko.carinfo.common.api.records.*;
-
-import java.sql.Date;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Objects;
+import ua.kostenko.carinfo.common.api.records.AdministrativeObject;
+import ua.kostenko.carinfo.common.api.records.BodyType;
+import ua.kostenko.carinfo.common.api.records.Brand;
+import ua.kostenko.carinfo.common.api.records.Color;
+import ua.kostenko.carinfo.common.api.records.Department;
+import ua.kostenko.carinfo.common.api.records.FuelType;
+import ua.kostenko.carinfo.common.api.records.Kind;
+import ua.kostenko.carinfo.common.api.records.Model;
+import ua.kostenko.carinfo.common.api.records.Operation;
+import ua.kostenko.carinfo.common.api.records.Purpose;
 
 @Slf4j
 @Data
@@ -19,7 +27,9 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegistrationCsvRecord {
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("[yyyy-MM-dd][dd.MM.yyyy]");//2013-02-02 or 19.02.2019
+
+    private static final DateTimeFormatter DATE_TIME_FORMATTER =
+            DateTimeFormatter.ofPattern("[yyyy-MM-dd][dd.MM.yyyy]");// 2013-02-02 or 19.02.2019
     private String personType;
     private Long administrativeObject;
     private Long operationCode;

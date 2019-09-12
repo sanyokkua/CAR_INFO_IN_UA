@@ -1,27 +1,36 @@
 package ua.kostenko.carinfo.rest.data.persistent.services;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
-import ua.kostenko.carinfo.common.api.records.*;
+import ua.kostenko.carinfo.common.api.records.AdministrativeObject;
+import ua.kostenko.carinfo.common.api.records.BodyType;
+import ua.kostenko.carinfo.common.api.records.Brand;
+import ua.kostenko.carinfo.common.api.records.Color;
+import ua.kostenko.carinfo.common.api.records.Department;
+import ua.kostenko.carinfo.common.api.records.FuelType;
+import ua.kostenko.carinfo.common.api.records.Kind;
+import ua.kostenko.carinfo.common.api.records.Model;
+import ua.kostenko.carinfo.common.api.records.Operation;
+import ua.kostenko.carinfo.common.api.records.Purpose;
+import ua.kostenko.carinfo.common.api.records.Registration;
+import ua.kostenko.carinfo.common.api.records.Vehicle;
 import ua.kostenko.carinfo.common.api.services.DBService;
 import ua.kostenko.carinfo.rest.data.presentation.Auto;
 import ua.kostenko.carinfo.rest.data.presentation.CombinedInformation;
 import ua.kostenko.carinfo.rest.data.presentation.ServiceCenter;
 import ua.kostenko.carinfo.rest.data.presentation.VRegistration;
 
-import javax.transaction.Transactional;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @Transactional
-@Slf4j
 @Deprecated
 public class DBSearchService implements SearchService {
+
     private final DBService<Registration> registrationDBService;
     private final DBService<Brand> brandDBService;
     private final DBService<Color> colorDBService;
@@ -31,17 +40,17 @@ public class DBSearchService implements SearchService {
 
     @Autowired
     public DBSearchService(DBService<Registration> registrationDBService,
-                           DBService<AdministrativeObject> administrativeObjectDBService,
-                           DBService<BodyType> bodyTypeDBService,
-                           DBService<Brand> brandDBService,
-                           DBService<Color> colorDBService,
-                           DBService<Department> departmentDBService,
-                           DBService<FuelType> fuelTypeDBService,
-                           DBService<Kind> kindDBService,
-                           DBService<Model> modelDBService,
-                           DBService<Operation> operationDBService,
-                           DBService<Purpose> purposeDBService,
-                           DBService<Vehicle> vehicleDBService) {
+            DBService<AdministrativeObject> administrativeObjectDBService,
+            DBService<BodyType> bodyTypeDBService,
+            DBService<Brand> brandDBService,
+            DBService<Color> colorDBService,
+            DBService<Department> departmentDBService,
+            DBService<FuelType> fuelTypeDBService,
+            DBService<Kind> kindDBService,
+            DBService<Model> modelDBService,
+            DBService<Operation> operationDBService,
+            DBService<Purpose> purposeDBService,
+            DBService<Vehicle> vehicleDBService) {
         this.registrationDBService = registrationDBService;
         this.brandDBService = brandDBService;
         this.colorDBService = colorDBService;
@@ -60,7 +69,8 @@ public class DBSearchService implements SearchService {
                 Auto auto = Auto.map(record);
                 VRegistration vRegistration = VRegistration.map(record);
                 ServiceCenter serviceCenter = ServiceCenter.map(record);
-                return CombinedInformation.builder().auto(auto).registration(vRegistration).serviceCenter(serviceCenter).build();
+                return CombinedInformation.builder().auto(auto).registration(vRegistration).serviceCenter(serviceCenter)
+                        .build();
             }).collect(Collectors.toList());
         }
         return Collections.emptyList();
@@ -137,10 +147,6 @@ public class DBSearchService implements SearchService {
 
     @Override
     public long countAllCarsInRegion(String region) {
-        return 0;
-    }
-
-    private long countForTableByField(String field, String value) {
         return 0;
     }
 

@@ -1,7 +1,8 @@
 package ua.kostenko.carinfo.common.database.repositories;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -9,21 +10,18 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
+import lombok.NonNull;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.records.Color;
 import ua.kostenko.carinfo.common.database.Constants;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.List;
-
 @Repository
-@Slf4j
 class RegistrationColorRepository extends CommonDBRepository<Color, String> {
+
     private static final RowMapper<Color> ROW_MAPPER = (resultSet, i) -> Color.builder()
-                                                                              .colorId(resultSet.getLong(Constants.RegistrationColor.ID))
-                                                                              .colorName(resultSet.getString(Constants.RegistrationColor.NAME))
-                                                                              .build();
+            .colorId(resultSet.getLong(Constants.RegistrationColor.ID))
+            .colorName(resultSet.getString(Constants.RegistrationColor.NAME))
+            .build();
 
     @Autowired
     public RegistrationColorRepository(@NonNull @Nonnull NamedParameterJdbcTemplate jdbcTemplate) {

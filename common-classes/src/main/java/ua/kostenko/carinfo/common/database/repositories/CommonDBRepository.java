@@ -1,7 +1,9 @@
 package ua.kostenko.carinfo.common.database.repositories;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import javax.annotation.Nonnull;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -10,18 +12,16 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.ParamsHolderBuilder;
 import ua.kostenko.carinfo.common.api.records.GenericRecord;
 import ua.kostenko.carinfo.common.database.Constants;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
 @Slf4j
 abstract class CommonDBRepository<T extends GenericRecord<R>, R> implements DBRepository<T, R> {
+
     static final String ID_PARAM = "id";
     static final String NAME_PARAM = "name";
     private static final RowMapper<Integer> FIND_TOTAL_MAPPER = (rs, rowNum) -> rs.getInt(1);
@@ -73,7 +73,8 @@ abstract class CommonDBRepository<T extends GenericRecord<R>, R> implements DBRe
 
     }
 
-    Page<T> findPage(@NonNull @Nonnull ParamsHolder paramsHolder, @NonNull @Nonnull String selectSql, @NonNull @Nonnull String fromSql, @NonNull @Nonnull WhereBuilder whereBuilder) {
+    Page<T> findPage(@NonNull @Nonnull ParamsHolder paramsHolder, @NonNull @Nonnull String selectSql,
+            @NonNull @Nonnull String fromSql, @NonNull @Nonnull WhereBuilder whereBuilder) {
         if (StringUtils.isBlank(selectSql) || StringUtils.isBlank(fromSql)) {
             throw new IllegalArgumentException("Select or From values can't be blank");
         }
@@ -104,15 +105,18 @@ abstract class CommonDBRepository<T extends GenericRecord<R>, R> implements DBRe
 
     @Override
     public int countAll() {
-        String countQuery = String.format("select count(1) as row_count from %s", formatTableNameWithSchema(getTableName()));
+        String countQuery =
+                String.format("select count(1) as row_count from %s", formatTableNameWithSchema(getTableName()));
         return jdbcTemplate.query(countQuery, FIND_TOTAL_MAPPER).stream().findFirst().orElse(0);
     }
 
     @Override
     public int countAll(@Nonnull @NonNull ParamsHolder searchParams) {
         WhereBuilder.BuildResult result = getWhereFromParams(searchParams);
-        String countQuery = String.format("select count(1) as row_count from %s %s", formatTableNameWithSchema(getTableName()), result.getWhereSql());
-        return jdbcTemplate.query(countQuery, result.getSqlParameters(), FIND_TOTAL_MAPPER).stream().findFirst().orElse(0);
+        String countQuery = String.format("select count(1) as row_count from %s %s",
+                formatTableNameWithSchema(getTableName()), result.getWhereSql());
+        return jdbcTemplate.query(countQuery, result.getSqlParameters(), FIND_TOTAL_MAPPER).stream().findFirst()
+                .orElse(0);
     }
 
     abstract WhereBuilder.BuildResult getWhereFromParams(ParamsHolder params);

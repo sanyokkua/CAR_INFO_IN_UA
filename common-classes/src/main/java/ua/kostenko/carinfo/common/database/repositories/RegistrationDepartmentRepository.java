@@ -1,7 +1,9 @@
 package ua.kostenko.carinfo.common.database.repositories;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -9,26 +11,22 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
+import lombok.NonNull;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.records.Department;
 import ua.kostenko.carinfo.common.database.Constants;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Objects;
-
 @Repository
-@Slf4j
 class RegistrationDepartmentRepository extends CommonDBRepository<Department, Long> {
+
     protected static final String CODE_PARAM = "code";
     protected static final String ADDR_PARAM = "addr";
     protected static final String EMAIL_PARAM = "email";
     private static final RowMapper<Department> ROW_MAPPER = (resultSet, i) -> Department.builder()
-                                                                                        .departmentCode(resultSet.getLong(Constants.RegistrationDepartment.CODE))
-                                                                                        .departmentAddress(resultSet.getString(Constants.RegistrationDepartment.ADDRESS))
-                                                                                        .departmentEmail(resultSet.getString(Constants.RegistrationDepartment.EMAIL))
-                                                                                        .build();
+            .departmentCode(resultSet.getLong(Constants.RegistrationDepartment.CODE))
+            .departmentAddress(resultSet.getString(Constants.RegistrationDepartment.ADDRESS))
+            .departmentEmail(resultSet.getString(Constants.RegistrationDepartment.EMAIL))
+            .build();
 
     @Autowired
     public RegistrationDepartmentRepository(@NonNull @Nonnull NamedParameterJdbcTemplate jdbcTemplate) {
@@ -43,9 +41,12 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department, Lo
     @Override
     WhereBuilder.BuildResult getWhereFromParams(ParamsHolder params) {
         return buildWhere()
-                .addFieldParam(Constants.RegistrationDepartment.CODE, NAME_PARAM, params.getLong(Department.DEPARTMENT_CODE))
-                .addFieldParam(Constants.RegistrationDepartment.ADDRESS, NAME_PARAM, params.getString(Department.DEPARTMENT_ADDRESS))
-                .addFieldParam(Constants.RegistrationDepartment.EMAIL, NAME_PARAM, params.getString(Department.DEPARTMENT_EMAIL))
+                .addFieldParam(Constants.RegistrationDepartment.CODE, NAME_PARAM,
+                        params.getLong(Department.DEPARTMENT_CODE))
+                .addFieldParam(Constants.RegistrationDepartment.ADDRESS, NAME_PARAM,
+                        params.getString(Department.DEPARTMENT_ADDRESS))
+                .addFieldParam(Constants.RegistrationDepartment.EMAIL, NAME_PARAM,
+                        params.getString(Department.DEPARTMENT_EMAIL))
                 .build();
     }
 
@@ -57,7 +58,8 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department, Lo
     @Nullable
     @Override
     public Department create(@NonNull @Nonnull Department entity) {
-        String jdbcTemplateInsert = "insert into carinfo.department (dep_code, dep_addr, dep_email) values (:code, :addr, :email);";
+        String jdbcTemplateInsert =
+                "insert into carinfo.department (dep_code, dep_addr, dep_email) values (:code, :addr, :email);";
         SqlParameterSource parameterSource = getSqlParamBuilder()
                 .addParam(CODE_PARAM, entity.getDepartmentCode())
                 .addParam(ADDR_PARAM, entity.getDepartmentAddress())
@@ -69,14 +71,16 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department, Lo
     @Nullable
     @Override
     public Department update(@NonNull @Nonnull Department entity) {
-        String jdbcTemplateUpdate = "update carinfo.department set dep_addr = :addr, dep_email = :email where dep_code = :code;";
+        String jdbcTemplateUpdate =
+                "update carinfo.department set dep_addr = :addr, dep_email = :email where dep_code = :code;";
         SqlParameterSource parameterSource = getSqlParamBuilder()
                 .addParam(CODE_PARAM, entity.getDepartmentCode())
                 .addParam(ADDR_PARAM, entity.getDepartmentAddress())
                 .addParam(EMAIL_PARAM, entity.getDepartmentEmail())
                 .build();
         jdbcTemplate.update(jdbcTemplateUpdate, parameterSource);
-        ParamsHolder holder = getParamsHolderBuilder().param(Department.DEPARTMENT_CODE, entity.getDepartmentCode()).build();
+        ParamsHolder holder =
+                getParamsHolderBuilder().param(Department.DEPARTMENT_CODE, entity.getDepartmentCode()).build();
         return findOne(holder);
     }
 
@@ -98,7 +102,8 @@ class RegistrationDepartmentRepository extends CommonDBRepository<Department, Lo
     @Override
     public boolean exist(@NonNull @Nonnull Department entity) {
         String jdbcTemplateSelectCount = "select count(dep_code) from carinfo.department where dep_code = :code;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(CODE_PARAM, entity.getDepartmentCode()).build();
+        SqlParameterSource parameterSource =
+                getSqlParamBuilder().addParam(CODE_PARAM, entity.getDepartmentCode()).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
     }
 

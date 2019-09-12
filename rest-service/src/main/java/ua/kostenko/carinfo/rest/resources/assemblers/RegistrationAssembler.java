@@ -12,8 +12,8 @@ public class RegistrationAssembler extends ResourceAssemblerSupport<Registration
     }
 
     @Override
-    public RegistrationResource toResource(Registration entity) {
-        RegistrationResource resource = super.createResourceWithId(entity.getId(), entity);
+    public RegistrationResource toResource(final Registration entity) {
+        final RegistrationResource resource = super.createResourceWithId(entity.getId(), entity);
         resource.setAdminObjName(entity.getAdminObjName());
         resource.setAdminObjType(entity.getAdminObjType());
         resource.setOperationCode(entity.getOperationCode());

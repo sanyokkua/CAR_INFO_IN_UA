@@ -3,6 +3,7 @@ package ua.kostenko.carinfo.importing.csv.structure.headers.registration;
 import ua.kostenko.carinfo.importing.csv.structure.enums.RegistrationCsvRecord;
 
 public class LowerCaseRegistrationHeaders implements RegistrationHeaders {
+
     @Override
     public String getPersonType() {
         return RegistrationCsvRecord.PERSON.getLowerCase();

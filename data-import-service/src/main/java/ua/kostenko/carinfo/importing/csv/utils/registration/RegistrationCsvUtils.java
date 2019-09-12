@@ -1,14 +1,13 @@
 package ua.kostenko.carinfo.importing.csv.utils.registration;
 
+import java.io.File;
+import javax.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
-import ua.kostenko.carinfo.importing.csv.structure.headers.registration.LowerCaseRegistrationHeaders;
 import ua.kostenko.carinfo.importing.csv.structure.enums.RegistrationCsvRecord;
+import ua.kostenko.carinfo.importing.csv.structure.headers.registration.LowerCaseRegistrationHeaders;
 import ua.kostenko.carinfo.importing.csv.structure.headers.registration.RegistrationHeaders;
 import ua.kostenko.carinfo.importing.csv.structure.headers.registration.UpperCaseRegistrationHeaders;
 import ua.kostenko.carinfo.importing.csv.utils.CsvUtils;
-
-import javax.annotation.Nonnull;
-import java.io.File;
 
 @Slf4j
 public class RegistrationCsvUtils extends CsvUtils<RegistrationHeaders> {

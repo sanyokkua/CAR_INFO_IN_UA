@@ -12,8 +12,8 @@ public class BodyTypeAssembler extends ResourceAssemblerSupport<BodyType, BodyTy
     }
 
     @Override
-    public BodyTypeResource toResource(BodyType entity) {
-        BodyTypeResource resource = super.createResourceWithId(entity.getId(), entity);
+    public BodyTypeResource toResource(final BodyType entity) {
+        final BodyTypeResource resource = super.createResourceWithId(entity.getId(), entity);
         resource.setBodyTypeName(entity.getBodyTypeName());
         return resource;
     }

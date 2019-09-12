@@ -1,7 +1,8 @@
 package ua.kostenko.carinfo.common.database.repositories;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -9,22 +10,19 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
+import lombok.NonNull;
 import ua.kostenko.carinfo.common.api.ParamsHolder;
 import ua.kostenko.carinfo.common.api.records.Operation;
 import ua.kostenko.carinfo.common.database.Constants;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.List;
-
 @Repository
-@Slf4j
 class RegistrationOperationRepository extends CommonDBRepository<Operation, Long> {
+
     protected static final String CODE_PARAM = "code";
     private static final RowMapper<Operation> ROW_MAPPER = (resultSet, i) -> Operation.builder()
-                                                                                      .operationCode(resultSet.getLong(Constants.RegistrationOperation.CODE))
-                                                                                      .operationName(resultSet.getString(Constants.RegistrationOperation.NAME))
-                                                                                      .build();
+            .operationCode(resultSet.getLong(Constants.RegistrationOperation.CODE))
+            .operationName(resultSet.getString(Constants.RegistrationOperation.NAME))
+            .build();
 
     @Autowired
     public RegistrationOperationRepository(@NonNull @Nonnull NamedParameterJdbcTemplate jdbcTemplate) {
@@ -40,7 +38,8 @@ class RegistrationOperationRepository extends CommonDBRepository<Operation, Long
     WhereBuilder.BuildResult getWhereFromParams(ParamsHolder params) {
         return buildWhere()
                 .addFieldParam(Constants.RegistrationOperation.CODE, ID_PARAM, params.getLong(Operation.OPERATION_CODE))
-                .addFieldParam(Constants.RegistrationOperation.NAME, NAME_PARAM, params.getString(Operation.OPERATION_NAME))
+                .addFieldParam(Constants.RegistrationOperation.NAME, NAME_PARAM,
+                        params.getString(Operation.OPERATION_NAME))
                 .build();
     }
 
@@ -69,7 +68,8 @@ class RegistrationOperationRepository extends CommonDBRepository<Operation, Long
                 .addParam(NAME_PARAM, entity.getOperationName())
                 .build();
         jdbcTemplate.update(jdbcTemplateUpdate, parameterSource);
-        ParamsHolder searchParams = getParamsHolderBuilder().param(Operation.OPERATION_CODE, entity.getOperationCode()).build();
+        ParamsHolder searchParams =
+                getParamsHolderBuilder().param(Operation.OPERATION_CODE, entity.getOperationCode()).build();
         return findOne(searchParams);
     }
 
@@ -91,7 +91,8 @@ class RegistrationOperationRepository extends CommonDBRepository<Operation, Long
     @Override
     public boolean exist(@NonNull @Nonnull Operation entity) {
         String jdbcTemplateSelectCount = "select count(op_code) from carinfo.operation where op_code = :code;";
-        SqlParameterSource parameterSource = getSqlParamBuilder().addParam(CODE_PARAM, entity.getOperationCode()).build();
+        SqlParameterSource parameterSource =
+                getSqlParamBuilder().addParam(CODE_PARAM, entity.getOperationCode()).build();
         return exist(jdbcTemplateSelectCount, parameterSource);
     }
 

@@ -12,8 +12,8 @@ public class PurposeAssembler extends ResourceAssemblerSupport<Purpose, PurposeR
     }
 
     @Override
-    public PurposeResource toResource(Purpose entity) {
-        PurposeResource resource = super.createResourceWithId(entity.getId(), entity);
+    public PurposeResource toResource(final Purpose entity) {
+        final PurposeResource resource = super.createResourceWithId(entity.getId(), entity);
         resource.setPurposeName(entity.getPurposeName());
         return null;
     }

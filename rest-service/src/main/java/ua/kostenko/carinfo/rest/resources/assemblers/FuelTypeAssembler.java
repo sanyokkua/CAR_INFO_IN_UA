@@ -12,8 +12,8 @@ public class FuelTypeAssembler extends ResourceAssemblerSupport<FuelType, FuelTy
     }
 
     @Override
-    public FuelTypeResource toResource(FuelType entity) {
-        FuelTypeResource resource = super.createResourceWithId(entity.getId(), entity);
+    public FuelTypeResource toResource(final FuelType entity) {
+        final FuelTypeResource resource = super.createResourceWithId(entity.getId(), entity);
         resource.setFuelTypeName(entity.getFuelTypeName());
         return resource;
     }

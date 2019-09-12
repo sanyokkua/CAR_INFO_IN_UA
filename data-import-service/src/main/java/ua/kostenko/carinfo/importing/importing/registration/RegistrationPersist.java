@@ -1,15 +1,5 @@
 package ua.kostenko.carinfo.importing.importing.registration;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import ua.kostenko.carinfo.common.api.records.*;
-import ua.kostenko.carinfo.common.api.services.DBService;
-import ua.kostenko.carinfo.importing.csv.pojo.RegistrationCsvRecord;
-import ua.kostenko.carinfo.importing.importing.Persist;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.sql.Date;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -20,17 +10,40 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import org.apache.commons.lang3.StringUtils;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import ua.kostenko.carinfo.common.api.records.AdministrativeObject;
+import ua.kostenko.carinfo.common.api.records.BodyType;
+import ua.kostenko.carinfo.common.api.records.Brand;
+import ua.kostenko.carinfo.common.api.records.Color;
+import ua.kostenko.carinfo.common.api.records.Department;
+import ua.kostenko.carinfo.common.api.records.FuelType;
+import ua.kostenko.carinfo.common.api.records.Kind;
+import ua.kostenko.carinfo.common.api.records.Model;
+import ua.kostenko.carinfo.common.api.records.Operation;
+import ua.kostenko.carinfo.common.api.records.Purpose;
+import ua.kostenko.carinfo.common.api.records.Registration;
+import ua.kostenko.carinfo.common.api.records.Vehicle;
+import ua.kostenko.carinfo.common.api.services.DBService;
+import ua.kostenko.carinfo.importing.csv.pojo.RegistrationCsvRecord;
+import ua.kostenko.carinfo.importing.importing.Persist;
 
 @Slf4j
 public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
+
     private static final LocalDateTime START_TIME = LocalDateTime.now();
-    private static final ScheduledExecutorService GLOBAL_SCHEDULED_EXECUTOR_SERVICE = Executors.newSingleThreadScheduledExecutor();
-    private static volatile AtomicInteger globalPersistentCounter = new AtomicInteger(0);
-    private static volatile AtomicInteger globalProcessedCounter = new AtomicInteger(0);
-    private static volatile AtomicInteger globalLastProcessedCounter = new AtomicInteger(0);
+    private static final ScheduledExecutorService GLOBAL_SCHEDULED_EXECUTOR_SERVICE =
+            Executors.newSingleThreadScheduledExecutor();
+    private static AtomicInteger globalPersistentCounter = new AtomicInteger(0);
+    private static AtomicInteger globalProcessedCounter = new AtomicInteger(0);
+    private static AtomicInteger globalLastProcessedCounter = new AtomicInteger(0);
 
     static {
-        GLOBAL_SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(RegistrationPersist::logGlobalStatistics, 2, 2, TimeUnit.MINUTES);
+        GLOBAL_SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(RegistrationPersist::logGlobalStatistics, 2, 2,
+                TimeUnit.MINUTES);
     }
 
     private final DBService<Registration> registrationDBService;
@@ -53,17 +66,17 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
     private int localLastProcessedCounter = 0;
 
     RegistrationPersist(@NonNull @Nonnull DBService<Registration> registrationDBService,
-                        @NonNull @Nonnull DBService<AdministrativeObject> administrativeObjectDBService,
-                        @NonNull @Nonnull DBService<BodyType> bodyTypeDBService,
-                        @NonNull @Nonnull DBService<Brand> brandDBService,
-                        @NonNull @Nonnull DBService<Color> colorDBService,
-                        @NonNull @Nonnull DBService<Department> departmentDBService,
-                        @NonNull @Nonnull DBService<FuelType> fuelTypeDBService,
-                        @NonNull @Nonnull DBService<Kind> kindDBService,
-                        @NonNull @Nonnull DBService<Model> modelDBService,
-                        @NonNull @Nonnull DBService<Operation> operationDBService,
-                        @NonNull @Nonnull DBService<Purpose> purposeDBService,
-                        @NonNull @Nonnull DBService<Vehicle> vehicleDBService, String fileName) {
+            @NonNull @Nonnull DBService<AdministrativeObject> administrativeObjectDBService,
+            @NonNull @Nonnull DBService<BodyType> bodyTypeDBService,
+            @NonNull @Nonnull DBService<Brand> brandDBService,
+            @NonNull @Nonnull DBService<Color> colorDBService,
+            @NonNull @Nonnull DBService<Department> departmentDBService,
+            @NonNull @Nonnull DBService<FuelType> fuelTypeDBService,
+            @NonNull @Nonnull DBService<Kind> kindDBService,
+            @NonNull @Nonnull DBService<Model> modelDBService,
+            @NonNull @Nonnull DBService<Operation> operationDBService,
+            @NonNull @Nonnull DBService<Purpose> purposeDBService,
+            @NonNull @Nonnull DBService<Vehicle> vehicleDBService, String fileName) {
         this.registrationDBService = registrationDBService;
         this.administrativeObjectDBService = administrativeObjectDBService;
         this.bodyTypeDBService = bodyTypeDBService;
@@ -88,7 +101,7 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
         final int difference = localProcessedCounter - localLastProcessedCounter;
 
         log.info("Thread: {}, Time: {}, File: {} Processed: {}, Saved: {}, Processed from previous time: {}",
-                 localThreadId, formattedTime, fileName, localProcessedCounter, localPersistentCounter, difference);
+                localThreadId, formattedTime, fileName, localProcessedCounter, localPersistentCounter, difference);
         localLastProcessedCounter = localProcessedCounter;
         if (localProcessedCounter > 0 && difference == 0) {
             log.info("localScheduledExecutorService will shutdown");
@@ -102,10 +115,11 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
         final int globalPersistedNumber = globalPersistentCounter.get();
         final int globalProcessesNumber = globalProcessedCounter.get();
         final long minutesBetweenStartAndNow = Duration.between(START_TIME, timeNow).toMinutes();
-        final long globalThroughput = minutesBetweenStartAndNow > 0 ? globalProcessesNumber / minutesBetweenStartAndNow : 0;
+        final long globalThroughput =
+                minutesBetweenStartAndNow > 0 ? globalProcessesNumber / minutesBetweenStartAndNow : 0;
         final int difference = globalProcessesNumber - globalLastProcessedCounter.get();
         log.info("Global: Time: {}. Processed: {}, Saved: {}, globalThroughput: {}, Processed from previous time: {}",
-                 formattedTime, globalProcessesNumber, globalPersistedNumber, globalThroughput, difference);
+                formattedTime, globalProcessesNumber, globalPersistedNumber, globalThroughput, difference);
         globalLastProcessedCounter.set(globalProcessesNumber);
 
         if (globalProcessesNumber > 0 && difference == 0) {
@@ -128,7 +142,7 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
             final Optional<Purpose> purpose = getPurpose(record);
             final Optional<FuelType> fuelType = getFuelType(record);
             final Optional<Department> department = getDepartment(record);
-            @SuppressWarnings("ConstantConditions") final Optional<Vehicle> createdVehicle = getVehicle(model.orElseGet(null), brand.orElseGet(null));
+            final Optional<Vehicle> createdVehicle = getVehicle(model.orElseGet(null), brand.orElseGet(null));
 
             final Date registrationDate = record.getDate();
 
@@ -145,30 +159,29 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
                     isPresent(department, "department") && isPresent(createdVehicle, "createdVehicle") &&
                     isNotNull(vehicleMakeYear, "vehicleMakeYear") && isNotNull(registrationDate, "registrationDate") &&
                     isNotBlankPersonType(personType)) {
-                @SuppressWarnings("OptionalGetWithoutIsPresent")
                 Registration registration = Registration.builder()
-                                                        .adminObjName(administrativeObject.map(AdministrativeObject::getAdminObjName).orElse(null))//NULLABLE
-                                                        .adminObjType(administrativeObject.map(AdministrativeObject::getAdminObjType).orElse(null))//NULLABLE
-                                                        .operationCode(operation.get().getOperationCode())//non NULLABLE opName
-                                                        .operationName(operation.get().getOperationName())//non NULLABLE opName
-                                                        .departmentCode(department.get().getDepartmentCode())//non NULLABLE
-                                                        .departmentAddress(department.get().getDepartmentAddress())//non NULLABLE
-                                                        .departmentEmail(department.get().getDepartmentEmail())//non NULLABLE
-                                                        .kindName(kind.get().getKindName())//non NULLABLE
-                                                        .colorName(color.get().getColorName())//non NULLABLE
-                                                        .bodyTypeName(bodyType.map(BodyType::getBodyTypeName).orElse(null))//NULLABLE
-                                                        .purposeName(purpose.get().getPurposeName())//non NULLABLE
-                                                        .brandName(brand.get().getBrandName())//non NULLABLE
-                                                        .modelName(model.get().getModelName())//non NULLABLE
-                                                        .fuelTypeName(fuelType.map(FuelType::getFuelTypeName).orElse(null))//NULLABLE
-                                                        .engineCapacity(vehicleEngineCapacity)//NULLABLE
-                                                        .makeYear(vehicleMakeYear)//non NULLABLE
-                                                        .ownWeight(vehicleOwnWeight)//NULLABLE
-                                                        .totalWeight(vehicleTotalWeight)//NULLABLE
-                                                        .personType(personType)//non NULLABLE
-                                                        .registrationNumber(vehicleRegistrationNumber)//NULLABLE
-                                                        .registrationDate(record.getDate())//non NULLABLE
-                                                        .build();
+                        .adminObjName(administrativeObject.map(AdministrativeObject::getAdminObjName).orElse(null))// NULLABLE
+                        .adminObjType(administrativeObject.map(AdministrativeObject::getAdminObjType).orElse(null))// NULLABLE
+                        .operationCode(operation.get().getOperationCode())// non NULLABLE opName
+                        .operationName(operation.get().getOperationName())// non NULLABLE opName
+                        .departmentCode(department.get().getDepartmentCode())// non NULLABLE
+                        .departmentAddress(department.get().getDepartmentAddress())// non NULLABLE
+                        .departmentEmail(department.get().getDepartmentEmail())// non NULLABLE
+                        .kindName(kind.get().getKindName())// non NULLABLE
+                        .colorName(color.get().getColorName())// non NULLABLE
+                        .bodyTypeName(bodyType.map(BodyType::getBodyTypeName).orElse(null))// NULLABLE
+                        .purposeName(purpose.get().getPurposeName())// non NULLABLE
+                        .brandName(brand.get().getBrandName())// non NULLABLE
+                        .modelName(model.get().getModelName())// non NULLABLE
+                        .fuelTypeName(fuelType.map(FuelType::getFuelTypeName).orElse(null))// NULLABLE
+                        .engineCapacity(vehicleEngineCapacity)// NULLABLE
+                        .makeYear(vehicleMakeYear)// non NULLABLE
+                        .ownWeight(vehicleOwnWeight)// NULLABLE
+                        .totalWeight(vehicleTotalWeight)// NULLABLE
+                        .personType(personType)// non NULLABLE
+                        .registrationNumber(vehicleRegistrationNumber)// NULLABLE
+                        .registrationDate(record.getDate())// non NULLABLE
+                        .build();
                 if (!registrationDBService.exists(registration)) {
                     registrationDBService.create(registration);
                     globalPersistentCounter.incrementAndGet();
@@ -193,7 +206,8 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
 
     private Optional<Operation> getOperation(@NonNull @Nonnull RegistrationCsvRecord record) {
         Operation operation = record.getOperation();
-        return operationDBService.exists(operation) ? operationDBService.get(operation) : operationDBService.create(operation);
+        return operationDBService.exists(operation) ? operationDBService.get(operation)
+                : operationDBService.create(operation);
     }
 
     private Optional<Model> getModel(@NonNull @Nonnull RegistrationCsvRecord record) {
@@ -218,7 +232,8 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
 
     private Optional<BodyType> getBodyType(@NonNull @Nonnull RegistrationCsvRecord record) {
         BodyType bodyType = record.getBodyType();
-        return bodyTypeDBService.exists(bodyType) ? bodyTypeDBService.get(bodyType) : bodyTypeDBService.create(bodyType);
+        return bodyTypeDBService.exists(bodyType) ? bodyTypeDBService.get(bodyType)
+                : bodyTypeDBService.create(bodyType);
     }
 
     private Optional<Purpose> getPurpose(@NonNull @Nonnull RegistrationCsvRecord record) {
@@ -228,26 +243,27 @@ public class RegistrationPersist implements Persist<RegistrationCsvRecord> {
 
     private Optional<FuelType> getFuelType(@NonNull @Nonnull RegistrationCsvRecord record) {
         FuelType fuelType = record.getFuelType();
-        return fuelTypeDBService.exists(fuelType) ? fuelTypeDBService.get(fuelType) : fuelTypeDBService.create(fuelType);
+        return fuelTypeDBService.exists(fuelType) ? fuelTypeDBService.get(fuelType)
+                : fuelTypeDBService.create(fuelType);
     }
 
     private Optional<Department> getDepartment(@NonNull @Nonnull RegistrationCsvRecord record) {
         Department department = record.getDepartment();
-        return departmentDBService.exists(department) ? departmentDBService.get(department) : departmentDBService.create(department);
+        return departmentDBService.exists(department) ? departmentDBService.get(department)
+                : departmentDBService.create(department);
     }
 
     private Optional<Vehicle> getVehicle(@Nullable Model createdModel, @Nullable Brand createdBrand) {
         if (Objects.nonNull(createdBrand) && Objects.nonNull(createdModel)) {
             Vehicle vehicle = Vehicle.builder()
-                                     .brandName(createdBrand.getBrandName())
-                                     .modelName(createdModel.getModelName())
-                                     .build();
+                    .brandName(createdBrand.getBrandName())
+                    .modelName(createdModel.getModelName())
+                    .build();
             return vehicleDBService.exists(vehicle) ? vehicleDBService.get(vehicle) : vehicleDBService.create(vehicle);
         }
         return Optional.empty();
     }
 
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private static <T> boolean isPresent(Optional<T> optional, String objectName) {
         if (!optional.isPresent()) {
             log.warn("{} is not present", objectName);

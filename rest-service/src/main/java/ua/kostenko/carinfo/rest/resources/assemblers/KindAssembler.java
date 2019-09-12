@@ -12,8 +12,8 @@ public class KindAssembler extends ResourceAssemblerSupport<Kind, KindResource> 
     }
 
     @Override
-    public KindResource toResource(Kind entity) {
-        KindResource resource = super.createResourceWithId(entity.getId(), entity);
+    public KindResource toResource(final Kind entity) {
+        final KindResource resource = super.createResourceWithId(entity.getId(), entity);
         resource.setKindName(entity.getKindName());
         return resource;
     }
