@@ -1,0 +1,25 @@
+@startuml
+
+entity Registration  {
+    person                  (P)
+    reg_addr_koatuu         (0510137000)
+    oper_code               (40)
+    oper_name               ("40 - ВТОРИННА РЕЄСТРАЦІЯ ТЗ, ПРИДБАНОГО В ТОРГОВЕЛЬНІЙ ОРГАНІЗАЦІЇ")
+    d_reg                   (2013-01-16)
+    dep_code                (1305301)
+    dep                     ("ВІННИЦЬКИЙ  ВРЕР УДАІ УМВС УКРАЇНИ У ВІННИЦЬКІЙ ОБЛАСТІ")
+    brand                   ("SSANG YONG  REXTON")
+    model                   (REXTON)
+    make_year               (2007)
+    color                   (ЧОРНИЙ)
+    kind                    (ЛЕГКОВИЙ)
+    body                    (УНІВЕРСАЛ-B)
+    purpose                 (ЗАГАЛЬНИЙ)
+    fuel                    ("ДИЗЕЛЬНЕ ПАЛИВО")
+    capacity                (2696)
+    own_weight              (2069)
+    total_weight            (2550)
+    n_reg_new               (АВ1923ВТ)
+}
+
+@enduml

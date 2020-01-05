@@ -1,0 +1,25 @@
+@startuml
+
+entity Registration  {
+    person                  (P)
+    reg_addr_koatuu         (2310136300)
+    oper_code               (530)
+    oper_name               ("530 - ЗНЯТТЯ З ОБЛIКУ ДЛЯ РЕАЛIЗАЦIЇ")
+    d_reg                   (2017-01-03)
+    dep_code                (2341)
+    dep                     ("Центр 2341")
+    brand                   ("ВАЗ  210700-20")
+    model                   (210700-20)
+    make_year               (2008)
+    color                   (ЗЕЛЕНИЙ)
+    kind                    (ЛЕГКОВИЙ)
+    body                    (СЕДАН-B)
+    purpose                 (ЗАГАЛЬНИЙ)
+    fuel                    (БЕНЗИН)
+    capacity                (1451)
+    own_weight              (1060)
+    total_weight            (1460)
+    n_reg_new               (08ВА8008)
+}
+
+@enduml

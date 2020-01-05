@@ -1,0 +1,45 @@
+@startuml
+
+entity Registration  {
+    "PERSON"                  ("J")
+    "REG_ADDR_KOATUU"         ("1210137800")
+    "OPER_CODE"               ("315")
+    "OPER_NAME"               ("ПЕРЕРЕЄСТРАЦІЯ ТЗ НА НОВ. ВЛАСН. ПО ДОГОВОРУ УКЛАДЕНОМУ В ТСЦ")
+    "D_REG"                   (18.10.2019)
+    "DEP_CODE"                (12537)
+    "DEP"                     ("ТСЦ 1248")
+    "BRAND"                   ("MITSUBISHI")
+    "MODEL"                   ("ASX")
+    "MAKE_YEAR"               (2019)
+    "COLOR"                   ("СИНІЙ")
+    "KIND"                    ("ЛЕГКОВИЙ")
+    "BODY"                    ("УНІВЕРСАЛ-B")
+    "PURPOSE"                 ("ЗАГАЛЬНИЙ")
+    "FUEL"                    ("БЕНЗИН")
+    "CAPACITY"                (1998)
+    "OWN_WEIGHT"              (1520)
+    "TOTAL_WEIGHT"            (1970)
+    "N_REG_NEW"               ("АЕ7794КР")
+}
+
+@enduml
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

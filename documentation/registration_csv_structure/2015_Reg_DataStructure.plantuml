@@ -1,0 +1,25 @@
+@startuml
+
+entity Registration  {
+    person                  (P)
+    reg_addr_koatuu         (1412000000)
+    oper_code               (530)
+    oper_name               ("530 - ЗНЯТТЯ З ОБЛIКУ ДЛЯ РЕАЛIЗАЦIЇ")
+    d_reg                   (2015-01-02)
+    dep_code                (1314309)
+    dep                     ("Центр ДАІ 1409")
+    brand                   ("MITSUBISHI  PAJERO WAGON")
+    model                   ("PAJERO WAGON")
+    make_year               (2007)
+    color                   (ЧОРНИЙ)
+    kind                    (ЛЕГКОВИЙ)
+    body                    (УНІВЕРСАЛ-B)
+    purpose                 (ЗАГАЛЬНИЙ)
+    fuel                    (БЕНЗИН)
+    capacity                (2972)
+    own_weight              (2030)
+    total_weight            (2620)
+    n_reg_new               (05СЕ5341)
+}
+
+@enduml

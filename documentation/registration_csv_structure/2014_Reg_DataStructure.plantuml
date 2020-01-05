@@ -1,0 +1,25 @@
+@startuml
+
+entity Registration  {
+    person                  (P)
+    reg_addr_koatuu         (6310136600)
+    oper_code               (430)
+    oper_name               ("430 - ПЕРЕРЕЄСТРАЦІЯ ПРИ ЗАМІНІ СВІДОЦТВА ПРО РЕЄСТРАЦІЮ")
+    d_reg                   (2014-06-21)
+    dep_code                (6341)
+    dep                     ("Центр 6341")
+    brand                   ("ВАЗ  21093")
+    model                   (21093)
+    make_year               (1990)
+    color                   (СИНІЙ)
+    kind                    (ЛЕГКОВИЙ)
+    body                    (ХЕТЧБЕК-В)
+    purpose                 (ЗАГАЛЬНИЙ)
+    fuel                    (БЕНЗИН)
+    capacity                (1499)
+    own_weight              (945)
+    total_weight            (1395)
+    n_reg_new               (АХ0223ЕН)
+}
+
+@enduml

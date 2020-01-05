@@ -1,0 +1,92 @@
+@startuml
+
+entity BodyType  {
+    + type (PK) : text
+    --
+}
+
+entity Brand  {
+    + name (PK) : text
+    --
+}
+
+entity Color {
+    + name (PK) : text
+    --
+}
+
+entity Department {
+    + code (PK) : Number
+    --
+    * name : text
+}
+
+entity FuelType {
+    + type (PK) : text
+    --
+}
+
+entity Kind {
+    + kind (PK) : text
+    --
+}
+
+entity Model {
+    + name (PK) : text
+    --
+}
+
+entity Operation {
+    + code (PK) : Number
+    --
+    * name : text
+}
+
+entity Purpose {
+    + purpose (PK) : text
+    --
+}
+
+entity Registration {
+    + id (PK) : Number
+    --
+    personType : text
+    administrativeTerritorialUnitCode : Number
+    registrationDate : Date
+    vehicleRegistrationNumber : text
+    # vehicle (FK) : Number
+    # purpose (FK) : text
+    # operationCode (FK) : Number
+    # departmentCode (FK) : Number
+}
+
+entity Vehicle {
+    + id (PK) : Number
+    --
+    # brand (FK) : text
+    # model (FK) : text
+    # body (FK) : text
+    # color (FK) : text
+    # fuel (FK) : text
+    # kind (FK) : text
+    makeYear : Number
+    capacity : Number
+    ownWeight : Number
+    totalWeight : Number
+}
+
+Registration -left-o{ Vehicle
+Registration -left-o{ Department
+Registration -left-o{ Operation
+Registration -left-o{ Purpose
+
+Vehicle -left-o{ Brand
+Vehicle -left-o{ Model
+Vehicle -left-o{ BodyType
+Vehicle -left-o{ Color
+Vehicle -left-o{ FuelType
+Vehicle -left-o{ Kind
+
+Registration -right-o{ Body
+
+@enduml

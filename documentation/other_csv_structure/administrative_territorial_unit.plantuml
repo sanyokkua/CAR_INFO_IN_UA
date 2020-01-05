@@ -1,0 +1,9 @@
+@startuml
+
+entity AdministrativeTerritorialUnit  {
+    TE          (110136300)
+    NP          ("Р")
+    NU          ("ЗАЛІЗНИЧНИЙ")
+}
+
+@enduml

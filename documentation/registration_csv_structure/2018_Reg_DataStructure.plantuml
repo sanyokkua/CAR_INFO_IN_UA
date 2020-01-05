@@ -1,0 +1,25 @@
+@startuml
+
+entity Registration  {
+    person                  (J)
+    reg_addr_koatuu         (6510000000)
+    oper_code               (100)
+    oper_name               ("100 - ПЕРВИННА РЕЄСТРАЦIЯ ТЗ ПРИДБАНОГО В ТОРГІВЕЛЬНІЙ ОРГАНІЗАЦІЇ, ЯКИЙ ВВЕЗЕНО З-ЗА КОРДОНУ")
+    d_reg                   (2018-08-02)
+    dep_code                (3246)
+    dep                     ("Центр 3246")
+    brand                   ("ACURA MDX")
+    model                   (MDX)
+    make_year               (2018)
+    color                   (БІЛИЙ)
+    kind                    (ЛЕГКОВИЙ)
+    body                    (СЕДАН-В)
+    purpose                 (ЗАГАЛЬНИЙ)
+    fuel                    ("ДИЗЕЛЬНЕ ПАЛИВО")
+    capacity                (2048)
+    own_weight              (2600)
+    total_weight            (3500)
+    n_reg_new               (AI7441AP)
+}
+
+@enduml

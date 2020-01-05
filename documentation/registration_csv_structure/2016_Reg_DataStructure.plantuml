@@ -1,0 +1,25 @@
+@startuml
+
+entity Registration  {
+    person                  (J)
+    reg_addr_koatuu         (8036600000)
+    oper_code               (100)
+    oper_name               ("100 - ПЕРВИННА РЕЄСТРАЦIЯ ТЗ ПРИДБАНОГО В ТОРГІВЕЛЬНІЙ ОРГАНІЗАЦІЇ, ЯКИЙ ВВЕЗЕНО З-ЗА КОРДОНУ")
+    d_reg                   (2016-09-02)
+    dep_code                (8041)
+    dep                     ("Центр 8041")
+    brand                   ("VOLKSWAGEN  PASSAT")
+    model                   (PASSAT)
+    make_year               (2016)
+    color                   (ЧОРНИЙ)
+    kind                    (ЛЕГКОВИЙ)
+    body                    (СЕДАН-B)
+    purpose                 (ЗАГАЛЬНИЙ)
+    fuel                    (БЕНЗИН)
+    capacity                (1798)
+    own_weight              (1480)
+    total_weight            (2030)
+    n_reg_new               (АА2684РС)
+}
+
+@enduml

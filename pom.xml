@@ -28,9 +28,12 @@
     </properties>
 
     <modules>
+        <module>common-api</module>
         <module>common-classes</module>
+        <module>common-entity-api</module>
         <module>rest-service</module>
         <module>data-import-service</module>
+        <module>project-db-scripts</module>
     </modules>
 
     <dependencies>
