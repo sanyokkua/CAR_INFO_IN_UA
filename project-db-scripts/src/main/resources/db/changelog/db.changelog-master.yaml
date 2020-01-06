@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/sql_init/2020_01_05_CreateSchema_CarInfo.sql
+  - include:
+      file: db/changelog/sql_init/2020_01_05_CreateTable_Purpose.sql
+  - include:
+      file: db/changelog/sql_init/2020_01_05_CreateTable_BodyType.sql
+  - include:
+      file: db/changelog/sql_init/2020_01_05_CreateTable_Model.sql
+  - include:
+      file: db/changelog/sql_init/2020_01_05_CreateTable_Operation.sql
+  - include:
+      file: db/changelog/sql_init/2020_01_05_CreateTable_Department.sql
+  - include:
+      file: db/changelog/sql_init/2020_01_05_CreateTable_Brand.sql
+  - include:
+      file: db/changelog/sql_init/2020_01_05_CreateTable_Color.sql
+  - include:
+      file: db/changelog/sql_init/2020_01_05_CreateTable_FuelType.sql
+  - include:
+      file: db/changelog/sql_init/2020_01_05_CreateTable_Kind.sql
+  - include:
+      file: db/changelog/sql_init/2020_01_05_CreateTable_Vehicle.sql
+  - include:
+      file: db/changelog/sql_init/2020_01_05_CreateTable_Registration.sql
