@@ -24,3 +24,5 @@
 /nbdist/
 /.nb-gradle/
 /db/
+/project-db-scripts/target/*
+/data-import-batch/target/*

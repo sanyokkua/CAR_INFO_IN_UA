@@ -1,20 +1,19 @@
-package ua.kostenko.carinfo.dto;
+package ua.kostenko.carinfo.csv.records;
 
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import ua.kostenko.carinfo.enums.PersonType;
 
+@Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class FlatRegistrationDto {
+public class RegistrationRecord {
 
-    private PersonType personType;
+    private String personType;
     private Long administrativeTerritorialUnitCode;
-    private String administrativeTerritorialUnitType;
-    private String administrativeTerritorialUnitName;
     private Long operationCode;
     private String operationName;
     private LocalDate registrationDate;
@@ -32,13 +31,4 @@ public class FlatRegistrationDto {
     private Integer vehicleOwnWeight;
     private Integer vehicleTotalWeight;
     private String registrationNumber;
-    private String companyName;
-    private String companyStatus;
-    private String phoneNumber;
-    private String companyEmail;
-    private String companyAddress;
-    private String carRegistrationNumber;
-    private String carVinNumber;
-    private String carType;
-    private String carBrandAndModel;
 }

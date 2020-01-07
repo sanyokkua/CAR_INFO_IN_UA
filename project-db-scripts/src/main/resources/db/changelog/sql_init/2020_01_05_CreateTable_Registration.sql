@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS car_info.registration
 (
     "id"                                SERIAL NOT NULL,
     "personType"                        VARCHAR(2),
-    "administrativeTerritorialUnitCode" INT,
+    "administrativeTerritorialUnitCode" BIGINT,
     "registrationDate"                  DATE,
     "vehicleRegistrationNumber"         VARCHAR,
     "vehicle"                           INT    NOT NULL,

@@ -23,3 +23,5 @@ databaseChangeLog:
       file: db/changelog/sql_init/2020_01_05_CreateTable_Vehicle.sql
   - include:
       file: db/changelog/sql_init/2020_01_05_CreateTable_Registration.sql
+  - include:
+      file: db/changelog/sql_init/2020_01_07_CreateTable_AdminUnit.sql
